@@ -1,0 +1,19 @@
+{
+  "name": "draglogics",
+  "version": "0.8.0",
+  "private": true,
+  "description": "DRAGLOGICS : application de chrono de drag (iPhone, Android, web) qui parle au kit DRAGLOGICS par le Bluetooth",
+  "license": "UNLICENSED",
+  "scripts": {
+    "www": "python outils/construire_www.py",
+    "ios": "python outils/construire_www.py && cap sync ios"
+  },
+  "dependencies": {
+    "@capacitor-community/bluetooth-le": "8.3.0",
+    "@capacitor/core": "8.5.3",
+    "@capacitor/ios": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3"
+  }
+}

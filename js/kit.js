@@ -157,17 +157,73 @@ window.DLKit = (function () {
     ble = { dev: null, ch: {}, telem: null, etatPerf: null, suivi: false, vus: {}, runs: null, dump: null };
     if (st.mode === 'ble') { st = { connecte: false, mode: null, nom: '' }; emettre('etat', { connecte: false, mode: null, nom: '' }); }
   }
+  // [B v0.9] L'APP NATIVE (iPhone, Android : Capacitor) n'a pas navigator.bluetooth. Le module
+  // @capacitor-community/bluetooth-le (BleClient, charge seulement dans l'app native par outils/construire_www.py) est
+  // habille comme le Bluetooth Web : un faux « device » et de fausses « caracteristiques » (readValue,
+  // writeValueWithResponse, startNotifications, addEventListener). Le reste de la couche ne change pas.
+  // ?natif=1 force ce chemin dans Chrome (BleClient y passe par le Bluetooth Web) : essai avec un vrai kit sur le PC.
+  function bleNatifDispo() {
+    var C = window.Capacitor, P = window.capacitorCommunityBluetoothLe;
+    if (!P || !P.BleClient) return false;
+    return !!(C && C.isNativePlatform && C.isNativePlatform()) || /[?&]natif=1\b/.test(location.search);
+  }
+  var bleNatifPret = null;
+  function ouvrirBleNatif() {
+    var B = window.capacitorCommunityBluetoothLe.BleClient, finDev = [], dev = null;
+    // la permission Bluetooth est demandee ICI, quand l'utilisateur touche « Chercher un kit » (regle Apple et Google)
+    if (!bleNatifPret) bleNatifPret = B.initialize({ androidNeverForLocation: true }).catch(function (e) { bleNatifPret = null; throw e; });
+    function carac(u) {
+      var ecoute = [];
+      return {
+        readValue: function () { return B.read(dev.id, SVC, u); },
+        writeValueWithResponse: function (d) { return B.write(dev.id, SVC, u, new DataView(d.buffer, d.byteOffset, d.byteLength)); },
+        startNotifications: function () {
+          return B.startNotifications(dev.id, SVC, u, function (v) { ecoute.forEach(function (f) { f({ target: { value: v } }); }); });
+        },
+        addEventListener: function (t, f) { if (t === 'characteristicvaluechanged') ecoute.push(f); }
+      };
+    }
+    return bleNatifPret.then(function () {
+      return B.requestDevice({ services: [SVC] });
+    }).catch(function (e) {
+      // l'utilisateur ferme la liste : meme message que dans le navigateur (« recherche annulee »)
+      if (/cancel/i.test(e && e.message || '')) { var a = new Error(e.message); a.name = 'NotFoundError'; throw a; }
+      throw e;
+    }).then(function (d) {
+      dev = { id: d.deviceId, name: d.name || '', ouvert: false };
+      return B.connect(dev.id, function () { dev.ouvert = false; finDev.forEach(function (f) { f(); }); }, { timeout: 15000 });
+    }).then(function () {
+      dev.ouvert = true;
+      return B.getServices(dev.id);
+    }).then(function (services) {
+      var s = services.filter(function (x) { return String(x.uuid).toLowerCase() === SVC; })[0];
+      var uu = s ? s.characteristics.map(function (c) { return String(c.uuid).toLowerCase(); }) : [];
+      if (uu.indexOf(C_CONFIG) < 0) { B.disconnect(dev.id); throw new Error(TT('kitPasDlpt2')); }
+      var opt = function (u) { return uu.indexOf(u) >= 0 ? carac(u) : null; };
+      var faux = {
+        name: dev.name,
+        addEventListener: function (t, f) { if (t === 'gattserverdisconnected') finDev.push(f); },
+        gatt: { get connected() { return dev.ouvert; }, disconnect: function () { B.disconnect(dev.id); } }
+      };
+      return { dev: faux, c: [carac(C_CONFIG), opt(C_TELEM), opt(C_CMD), opt(C_DUMP)] };
+    });
+  }
   function connecterBle() {
-    if (!navigator.bluetooth) return Promise.reject(new Error('ble-absent'));
+    var natif = bleNatifDispo();
+    if (!natif && !navigator.bluetooth) return Promise.reject(new Error('ble-absent'));
     var dev, svc;
-    return navigator.bluetooth.requestDevice({ filters: [{ services: [SVC] }], optionalServices: [SVC] }).then(function (d) {
+    var ouvrir = natif ? ouvrirBleNatif().then(function (r) {
+      dev = r.dev; dev.addEventListener('gattserverdisconnected', finBle);
+      return r.c;
+    }) : navigator.bluetooth.requestDevice({ filters: [{ services: [SVC] }], optionalServices: [SVC] }).then(function (d) {
       dev = d; dev.addEventListener('gattserverdisconnected', finBle);
       return dev.gatt.connect();
     }).then(function (srv) { return srv.getPrimaryService(SVC); }).then(function (s) {
       svc = s;
       var opt = function (u) { return svc.getCharacteristic(u).catch(function () { return null; }); };
       return Promise.all([svc.getCharacteristic(C_CONFIG), opt(C_TELEM), opt(C_CMD), opt(C_DUMP)]);
-    }).then(function (c) {
+    });
+    return ouvrir.then(function (c) {
       ble.dev = dev; ble.ch = { config: c[0], telem: c[1], cmd: c[2], dump: c[3] };
       return lireJson(ble.ch.config);
     }).then(function (cfg) {

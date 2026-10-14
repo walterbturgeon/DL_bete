@@ -5,3 +5,6 @@ outils/ocr_essai/photos/
 outils/ocr_essai/lib/
 # lib/tesseract/ (15 Mo, Apache-2.0) EST dans git depuis la publication du 14 oct. : l'application doit lire le ticket
 # sans reseau, sur le web et dans les magasins. outils/installer_tesseract.sh le refait a l'identique.
+# Projet natif (Capacitor) : modules npm et dossier web construit par outils/construire_www.py
+node_modules/
+www/

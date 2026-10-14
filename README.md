@@ -4,6 +4,11 @@ Maquette **locale** de l'application DRAGLOGICS (drag seulement), en français e
 Les données de démonstration sont synthétiques (`outils/gen_demo_runs.py`) : aucune donnée de piste réelle, aucun nom.
 La E3B4 et TRACLOGICS restent à part pour l'instant.
 
+## App iPhone (TestFlight)
+La page B dans une app native Capacitor 8, avec le Bluetooth natif. Compilée et envoyée à TestFlight par un Mac de
+GitHub Actions : voir **[TESTFLIGHT.md](TESTFLIGHT.md)**. Dossier web de l'app : `python outils/construire_www.py`
+(après `npm ci`). Politique de confidentialité : `confidentialite.html`.
+
 ## Lancer
 Dans Claude Code : serveur d'aperçu `draglogics-app` (port 8741). Ou à la main :
 

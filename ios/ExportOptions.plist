@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<!-- Export de l'archive vers App Store Connect (TestFlight). Signature AUTOMATIQUE « cloud » : Apple signe avec le
+     certificat de distribution qu'il garde, grace a la cle API (role Admin). EQUIPE est remplace par le Team ID au
+     moment de l'export (.github/workflows/ios-testflight.yml). -->
+<dict>
+	<key>method</key>
+	<string>app-store-connect</string>
+	<key>destination</key>
+	<string>upload</string>
+	<key>signingStyle</key>
+	<string>automatic</string>
+	<key>teamID</key>
+	<string>EQUIPE</string>
+	<key>manageAppVersionAndBuildNumber</key>
+	<false/>
+	<key>uploadSymbols</key>
+	<true/>
+</dict>
+</plist>

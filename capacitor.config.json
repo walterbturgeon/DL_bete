@@ -1,0 +1,19 @@
+{
+  "appId": "com.bps.draglogics",
+  "appName": "DRAGLOGICS",
+  "webDir": "www",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#ffffff"
+  },
+  "plugins": {
+    "BluetoothLe": {
+      "displayStrings": {
+        "scanning": "Recherche du kit… / Searching for the kit…",
+        "cancel": "Annuler / Cancel",
+        "availableDevices": "Kits trouvés / Kits found",
+        "noDeviceFound": "Aucun kit trouvé / No kit found"
+      }
+    }
+  }
+}
