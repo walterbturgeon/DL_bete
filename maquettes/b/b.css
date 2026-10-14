@@ -1,0 +1,149 @@
+/* MAQUETTE B « GUIDEE » : clair et doux, grandes tuiles a l'accueil, etapes numerotees, comparaison au ticket.
+   Orange = il faut agir ; bleu = choisi et jalons ; vert = dans la cible / fait. */
+:root { --bg:#f5f6f8; --card:#fff; --ink:#15171c; --muted:#646b76; --line:#e3e6eb; --sel:#2563eb; --selbg:#e8f0fe;
+        --ok:#178a49; --lent:#c0392b; --att:#e8730c; --tab:#eff1f4; --trait:#15171c; --cmp:#7b55d6; --gcol:#0f9488;
+        --zone:rgba(100,107,118,.10); --doux:#eaf7ef; --doux-att:#fff3e6; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+        --bg:#101215; --card:#191c21; --ink:#eceef2; --muted:#9ba3ae; --line:#2b3038; --sel:#5b9bff; --selbg:#1b2a44;
+        --ok:#3cc97a; --lent:#ff6b5e; --att:#ff9a3c; --tab:#21252c; --trait:#eceef2; --cmp:#b39cff; --gcol:#37cdbf;
+        --zone:rgba(155,163,174,.10); --doux:#16301f; --doux-att:#33261a; } }
+:root[data-theme="dark"] { --bg:#101215; --card:#191c21; --ink:#eceef2; --muted:#9ba3ae; --line:#2b3038; --sel:#5b9bff; --selbg:#1b2a44;
+        --ok:#3cc97a; --lent:#ff6b5e; --att:#ff9a3c; --tab:#21252c; --trait:#eceef2; --cmp:#b39cff; --gcol:#37cdbf;
+        --zone:rgba(155,163,174,.10); --doux:#16301f; --doux-att:#33261a; }
+body { padding-bottom:calc(84px + var(--sa-b)); }
+/* [B v0.4] iPhone : la page defilait SOUS l'heure et la Dynamic Island (vu dans l'apercu iPhone, 7 oct.).
+   Une bande fixe de la couleur du fond, haute comme la zone sure, garde la barre d'etat lisible. */
+body::before { content:''; position:fixed; left:0; right:0; top:0; height:var(--sa-h); background:var(--bg); z-index:25; pointer-events:none; }
+main { max-width:820px; margin:0 auto; padding:8px 16px 16px; }
+.b-tete { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:calc(10px + var(--sa-h)) 16px 6px; }
+.logo { position:relative; width:150px; height:38px; overflow:hidden; background:#fff; border-radius:8px; flex:none; }
+.logo img { position:absolute; left:0; top:-32px; width:150px; height:100px; }
+.seg.petit button { min-height:36px; padding:6px 12px; font-size:13px; font-weight:700; }
+/* [B v0.2] l'etat de la connexion dans l'en-tete (orange = il faut agir, vert = connecte) */
+.b-pilule { display:inline-flex; align-items:center; gap:7px; min-height:40px; padding:6px 14px; border-radius:999px; border:1px solid var(--line);
+            background:var(--card); font-weight:700; cursor:pointer; white-space:nowrap; }
+.b-pilule .point { width:9px; height:9px; border-radius:50%; background:currentColor; }
+.b-pilule.off { color:var(--att); border-color:var(--att); } .b-pilule.on { color:var(--ok); }
+/* [B v0.2] fiche du kit et pastille du ticket */
+dl.b-fiche { display:grid; grid-template-columns:max-content 1fr; gap:6px 16px; margin:4px 0 8px; }
+dl.b-fiche dt { color:var(--muted); } dl.b-fiche dd { margin:0; font-weight:700; }
+.b-pastille { display:inline-block; margin-left:8px; padding:1px 8px; border-radius:999px; font-size:12px; font-weight:800; background:var(--tab); color:var(--ink); }
+.b-pastille.ok { background:var(--ok); color:#fff; } .b-pastille.hors { background:var(--att); color:#fff; }
+
+.b-carte { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:16px; margin-bottom:14px; }
+.b-carte h2 { margin:0 0 10px; font-size:18px; }
+.b-tuiles { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:6px 0 14px; }
+.b-tuile { display:flex; flex-direction:column; align-items:flex-start; gap:6px; text-align:left; min-height:150px; padding:16px;
+           border-radius:22px; border:2px solid var(--line); background:var(--card); cursor:pointer; }
+.b-tuile .ic { width:44px; height:44px; border-radius:14px; background:var(--selbg); color:var(--sel); display:flex; align-items:center; justify-content:center; }
+.b-tuile svg { width:26px; height:26px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.b-tuile b { font-size:19px; }
+.b-tuile .sous { color:var(--muted); font-size:14px; }
+.b-tuile.att { border-color:var(--att); background:var(--doux-att); }
+.b-tuile.att .ic { background:var(--att); color:#fff; }
+.b-tuile.ok { border-color:var(--ok); background:var(--doux); }
+.b-tuile.ok .ic { background:var(--ok); color:#fff; }
+@media (max-width:420px) { .b-tuile { min-height:132px; } .b-tuile b { font-size:17px; } }
+
+.b-etapes { list-style:none; margin:0; padding:0; display:grid; gap:8px; }
+.b-etapes li { display:flex; align-items:center; gap:12px; font-weight:600; }
+.rond { width:30px; height:30px; flex:none; border-radius:50%; background:var(--tab); color:var(--muted); display:inline-flex; align-items:center; justify-content:center; font-weight:800; }
+.b-etapes li.fait .rond { background:var(--ok); color:#fff; }
+.b-etapes li.fait { color:var(--muted); text-decoration:line-through; }
+
+.b-bandeau { border-radius:16px; padding:14px 16px; font-size:20px; font-weight:800; text-align:center; margin:6px 0 14px; background:var(--tab); color:var(--muted); }
+.b-bandeau.course { background:var(--sel); color:#fff; } .b-bandeau.fini { background:var(--ok); color:#fff; }
+/* [B v0.5] pret = vert doux ; orange = il faut agir (pas de GPS, abandon, attente du reset) */
+.b-bandeau.pret { background:var(--doux); color:var(--ok); } .b-bandeau.att { background:var(--att); color:#fff; }
+.b-etat-kit { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin:-6px 2px 12px; font-size:14px; color:var(--muted); }
+.b-gps { display:inline-flex; align-items:center; gap:7px; font-weight:600; }
+.b-gps .point { width:9px; height:9px; border-radius:50%; background:var(--muted); }
+.b-gps.on .point { background:var(--ok); } .b-gps.off { color:var(--att); } .b-gps.off .point { background:var(--att); }
+.b-chip { padding:3px 10px; border-radius:999px; background:var(--tab); color:var(--ink); font-weight:700; font-size:13px; }
+.b-chip.sel { background:var(--sel); color:#fff; } .b-chip.ok { background:var(--ok); color:#fff; }
+.b-rearmer { margin:-4px 0 14px; }
+.b-vitesse { display:flex; align-items:baseline; flex-wrap:wrap; gap:6px 12px; }
+/* ⚠ :not(.b-g) : le G porte aussi la classe num ; sans ce filtre il sortait en 72 px comme la vitesse (vu dans le kit graphique) */
+.b-vitesse > .num:not(.b-g) { font-size:72px; font-weight:900; line-height:1; }
+.b-vitesse small { font-size:18px; color:var(--muted); font-weight:700; }
+.b-g { margin-left:auto; color:var(--muted); font-size:18px; } .b-g b { color:var(--ink); }
+/* [B v0.6] largeur FIXE pour la valeur du G : le signe « − » la rendait plus large et la lettre G dansait
+   a chaque passage du negatif au positif (vu le 7 oct.) */
+.b-g b { display:inline-block; min-width:5.5ch; text-align:right; }
+.b-liste-jal { list-style:none; margin:0; padding:0; }
+.b-liste-jal li { display:flex; align-items:baseline; gap:12px; padding:10px 0; border-bottom:1px solid var(--line); }
+.b-liste-jal li:last-child { border-bottom:0; }
+.b-liste-jal .l { font-weight:700; width:5.5em; }
+.b-liste-jal .t { font-size:24px; font-weight:800; margin-left:auto; }
+.b-liste-jal .v { color:var(--muted); font-size:14px; width:7em; text-align:right; }
+.b-liste-jal li.vient .t { color:var(--sel); }
+
+.b-liste { display:grid; }
+.b-ligne { display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:none; border:0; border-bottom:1px solid var(--line); padding:12px 4px; min-height:56px; cursor:pointer; }
+.b-ligne:last-child { border-bottom:0; }
+.b-ligne.choisi { background:var(--selbg); border-radius:12px; }
+.b-ligne .q { flex:1; font-weight:600; }
+.b-ligne .et { font-size:20px; font-weight:800; }
+.b-ligne .vf { color:var(--muted); font-size:13px; width:6.5em; text-align:right; }
+.b-outils { display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; justify-content:space-between; margin:12px 0 8px; }
+
+/* [B v0.7] la photo du ticket : champs fichier caches mais atteignables (pas display:none, voir index.html) */
+.b-cache { position:absolute; width:1px; height:1px; opacity:0; overflow:hidden; pointer-events:none; }
+.b-photo { margin:6px 0 12px; }
+.b-photo label.bouton { display:inline-flex; align-items:center; font-weight:700; }
+.b-photo-fig { margin:10px 0 0; }
+.b-photo-fig img { display:block; max-width:100%; max-height:220px; border-radius:12px; border:1px solid var(--line); object-fit:contain; background:var(--tab); }
+.b-photo-fig.grand img { max-height:none; width:100%; }
+.b-photo-fig figcaption { margin-top:8px; }
+/* [B v0.8] la lecture automatique : vert = lu pareil plusieurs fois ; orange = a verifier (il faut agir) */
+.b-ocr { margin-top:10px; padding-top:10px; border-top:1px solid var(--line); }
+.b-ocr .champ input { max-width:160px; text-transform:uppercase; }
+.b-saisie input.ocr-sur { border:2px solid var(--ok); }
+.b-saisie input.ocr-verif { border:2px solid var(--att); background:var(--doux-att); }
+.b-saisie { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px 12px; margin:8px 0 12px; }
+.b-saisie label { display:grid; gap:4px; font-weight:700; font-size:14px; }
+.b-saisie input { width:100%; font-size:18px; font-weight:700; text-align:right; }
+.b-boutons { display:flex; flex-wrap:wrap; gap:10px; }
+.b-table { width:100%; border-collapse:collapse; margin-top:14px; }
+.b-table th, .b-table td { padding:10px 6px; border-bottom:1px solid var(--line); text-align:left; }
+.b-table th { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
+.b-table .n { text-align:right; }
+.marque { display:inline-block; min-width:26px; text-align:center; border-radius:999px; padding:2px 8px; font-weight:800; font-size:13px; }
+.marque.ok { background:var(--ok); color:#fff; } .marque.proche { background:var(--tab); color:var(--muted); } .marque.hors { background:var(--att); color:#fff; }
+.b-bilan { font-size:18px; font-weight:800; margin:12px 0 4px; }
+
+.b-etape { display:grid; grid-template-columns:auto 1fr; gap:12px; background:var(--card); border:1px solid var(--line); border-radius:20px; padding:16px; margin-bottom:12px; }
+.b-etape h3 { margin:2px 0 10px; font-size:18px; }
+.b-etape .rond { background:var(--sel); color:#fff; }
+/* [B v0.3] le reglage au pas tient sur UNE ligne de telephone (iPhone 15/16 = 393 pt, SE = 375 pt) : les boutons et
+   la case se partagent la largeur, la valeur en pieds passe dessous. ⚠ Avant : 5 boutons de 48 + case de 96 = 366 px
+   pour 285 px de place, le +6 tombait seul sur la ligne suivante. */
+.b-etape .pas { max-width:400px; }
+.b-etape .pas button { flex:1 1 0; min-width:44px; }
+.b-etape .pas input { flex:1.6 1 0; min-width:64px; width:auto; }
+.b-etape .pas .pieds { flex-basis:100%; margin-left:0; }
+/* [B v0.6] Galaxy S23/S24/S25 = 360 dp (aperçu Android, 7 oct.) : avec 285 px de place a 393 pt, il n'en restait que
+   252 a 360 dp et le +6 retombait seul. Sous 380 px : carte et ecarts plus serres (place 264 px, besoin 248). */
+@media (max-width:380px) {
+  .b-etape { gap:8px; padding:14px 12px; }
+  .b-etape .pas { gap:4px; }
+  .b-etape .pas input { min-width:56px; }
+}
+.b-plus { margin-top:10px; }
+/* [B v0.4] l'etape « Ton ECU » : le resume de ce que fait la marque choisie, les 5 voies FuelTech, l'ID en hexadecimal */
+.b-ecu-resume { margin:2px 0 6px; padding:10px 12px; border-radius:12px; background:var(--selbg); font-size:14px; }
+.b-voies { margin:0 0 8px; padding-left:20px; font-size:14px; color:var(--muted); }
+.b-voies li { margin:3px 0; }
+.b-hex { font-family:ui-monospace,Consolas,monospace; }
+.b-plus summary { cursor:pointer; color:var(--sel); font-weight:700; min-height:44px; display:flex; align-items:center; }
+/* [B v0.3] la barre du bas fait 66 + 4 + 1 (bordure) = 71 px : le bouton se pose a 70 px, 1 px SOUS la barre (z 20 > 5).
+   ⚠ Il etait a 84 px : une bande de 13 px laissait voir la page entre le bouton et la barre (vu sur iPhone 15). */
+.b-envoi { position:sticky; bottom:calc(70px + var(--sa-b)); background:var(--bg); padding:8px 0; z-index:5; }
+
+.b-barre { position:fixed; left:0; right:0; bottom:0; z-index:20; display:flex; background:var(--card); border-top:1px solid var(--line);
+           padding:0 env(safe-area-inset-right) calc(4px + var(--sa-b)) env(safe-area-inset-left); }
+.b-barre button { flex:1; background:none; border:0; color:var(--muted); font-size:12px; font-weight:700; min-height:66px;
+                  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; cursor:pointer; }
+.b-barre svg { width:24px; height:24px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.b-barre button.actif { color:var(--sel); }
+.b-barre button.actif svg { background:var(--selbg); border-radius:12px; padding:2px; width:44px; height:28px; }

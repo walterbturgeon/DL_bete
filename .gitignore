@@ -1,0 +1,7 @@
+# Les photos de tickets de l'essai OCR sont des donnees de piste reelles (numero de voiture, heures) : jamais dans git.
+# Le dossier porte aussi photos/verite.js (les valeurs vraies de ces tickets) : jamais dans git non plus.
+outils/ocr_essai/photos/
+# Les bibliotheques telechargees pour l'essai OCR (grosses, refaites par outils/ocr_essai/LISEZMOI.md)
+outils/ocr_essai/lib/
+# lib/tesseract/ (15 Mo, Apache-2.0) EST dans git depuis la publication du 14 oct. : l'application doit lire le ticket
+# sans reseau, sur le web et dans les magasins. outils/installer_tesseract.sh le refait a l'identique.

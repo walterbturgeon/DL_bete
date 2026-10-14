@@ -1,0 +1,20 @@
+/* Page de comparaison des trois maquettes (outil de travail, pas l'application). */
+:root { --bg:#eceef2; --card:#fff; --ink:#15171c; --muted:#646b76; --line:#d9dce2; --sel:#2563eb; }
+@media (prefers-color-scheme: dark) { :root { --bg:#0e1013; --card:#181b20; --ink:#eceef2; --muted:#9ba3ae; --line:#2b3038; --sel:#5b9bff; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; font-size:15px; }
+header { padding:16px 20px 8px; max-width:1500px; margin:0 auto; }
+h1 { margin:0 0 4px; font-size:22px; }
+header p { margin:0 0 12px; color:var(--muted); }
+.outils { display:flex; flex-wrap:wrap; gap:10px; }
+.seg { display:inline-flex; }
+.seg button { border:1px solid var(--line); background:var(--card); color:var(--ink); padding:8px 14px; min-height:40px; cursor:pointer; font:inherit; }
+.seg button:first-child { border-radius:10px 0 0 10px; } .seg button:last-child { border-radius:0 10px 10px 0; }
+.seg button.on { background:var(--sel); border-color:var(--sel); color:#fff; }
+.grille { display:grid; grid-template-columns:repeat(auto-fit, minmax(330px, 1fr)); gap:18px; padding:8px 20px 30px; max-width:1500px; margin:0 auto; align-items:start; }
+.maquette { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:14px; display:grid; gap:8px; justify-items:center; }
+.maquette h2 { margin:0; font-size:18px; justify-self:start; }
+.maquette ul { margin:0; padding-left:18px; color:var(--muted); font-size:13.5px; justify-self:start; min-height:5.5em; }
+.cadre { position:relative; overflow:hidden; border-radius:26px; border:6px solid #1b1e24; background:#000; }
+.cadre iframe { position:absolute; left:0; top:0; border:0; transform-origin:0 0; background:#fff; }
+.ouvrir { color:var(--sel); font-weight:600; }

@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>DRAGLOGICS B · Kit graphique</title>
+<link rel="icon" href="../../img/icon-192.webp">
+<link rel="stylesheet" href="../../css/base-maquettes.css?v=0.3">
+<link rel="stylesheet" href="b.css?v=0.3">
+<link rel="stylesheet" href="kit-graphique.css?v=0.3">
+</head>
+<body class="kg-corps">
+<!-- LE KIT GRAPHIQUE DE LA MAQUETTE B : toutes les couleurs, les textes, les icones, chaque composant dans chacun de
+     ses etats, les graphiques et les 5 ecrans en direct. Memes fichiers de style que l'application : ce qu'on voit
+     ici est exactement ce que l'application affiche. -->
+<header class="kg-tete">
+  <div class="logo"><img src="../../img/logo.svg" alt="DRAGLOGICS"></div>
+  <h1 data-i18n="kg_titre">Kit graphique — maquette B</h1>
+  <div class="kg-outils">
+    <div class="seg petit" id="kgTheme"><button type="button" data-v="light" data-i18n="themeClair">Clair</button><button type="button" data-v="dark" data-i18n="themeSombre">Sombre</button><button type="button" data-v="auto" data-i18n="themeAuto">Auto</button></div>
+    <div class="seg petit" id="kgLangue"><button type="button" data-v="fr">FR</button><button type="button" data-v="en">EN</button></div>
+  </div>
+</header>
+<nav class="kg-sommaire" id="kgSommaire">
+  <a href="#k-couleurs" data-i18n="kg_couleurs">Couleurs</a><a href="#k-textes" data-i18n="kg_textes">Textes</a><a href="#k-icones" data-i18n="kg_icones">Icônes</a>
+  <a href="#k-nav" data-i18n="kg_nav">Navigation</a><a href="#k-accueil" data-i18n="b_accueil">Accueil</a><a href="#k-courir" data-i18n="b_courir">Courir</a>
+  <a href="#k-runs" data-i18n="bRuns">Runs</a><a href="#k-graphes" data-i18n="kg_graphes">Graphiques</a><a href="#k-ticket" data-i18n="kg_ticketCourt">Ticket</a>
+  <a href="#k-regler" data-i18n="b_regler">Régler</a><a href="#k-feuilles" data-i18n="kg_feuilles">Feuilles</a><a href="#k-ecrans" data-i18n="kg_ecrans">Écrans</a>
+</nav>
+
+<div class="kg">
+<!-- ===== 1. COULEURS ===== -->
+<section id="k-couleurs" class="kg-section">
+  <h2 data-i18n="kg_couleurs">Couleurs</h2>
+  <p class="aide" data-i18n="kg_couleursAide">Une couleur = un sens. Les valeurs changent avec le thème ; le sens ne change jamais.</p>
+  <div class="kg-regles">
+    <span><i class="kg-p kg-att"></i><b data-i18n="kg_rAtt">Orange</b> <span data-i18n="kg_rAttTxt">= seulement ce qui demande une action</span></span>
+    <span><i class="kg-p kg-sel"></i><b data-i18n="kg_rSel">Bleu</b> <span data-i18n="kg_rSelTxt">= ce qui est choisi, les jalons, l'action principale</span></span>
+    <span><i class="kg-p kg-ok"></i><b data-i18n="kg_rOk">Vert</b> <span data-i18n="kg_rOkTxt">= connecté, fait, dans la cible, meilleur</span></span>
+    <span><i class="kg-p kg-lent"></i><b data-i18n="kg_rLent">Rouge</b> <span data-i18n="kg_rLentTxt">= plus lent, valeur refusée</span></span>
+  </div>
+  <div class="kg-nuancier" id="kgNuancier"></div>
+</section>
+
+<!-- ===== 2. TEXTES ===== -->
+<section id="k-textes" class="kg-section">
+  <h2 data-i18n="kg_textes">Textes</h2>
+  <p class="aide" data-i18n="kg_textesAide">Police du système (San Francisco sur iPhone, Roboto sur Android). Chiffres à largeur fixe pour les temps.</p>
+  <div class="kg-types">
+    <div><span class="kg-t72 num">212</span><small>72 · 900 · <span data-i18n="kg_tVitesse">vitesse</span></small></div>
+    <div><span class="kg-t24 num">7,294</span><small>24 · 800 · <span data-i18n="kg_tTemps">temps d'un jalon</span></small></div>
+    <div><span class="kg-t19" data-i18n="b_monKit">Mon kit</span><small>19 · 700 · <span data-i18n="kg_tTuile">titre de tuile</span></small></div>
+    <div><span class="kg-t18" data-i18n="b_mesRuns">Mes runs</span><small>18 · 700 · <span data-i18n="kg_tCarte">titre de carte</span></small></div>
+    <div><span class="kg-t16" data-i18n="kg_tCorpsEx">Le chrono part quand le véhicule a avancé.</span><small>16 · 400 · <span data-i18n="kg_tCorps">texte</span></small></div>
+    <div><span class="kg-t14 aide" data-i18n="b_ticketSous">Vérifie ton kit</span><small>14 · 400 · <span data-i18n="kg_tAide">aide, secondaire</span></small></div>
+    <div><span class="kg-t12" data-i18n="kg_tEtiqEx">ÉTIQUETTE</span><small>12 · 700 · <span data-i18n="kg_tEtiq">en-tête de tableau, barre du bas</span></small></div>
+  </div>
+</section>
+
+<!-- ===== 3. ICONES ===== -->
+<section id="k-icones" class="kg-section">
+  <h2 data-i18n="kg_icones">Icônes</h2>
+  <p class="aide" data-i18n="kg_iconesAide">Trait de 1,8 px, bouts arrondis, couleur du texte. Dessinées dans l'application : aucun fichier extérieur.</p>
+  <div class="kg-icones">
+    <figure><svg viewBox="0 0 24 24"><path d="M4 11 12 4l8 7"/><path d="M6 10v10h12V10"/></svg><figcaption data-i18n="b_accueil">Accueil</figcaption></figure>
+    <figure><svg viewBox="0 0 24 24"><path d="M4.5 17a8 8 0 1 1 15 0"/><path d="M12 13l4-4"/><circle cx="12" cy="13" r="1.3"/></svg><figcaption data-i18n="b_courir">Courir</figcaption></figure>
+    <figure><svg viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4L17 12H5"/></svg><figcaption data-i18n="bRuns">Runs</figcaption></figure>
+    <figure><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg><figcaption data-i18n="b_regler">Régler</figcaption></figure>
+    <figure><svg viewBox="0 0 24 24"><path d="M9 2v6M15 2v6"/><path d="M6 8h12v3a6 6 0 0 1-6 6 6 6 0 0 1-6-6V8Z"/><path d="M12 17v5"/></svg><figcaption data-i18n="b_monKit">Mon kit</figcaption></figure>
+    <figure><svg viewBox="0 0 24 24"><path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2V3Z"/><path d="M9 8h6M9 12h6"/></svg><figcaption data-i18n="kg_ticketCourt">Ticket</figcaption></figure>
+    <figure><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg><figcaption data-i18n="bKit">Kit</figcaption></figure>
+  </div>
+</section>
+
+<!-- ===== 4. NAVIGATION ===== -->
+<section id="k-nav" class="kg-section">
+  <h2 data-i18n="kg_nav">Navigation</h2>
+  <div class="kg-ligne">
+    <div class="kg-ex"><h3 data-i18n="kg_pilule">Connexion dans l'en-tête</h3>
+      <div class="kg-rang"><span class="b-pilule off"><span class="point"></span><span data-i18n="bConnecter">Connecter</span></span>
+        <span class="b-pilule on"><span class="point"></span>DEMO</span></div>
+      <p class="aide" data-i18n="kg_piluleAide">Orange : il faut connecter. Vert : le kit est connecté (son nom).</p></div>
+  </div>
+  <div class="kg-ex"><h3 data-i18n="kg_barre">Barre du bas (fixe)</h3>
+    <div class="kg-statique"><nav class="b-barre">
+      <button type="button" class="actif"><svg viewBox="0 0 24 24"><path d="M4 11 12 4l8 7"/><path d="M6 10v10h12V10"/></svg><span data-i18n="b_accueil">Accueil</span></button>
+      <button type="button"><svg viewBox="0 0 24 24"><path d="M4.5 17a8 8 0 1 1 15 0"/><path d="M12 13l4-4"/><circle cx="12" cy="13" r="1.3"/></svg><span data-i18n="b_courir">Courir</span></button>
+      <button type="button"><svg viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4L17 12H5"/></svg><span data-i18n="bRuns">Runs</span></button>
+      <button type="button"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg><span data-i18n="b_regler">Régler</span></button>
+    </nav></div>
+    <p class="aide" data-i18n="kg_barreAide">4 boutons, 66 px de haut, icône + mot. L'écran actif est bleu, avec un fond sous l'icône.</p></div>
+</section>
+
+<!-- ===== 5. ACCUEIL ===== -->
+<section id="k-accueil" class="kg-section">
+  <h2 data-i18n="b_accueil">Accueil</h2>
+  <h3 data-i18n="kg_tuiles">Tuiles : à faire, normale, faite</h3>
+  <div class="b-tuiles kg-tuiles3">
+    <div class="b-tuile att"><span class="ic"><svg viewBox="0 0 24 24"><path d="M9 2v6M15 2v6"/><path d="M6 8h12v3a6 6 0 0 1-6 6 6 6 0 0 1-6-6V8Z"/><path d="M12 17v5"/></svg></span><b data-i18n="b_monKit">Mon kit</b><span class="sous" data-i18n="b_kitOff">Pas connecté — touche ici</span></div>
+    <div class="b-tuile"><span class="ic"><svg viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4L17 12H5"/></svg></span><b data-i18n="b_mesRuns">Mes runs</b><span class="sous" id="kgTuileRuns"></span></div>
+    <div class="b-tuile ok"><span class="ic"><svg viewBox="0 0 24 24"><path d="M9 2v6M15 2v6"/><path d="M6 8h12v3a6 6 0 0 1-6 6 6 6 0 0 1-6-6V8Z"/><path d="M12 17v5"/></svg></span><b data-i18n="b_monKit">Mon kit</b><span class="sous">DEMO · 14 satellites</span></div>
+  </div>
+  <h3 data-i18n="kg_etapes">Étapes : faites, à faire</h3>
+  <div class="b-carte kg-etroit"><ol class="b-etapes">
+    <li class="fait"><span class="rond">1</span><span data-i18n="b_e1">Connecter le kit</span></li>
+    <li class="fait"><span class="rond">2</span><span data-i18n="b_e2">Faire un run</span></li>
+    <li><span class="rond">3</span><span data-i18n="b_e3">Comparer au ticket</span></li>
+  </ol></div>
+</section>
+
+<!-- ===== 6. COURIR ===== -->
+<section id="k-courir" class="kg-section">
+  <h2 data-i18n="b_courir">Courir</h2>
+  <h3 data-i18n="kg_bandeaux">Bandeau d'état : pas connecté, prêt, en course, terminé</h3>
+  <div class="kg-grille4">
+    <div class="b-bandeau" data-i18n="b_pretOff">Connecte le kit d'abord.</div>
+    <div class="b-bandeau" data-i18n="b_pret">Prêt à courir</div>
+    <div class="b-bandeau course" data-i18n="etatCourse">EN COURSE</div>
+    <div class="b-bandeau fini" data-i18n="etatFini">TERMINÉ</div>
+  </div>
+  <div class="kg-ligne">
+    <div class="kg-ex"><h3 data-i18n="kg_vitesse">Vitesse et G</h3>
+      <div class="b-carte b-vitesse"><span class="num" id="kgVit">212</span><small class="kgU">km/h</small><span class="b-g num"><span data-i18n="lG">G</span> <b>1,85</b></span></div></div>
+    <div class="kg-ex"><h3 data-i18n="kg_jalons">Jalons : vide, en course (le dernier en bleu), complets</h3>
+      <div class="kg-grille3">
+        <div class="b-carte"><ul class="b-liste-jal" id="kgJalVide"></ul></div>
+        <div class="b-carte"><ul class="b-liste-jal" id="kgJalCourse"></ul></div>
+        <div class="b-carte"><ul class="b-liste-jal" id="kgJalPlein"></ul></div>
+      </div></div>
+  </div>
+</section>
+
+<!-- ===== 7. RUNS ===== -->
+<section id="k-runs" class="kg-section">
+  <h2 data-i18n="bRuns">Runs</h2>
+  <div class="kg-ligne">
+    <div class="kg-ex"><h3 data-i18n="kg_lignes">Lignes : normale, choisie, avec ticket</h3>
+      <div class="b-carte"><div class="b-liste" id="kgLignes"></div></div></div>
+    <div class="kg-ex"><h3 data-i18n="kg_pastilles">Pastilles et marques du ticket</h3>
+      <div class="b-carte kg-rang">
+        <span class="b-pastille ok">4/4</span><span class="b-pastille hors">3/4</span><span class="b-pastille">—</span>
+        <span class="marque ok">✓</span><span class="marque proche">≈</span><span class="marque hors">!</span>
+      </div>
+      <p class="aide" data-i18n="kg_pastillesAide">✓ : écart ≤ 0,020 s (la cible). ≈ : ≤ 0,040 s. ! : plus de 0,040 s. Pastille verte = tous les jalons dans la cible.</p></div>
+  </div>
+</section>
+
+<!-- ===== 8. GRAPHIQUES ===== -->
+<section id="k-graphes" class="kg-section">
+  <h2 data-i18n="kg_graphes">Graphiques</h2>
+  <p class="aide" data-i18n="kg_graphesAide">Un seul moteur pour tous les graphiques : axes ronds, deux axes (vitesse à gauche, G à droite), jalons en bleu pointillé, zone grise avant le départ, lecture au doigt. Net sur la tablette.</p>
+  <div class="kg-ligne">
+    <div class="kg-ex b-carte"><h3 data-i18n="kg_gDirect">En direct (Courir) — 10 dernières secondes</h3>
+      <canvas class="graphe" id="kgCvDirect" role="img"></canvas>
+      <div class="legende"><span class="l-v"><i></i><span data-i18n="lgVitesse"></span></span><span class="l-g"><i></i><span data-i18n="lgG"></span></span></div></div>
+    <div class="kg-ex b-carte"><h3 data-i18n="kg_gTemps">Un run, en temps</h3>
+      <canvas class="graphe" id="kgCvTemps" role="img"></canvas>
+      <div class="legende"><span class="l-v"><i></i><span data-i18n="lgVitesse"></span></span><span class="l-g"><i></i><span data-i18n="lgG"></span></span><span class="l-r"><i></i><span data-i18n="lgJalons"></span></span></div>
+      <div class="lecture num" id="kgLecTemps"></div></div>
+  </div>
+  <div class="kg-ligne">
+    <div class="kg-ex b-carte"><h3 data-i18n="kg_gDist">Un run, en distance</h3>
+      <canvas class="graphe" id="kgCvDist" role="img"></canvas>
+      <div class="legende"><span class="l-v"><i></i><span data-i18n="lgVitesse"></span></span><span class="l-g"><i></i><span data-i18n="lgG"></span></span><span class="l-r"><i></i><span data-i18n="lgJalons"></span></span></div></div>
+    <div class="kg-ex b-carte"><h3 data-i18n="kg_gCmp">Deux runs comparés</h3>
+      <canvas class="graphe" id="kgCvCmp" role="img"></canvas>
+      <div class="legende"><span class="l-v"><i></i><span data-i18n="lgVitesse"></span></span><span class="l-c"><i></i><span data-i18n="lgCmp"></span></span><span class="l-g"><i></i><span data-i18n="lgG"></span></span><span class="l-r"><i></i><span data-i18n="lgJalons"></span></span></div>
+      <div class="lecture num" id="kgLecCmp"></div></div>
+  </div>
+</section>
+
+<!-- ===== 9. TICKET ===== -->
+<section id="k-ticket" class="kg-section">
+  <h2 data-i18n="b_ticket">Comparer au ticket</h2>
+  <div class="kg-ligne">
+    <div class="kg-ex b-carte"><h3 data-i18n="kg_saisie">Saisie</h3>
+      <div class="b-saisie">
+        <label><span data-i18n="j60"></span><input type="text" value="1,290" readonly></label>
+        <label><span data-i18n="j330"></span><input type="text" value="3,223" readonly></label>
+        <label><span data-i18n="j660"></span><input type="text" value="4,781" readonly></label>
+        <label><span data-i18n="j1320"></span><input type="text" value="7,306" readonly></label>
+      </div>
+      <div class="b-boutons"><button type="button" class="bouton" data-i18n="b_remplirDemo"></button><button type="button" class="bouton plein" data-i18n="b_comparer"></button></div></div>
+    <div class="kg-ex b-carte"><h3 data-i18n="kg_resultat">Résultat</h3>
+      <table class="b-table"><thead><tr><th data-i18n="b_jalon"></th><th class="n" data-i18n="b_kit"></th><th class="n" data-i18n="b_tk"></th><th class="n" data-i18n="b_ecart"></th><th></th></tr></thead><tbody id="kgTkCorps"></tbody></table>
+      <p class="b-bilan" id="kgTkBilan"></p><p class="aide" id="kgTkConseil"></p></div>
+  </div>
+</section>
+
+<!-- ===== 10. REGLER ===== -->
+<section id="k-regler" class="kg-section">
+  <h2 data-i18n="b_regler">Régler</h2>
+  <div class="kg-ligne">
+    <div class="kg-ex"><h3 data-i18n="kg_etape">Étape numérotée, avec un réglage en pouces</h3>
+      <div class="b-etape"><span class="rond">2</span><div><h3 data-i18n="b_s2">Où sont les jalons</h3>
+        <div class="pas" data-champ="jpo"><button type="button" data-pas="-6">−6</button><button type="button" data-pas="-1">−1</button><input type="number" id="f-jpo" value="-54" min="-120" max="36"><button type="button" data-pas="1">+1</button><button type="button" data-pas="6">+6</button><span class="pieds" id="p-jpo"></span></div>
+        <p class="aide" data-i18n="jpoAide"></p>
+        <details class="b-plus" open><summary data-i18n="b_s2b">Si le 60 pi reste à part</summary><p class="aide" data-i18n="d60Aide"></p></details></div></div></div>
+    <div class="kg-ex"><h3 data-i18n="kg_champs">Choix, champs, boutons, messages</h3>
+      <div class="b-carte">
+        <div class="ligne-pref"><span class="nom" data-i18n="langue"></span><div class="seg"><button type="button" class="on">Français</button><button type="button">English</button></div></div>
+        <div class="ligne-pref"><span class="nom" data-i18n="unite"></span><div class="seg"><button type="button" class="on">km/h</button><button type="button">mph</button></div></div>
+        <div class="champ"><label data-i18n="modeNom"></label><select><option>Holley</option><option>FuelTech</option></select></div>
+        <div class="champ"><label data-i18n="sfxNom"></label><input type="text" value="MAXXX" readonly></div>
+        <div class="kg-rang"><button type="button" class="bouton plein" data-i18n="envoyer"></button><button type="button" class="bouton" data-i18n="calBtn"></button><button type="button" class="bouton" disabled data-i18n="majBtn"></button></div>
+        <p class="msg-ok" data-i18n="formOk"></p>
+        <p class="msg-err" id="kgErr"></p>
+      </div></div>
+  </div>
+  <div class="kg-ex"><h3 data-i18n="hKit">Le kit</h3>
+    <div class="b-carte kg-etroit"><dl class="b-fiche" id="kgFiche"></dl></div></div>
+</section>
+
+<!-- ===== 11. FEUILLES ===== -->
+<section id="k-feuilles" class="kg-section">
+  <h2 data-i18n="kg_feuilles">Feuilles</h2>
+  <div class="kg-ligne">
+    <div class="kg-ex"><h3 data-i18n="cxTitre"></h3>
+      <div class="kg-statique"><div class="feuille">
+        <h2 data-i18n="cxTitre"></h2><p class="aide" data-i18n="cxPourquoi"></p>
+        <button type="button" class="bouton plein large" data-i18n="cxBle"></button><button type="button" class="bouton large" data-i18n="cxDemo"></button>
+        <button type="button" class="bouton large" data-i18n="fermer"></button></div></div>
+      <p class="aide" data-i18n="kg_feuilleAide">Monte du bas, sur un voile sombre. Le Bluetooth est demandé seulement ici, avec la raison.</p></div>
+    <div class="kg-ex"><h3 data-i18n="kg_vides">États vides</h3>
+      <div class="b-carte"><p class="vide" data-i18n="b_aucunRun"></p></div>
+      <div class="b-carte"><p class="vide" data-i18n="videReg"></p></div></div>
+  </div>
+</section>
+
+<!-- ===== 12. ECRANS ===== -->
+<section id="k-ecrans" class="kg-section">
+  <h2 data-i18n="kg_ecrans">Écrans</h2>
+  <p class="aide" data-i18n="kg_ecransAide">Les 5 écrans de l'application, en direct, connectés au kit de démonstration. « Courir » rejoue un run de démonstration toutes les 20 s.</p>
+  <div class="kg-ecrans" id="kgEcrans"></div>
+</section>
+</div>
+
+<script src="../../js/i18n.js?v=0.3"></script>
+<script src="../../js/graph.js?v=0.3"></script>
+<script src="../../js/demo-runs.js?v=0.3"></script>
+<script src="../../js/kit.js?v=0.3"></script>
+<script src="../../js/commun.js?v=0.3"></script>
+<script src="b-textes.js?v=0.3"></script>
+<script src="kit-graphique.js?v=0.3"></script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Essai OCR · tickets</title>
+<style>
+  body { font: 14px system-ui, sans-serif; margin: 16px; background: #f5f6f8; color: #15171c; }
+  table { border-collapse: collapse; margin: 8px 0 18px; background: #fff; }
+  th, td { border: 1px solid #ddd; padding: 4px 8px; text-align: right; font-variant-numeric: tabular-nums; }
+  th:first-child, td:first-child { text-align: left; }
+  .ok { background: #e3f6ea; } .faux { background: #fde3e0; } .vide { background: #fff3e6; }
+  pre { white-space: pre-wrap; background: #fff; border: 1px solid #ddd; padding: 8px; font-size: 12px; max-height: 220px; overflow: auto; }
+</style>
+</head>
+<body>
+<!-- ESSAI OCR DES TICKETS (7 oct.) : Tesseract.js 7 hors ligne sur 7 photos de tickets de piste, deux preparations
+     (brute / contraste local), lecture de la colonne du numero cherche, comparaison aux vraies valeurs lues a l'oeil.
+     Outil de mesure seulement : pas dans l'application. Bibliotheques, photos et valeurs vraies hors git (.gitignore). -->
+<h1>Essai OCR des tickets</h1>
+<p id="etat">Démarrage…</p>
+<div id="sortie"></div>
+<script src="lib/tesseract.js-7.0.0/dist/tesseract.min.js"></script>
+<script src="photos/verite.js"></script>
+<script src="essai.js"></script>
+</body>
+</html>

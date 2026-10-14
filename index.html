@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- Regles magasins (STORES.md) : tout le code et toutes les images sont DANS l'application ; aucun script en ligne,
+     aucun gestionnaire onclick dans le HTML, aucune ressource exterieure (polices, CDN, mesure d'audience). -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="theme-color" content="#f3f4f6">
+<title>DRAGLOGICS</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="img/icon-192.webp">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<header class="tete">
+  <div class="logo"><img src="img/logo.svg" alt="DRAGLOGICS"></div>
+  <div class="droite">
+    <span class="chip demo" id="chipDemo" hidden data-i18n="demo">DÉMO</span>
+    <span class="chip"><span class="point off" id="chipPoint"></span><span id="chipTxt" data-i18n="horsLigne">Pas connecté</span></span>
+  </div>
+</header>
+
+<main>
+<!-- ======================= DIRECT ======================= -->
+<section id="v-direct" class="vue">
+  <div class="grille deux">
+    <div class="card">
+      <h2 data-i18n="hDirect">En direct</h2>
+      <div class="direct-haut">
+        <div class="vitesse num"><span id="dVit">--</span><small id="dVitU">km/h</small></div>
+        <div class="direct-meta">
+          <div><span class="lab" data-i18n="lG">G</span><b class="num" id="dG">--</b></div>
+          <div><span class="badge cl" id="dEtat">—</span></div>
+          <div class="aide num" id="dGps">GPS --</div>
+        </div>
+      </div>
+      <div class="partiels" id="dTuiles"></div>
+    </div>
+    <div class="card">
+      <h2 data-i18n="hGraphDirect">Vitesse et G</h2>
+      <div class="outils-graph">
+        <div class="seg" id="segFenetre"><button type="button" data-f="5">5 s</button><button type="button" data-f="10" class="on">10 s</button><button type="button" data-f="30">30 s</button></div>
+        <button type="button" class="bouton" id="btnRejouer" data-i18n="bRejouer">Rejouer un run</button>
+      </div>
+      <canvas class="graphe" id="cvDirect" role="img" data-i18n-aria="ariaDirect"></canvas>
+      <div class="legende"><span class="l-v"><i></i><span data-i18n="lgVitesse">Vitesse</span></span><span class="l-g"><i></i><span data-i18n="lgG">G (accéléromètre)</span></span></div>
+    </div>
+  </div>
+  <p class="vide" id="dVide" data-i18n="videDirect">Connecte un kit pour voir la vitesse en direct.</p>
+</section>
+
+<!-- ======================= RUNS ======================= -->
+<section id="v-runs" class="vue" hidden>
+  <div class="grille passages">
+    <div class="card">
+      <h2 data-i18n="hRuns">Runs du kit</h2>
+      <div class="defile"><table id="tabRuns">
+        <thead><tr><th>#</th><th data-i18n="thQuand">Quand</th><th class="n">60</th><th class="n">1/8</th><th class="n">1/4</th><th class="n" id="thVit">km/h</th></tr></thead>
+        <tbody></tbody></table></div>
+      <p class="vide" id="runsVide" data-i18n="videRuns">Aucun run. Connecte un kit.</p>
+    </div>
+    <div class="card" id="runDetail" hidden>
+      <h2 data-i18n="hDetail">Détail du run</h2>
+      <div class="nav-run">
+        <button type="button" class="bouton" id="runPrec" data-i18n-aria="ariaPrec">‹</button>
+        <span class="pos" id="runPos"></span>
+        <button type="button" class="bouton" id="runSuiv" data-i18n-aria="ariaSuiv">›</button>
+      </div>
+      <div class="partiels" id="rTuiles"></div>
+      <div class="outils-graph">
+        <div class="seg" id="segAxe"><button type="button" data-a="t" class="on" data-i18n="axeTemps">Temps</button><button type="button" data-a="d" data-i18n="axeDistance">Distance</button></div>
+        <label class="cmp"><span data-i18n="comparer">Comparer avec</span><select id="selCmp"></select></label>
+      </div>
+      <canvas class="graphe" id="cvRun" role="img" data-i18n-aria="ariaRun"></canvas>
+      <div class="legende"><span class="l-v"><i></i><span data-i18n="lgVitesse">Vitesse</span></span><span class="l-c" id="lgCmp" hidden><i></i><span data-i18n="lgCmp">Run comparé</span></span><span class="l-g"><i></i><span data-i18n="lgG">G (accéléromètre)</span></span><span class="l-r"><i></i><span data-i18n="lgJalons">Jalons</span></span></div>
+      <div class="lecture num" id="rLecture" data-i18n="lectureAide">Touche la courbe pour lire les valeurs.</div>
+      <p class="aide" id="rReglages"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= KIT ======================= -->
+<section id="v-kit" class="vue" hidden>
+  <div class="grille deux">
+    <div class="card"><h2 data-i18n="hKit">Le kit</h2><dl class="fiche" id="kitFiche"></dl><p class="vide" id="kitVide" data-i18n="videKit">Aucun kit connecté.</p></div>
+    <div class="card"><h2 data-i18n="hEntretien">Entretien</h2>
+      <div class="reglage"><div><div class="nom" data-i18n="calNom">Calibration de l'accéléromètre</div><div class="aide" data-i18n="calAide">Kit monté, voiture à plat et immobile, moteur arrêté.</div></div><button type="button" class="bouton" id="btnCal" data-i18n="calBtn">Calibrer</button></div>
+      <div class="reglage"><div><div class="nom" data-i18n="majNom">Mise à jour du kit</div><div class="aide" data-i18n="majAide">Le kit ouvre un WiFi le temps de la mise à jour. Le Bluetooth se coupe pendant ce temps.</div></div><button type="button" class="bouton" id="btnMaj" data-i18n="majBtn">Passer en mise à jour</button></div>
+      <p class="aide" id="kitMsg" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= REGLAGES ======================= -->
+<section id="v-reglages" class="vue" hidden>
+  <div class="grille deux">
+    <form class="card" id="formKit" novalidate>
+      <h2 data-i18n="hRegKit">Réglages du kit</h2>
+      <p class="vide" id="regVide" data-i18n="videReg">Connecte un kit pour lire et changer ses réglages.</p>
+      <div id="regCorps" hidden>
+      <fieldset><legend data-i18n="fsChrono">Chrono</legend>
+        <div class="champ"><label for="f-rpo" data-i18n="rpoNom">Roll-out : où le chrono part (pouces)</label>
+          <div class="pas" data-champ="rpo"><button type="button" data-pas="-1">−1</button><input type="number" id="f-rpo" min="0" max="36" step="1"><button type="button" data-pas="1">+1</button><span class="pieds" id="p-rpo"></span></div>
+          <p class="aide" data-i18n="rpoAide">Le chrono part quand le véhicule a avancé de ce nombre de pouces depuis l'arrêt. Il règle seulement le départ.</p></div>
+        <div class="champ"><label for="f-jpo" data-i18n="jpoNom">Position des jalons (pouces)</label>
+          <div class="pas" data-champ="jpo"><button type="button" data-pas="-6">−6</button><button type="button" data-pas="-1">−1</button><input type="number" id="f-jpo" min="-120" max="36" step="1"><button type="button" data-pas="1">+1</button><button type="button" data-pas="6">+6</button><span class="pieds" id="p-jpo"></span></div>
+          <p class="aide" data-i18n="jpoAide">Chaque jalon D et son piège de vitesse sont pris à D + ce nombre de pouces depuis l'arrêt.</p></div>
+        <div class="champ"><label for="f-d60" data-i18n="d60Nom">Décalage du 60 pi (pouces)</label>
+          <div class="pas" data-champ="d60"><button type="button" data-pas="-6">−6</button><button type="button" data-pas="-1">−1</button><input type="number" id="f-d60" min="-72" max="72" step="1"><button type="button" data-pas="1">+1</button><button type="button" data-pas="6">+6</button><span class="pieds" id="p-d60"></span></div>
+          <p class="aide" data-i18n="d60Aide">Change seulement le 60 pi. Commence à 0.</p></div>
+        <div class="champ"><label for="f-cms" data-i18n="cmsNom">Correction de départ (ms)</label>
+          <input type="number" id="f-cms" min="-600" max="600" step="5">
+          <p class="aide" data-i18n="cmsAide">Ajoutée à tous les temps. Sert seulement à un écart constant sur tous les jalons.</p></div>
+        <div class="champ"><label for="f-pfft" data-i18n="pfftNom">Jalon partiel</label>
+          <select id="f-pfft"></select></div>
+      </fieldset>
+      <fieldset><legend data-i18n="fsDepart">Départ</legend>
+        <div class="champ"><label for="f-hecu" data-i18n="hecuNom">Transbrake (Holley)</label>
+          <select id="f-hecu"><option value="0">HP — canal 298</option><option value="1">Dominator — sortie 0</option></select></div>
+        <div class="champ"><label for="f-strig" data-i18n="strigNom">Entrée de départ câblée</label>
+          <select id="f-strig"><option value="0" data-i18n="strig0">Désactivée</option><option value="1" data-i18n="strig1">Front montant</option><option value="2" data-i18n="strig2">Front descendant</option></select></div>
+      </fieldset>
+      <fieldset><legend data-i18n="fsSortie">Sortie CAN</legend>
+        <div class="champ"><label for="f-mode" data-i18n="modeNom">Vers l'ECU</label>
+          <select id="f-mode"><option value="HOLLEY">Holley</option><option value="FUELTECH">FuelTech</option><option value="LINK">Link</option><option value="ECUMASTER">ECUMaster</option></select></div>
+        <div class="champ"><label for="f-cbr" data-i18n="cbrNom">Débit CAN</label>
+          <select id="f-cbr"><option value="250000">250 kbit/s</option><option value="500000">500 kbit/s</option><option value="1000000">1 Mbit/s</option></select></div>
+      </fieldset>
+      <fieldset><legend data-i18n="fsGps">GPS et unité</legend>
+        <div class="champ"><label for="f-grate" data-i18n="grateNom">Cadence du GPS</label>
+          <select id="f-grate"><option value="40">25 Hz</option><option value="50">20 Hz</option><option value="100">10 Hz</option></select></div>
+        <div class="champ"><label for="f-sfx" data-i18n="sfxNom">Nom de l'unité</label>
+          <input type="text" id="f-sfx" maxlength="5" autocomplete="off" spellcheck="false"></div>
+        <div class="champ"><label for="f-tzh" data-i18n="tzhNom">Fuseau horaire (heures)</label>
+          <input type="number" id="f-tzh" min="-12" max="14" step="1"></div>
+      </fieldset>
+      <div class="actions"><button type="submit" class="bouton plein" data-i18n="envoyer">Envoyer au kit</button><span id="formMsg" aria-live="polite"></span></div>
+      </div>
+    </form>
+    <div class="colonne">
+      <div class="card"><h2 data-i18n="hApp">Application</h2>
+        <div class="reglage"><span class="nom" data-i18n="langue">Langue</span><div class="seg" id="segLangue"><button type="button" data-v="fr">Français</button><button type="button" data-v="en">English</button></div></div>
+        <div class="reglage"><span class="nom" data-i18n="unite">Vitesse</span><div class="seg" id="segUnite"><button type="button" data-v="kmh">km/h</button><button type="button" data-v="mph">mph</button></div></div>
+        <div class="reglage"><span class="nom" data-i18n="theme">Thème</span><div class="seg" id="segTheme"><button type="button" data-v="auto" data-i18n="themeAuto">Auto</button><button type="button" data-v="light" data-i18n="themeClair">Clair</button><button type="button" data-v="dark" data-i18n="themeSombre">Sombre</button></div></div>
+        <div class="reglage"><span class="nom" data-i18n="texte">Texte</span><div class="seg" id="segTexte"><button type="button" data-v="n" data-i18n="texteN">Normal</button><button type="button" data-v="g" data-i18n="texteG">Grand</button></div></div>
+      </div>
+      <div class="card"><h2 data-i18n="hPrive">Confidentialité</h2>
+        <p class="aide" data-i18n="priveTexte">Tes runs et tes réglages restent dans ton appareil et dans ton kit. L'application n'a pas de compte, pas de publicité et ne mesure pas son utilisation. Elle utilise le Bluetooth seulement pour parler à ton kit.</p>
+        <button type="button" class="bouton" id="btnEffacer" data-i18n="effacer">Effacer les données de l'application</button>
+        <p class="aide" id="priveMsg" aria-live="polite"></p>
+      </div>
+      <div class="card"><h2 data-i18n="hApropos">À propos</h2><p class="aide" id="apropos"></p></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- la feuille de connexion -->
+<div id="voile" hidden></div>
+<div id="feuilleCx" class="feuille" hidden role="dialog" aria-modal="true" aria-labelledby="cxTitre">
+  <h2 id="cxTitre" data-i18n="cxTitre">Connecter un kit</h2>
+  <p class="aide" data-i18n="cxPourquoi">DRAGLOGICS utilise le Bluetooth seulement pour parler à ton kit. Aucune donnée ne quitte ton appareil.</p>
+  <button type="button" class="bouton plein large" id="cxBle" data-i18n="cxBle">Chercher un kit (Bluetooth)</button>
+  <button type="button" class="bouton large" id="cxDemo" data-i18n="cxDemo">Essayer avec le kit de démonstration</button>
+  <button type="button" class="bouton large" id="cxDeco" hidden data-i18n="cxDeco">Déconnecter</button>
+  <p class="aide" id="cxMsg" aria-live="polite"></p>
+  <button type="button" class="bouton large" id="cxFermer" data-i18n="fermer">Fermer</button>
+</div>
+
+<!-- LA BARRE DU BAS -->
+<nav id="barbas" data-i18n-aria="ariaNav">
+  <button type="button" id="btnCx" class="cx-off"><svg viewBox="0 0 24 24"><path d="M9 2v6M15 2v6"/><path d="M6 8h12v3a6 6 0 0 1-6 6 6 6 0 0 1-6-6V8Z"/><path d="M12 17v5"/></svg><span id="btnCxTxt" data-i18n="bConnecter">Connecter</span></button>
+  <button type="button" data-vue="direct" class="actif"><svg viewBox="0 0 24 24"><path d="M4.5 17a8 8 0 1 1 15 0"/><path d="M12 13l4-4"/><circle cx="12" cy="13" r="1.3"/></svg><span data-i18n="bDirect">Direct</span></button>
+  <button type="button" data-vue="runs"><svg viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4L17 12H5"/></svg><span data-i18n="bRuns">Runs</span></button>
+  <button type="button" data-vue="kit"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg><span data-i18n="bKit">Kit</span></button>
+  <button type="button" data-vue="reglages"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg><span data-i18n="bReglages">Réglages</span></button>
+</nav>
+
+<script src="js/i18n.js"></script>
+<script src="js/graph.js"></script>
+<script src="js/demo-runs.js"></script>
+<script src="js/kit.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

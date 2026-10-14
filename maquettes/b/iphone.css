@@ -1,0 +1,31 @@
+/* APERCU IPHONE : la mise en page de l'outil (pas de l'application). Les couleurs viennent de b.css. */
+body.ip-corps { padding-bottom:0; min-height:100vh; }
+.ip-tete { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; padding:10px 16px; border-bottom:1px solid var(--line); background:var(--bg); }
+.ip-tete .bouton { min-height:36px; padding:6px 14px; font-size:13px; font-weight:700; }
+.ip-scene { display:flex; justify-content:center; padding:16px; }
+.ip-boite { position:relative; flex:none; }
+/* le telephone : cadre de 12 px, mis a l'echelle par iphone.js (l'origine en haut a gauche garde la boite exacte) */
+.ip-tel { position:absolute; left:0; top:0; transform-origin:0 0; padding:12px; background:#1b1e24;
+          box-shadow:0 0 0 2px #3a3f48, 0 20px 50px rgba(0,0,0,.35); }
+.ip-ecran { position:relative; overflow:hidden; background:#000; }
+.ip-ecran iframe { display:block; border:0; background:#fff; }
+/* ce que iOS dessine par-dessus l'application : le doigt passe au travers */
+.ip-etat { position:absolute; left:0; right:0; top:11px; height:37px; z-index:2; pointer-events:none;
+           display:grid; grid-template-columns:1fr 125px 1fr; align-items:center;
+           font:600 16px/1 system-ui,-apple-system,"Segoe UI",sans-serif; }
+.ip-etat .g, .ip-etat .d { justify-self:center; display:flex; align-items:center; gap:6px; }
+.ip-etat svg { fill:currentColor; flex:none; }
+.ip-etat.se { top:0; height:20px; grid-template-columns:1fr auto 1fr; font-size:12px; }
+.ip-etat.se .g { justify-self:start; padding-left:6px; } .ip-etat.se .d { justify-self:end; padding-right:6px; }
+.ip-ile { position:absolute; top:11px; left:50%; width:125px; height:37px; margin-left:-62.5px; border-radius:19px; background:#000; z-index:3; pointer-events:none; }
+.ip-accueil { position:absolute; bottom:8px; left:50%; width:134px; height:5px; margin-left:-67px; border-radius:3px; background:#15171c; z-index:3; pointer-events:none; }
+/* [7 oct.] Android : barre d'etat a gauche/droite (heure, icones), camera en trou ou en goutte, trait des gestes,
+   ou les 3 boutons (retour, accueil, apps) sur une bande de 48 dp */
+.ip-etat.android { top:0; grid-template-columns:1fr auto 1fr; font:500 13px/1 system-ui,Roboto,"Segoe UI",sans-serif; }
+.ip-etat.android .g { justify-self:start; padding-left:18px; } .ip-etat.android .d { justify-self:end; padding-right:16px; gap:5px; }
+.ip-trou { position:absolute; top:10px; left:50%; width:12px; height:12px; margin-left:-6px; border-radius:50%; background:#000; z-index:3; pointer-events:none; }
+.ip-trou.goutte { top:0; width:26px; height:22px; margin-left:-13px; border-radius:0 0 13px 13px; }
+.ip-accueil.android { width:108px; height:4px; margin-left:-54px; bottom:10px; border-radius:2px; }
+.ip-nav3 { position:absolute; left:0; right:0; bottom:0; height:48px; z-index:3; pointer-events:none;
+           display:flex; justify-content:space-around; align-items:center; background:rgba(127,127,127,.12); }
+.ip-nav3 svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2; stroke-linejoin:round; }

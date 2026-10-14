@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>DRAGLOGICS B · téléphone</title>
+<link rel="icon" href="../../img/icon-192.webp">
+<link rel="stylesheet" href="../../css/base-maquettes.css?v=0.3">
+<link rel="stylesheet" href="b.css?v=0.3">
+<link rel="stylesheet" href="iphone.css?v=0.3">
+</head>
+<body class="ip-corps">
+<!-- APERCU IPHONE DE LA MAQUETTE B (outil de mise au point, pas l'application) : l'application tourne dans un iframe
+     a la taille exacte de l'ecran en points iOS ; la Dynamic Island, la barre d'etat et la barre d'accueil sont
+     dessinees par-dessus et laissent passer le doigt. Les zones sures sont imposees a l'application par ?sa=haut,bas.
+     ⚠ Le moteur reste Chrome : ce n'est pas Safari. -->
+<header class="ip-tete" id="ipTete">
+  <div class="seg petit" id="ipModele"></div>
+  <!-- [7 oct.] Android : les modeles les plus vendus en Amerique du Nord, et le mode de navigation -->
+  <div class="seg petit" id="ipModeleA"></div>
+  <div class="seg petit" id="ipNav" hidden></div>
+  <div class="seg petit" id="ipVue"></div>
+  <div class="seg petit" id="ipKit"></div>
+  <div class="seg petit" id="ipEchelle"></div>
+  <button type="button" class="bouton" id="ipRecharger">Recharger</button>
+  <span class="aide" id="ipInfo"></span>
+</header>
+<div class="ip-scene">
+  <div class="ip-boite" id="ipBoite">
+    <div class="ip-tel" id="ipTel">
+      <div class="ip-ecran" id="ipEcran">
+        <!-- allow="bluetooth" : le vrai kit se connecte depuis l'application DANS le cadre (B v0.3) -->
+        <iframe id="ipApp" title="DRAGLOGICS B" allow="bluetooth"></iframe>
+        <div class="ip-etat" id="ipEtat" aria-hidden="true"></div>
+        <div class="ip-ile" id="ipIle" aria-hidden="true"></div>
+        <div class="ip-trou" id="ipTrou" aria-hidden="true" hidden></div>
+        <div class="ip-accueil" id="ipAccueil" aria-hidden="true"></div>
+        <div class="ip-nav3" id="ipNav3" aria-hidden="true" hidden>
+          <svg viewBox="0 0 24 24"><path d="M15 6 8 12l7 6Z"/></svg><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5"/></svg><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="iphone.js?v=0.3"></script>
+</body>
+</html>

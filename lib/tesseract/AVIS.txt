@@ -1,0 +1,14 @@
+Tesseract.js dans DRAGLOGICS : lecture du ticket de la piste, dans l'appareil, sans reseau.
+
+Composant                     Version                  Licence      Texte de la licence
+tesseract.js                  7.0.0                    Apache-2.0   LICENSE-tesseract.js.md
+                              https://github.com/naptha/tesseract.js
+tesseract.js-core             7.0.0                    Apache-2.0   core/LICENSE
+                              https://github.com/naptha/tesseract.js-core
+Donnees de langue anglaise    4.0.0_best_int
+  (eng.traineddata.gz)
+  - le paquet npm             @tesseract.js-data/eng 1.0.0   MIT (champ license du paquet, https://github.com/naptha/tessdata)
+  - le modele d'origine       tesseract-ocr/tessdata_best    Apache-2.0   core/LICENSE (meme texte Apache 2.0)
+                              https://github.com/tesseract-ocr/tessdata_best
+
+Les fichiers sont copies sans modification par outils/installer_tesseract.sh.

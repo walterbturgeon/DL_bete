@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>DRAGLOGICS · C</title>
+<link rel="icon" href="../../img/icon-192.webp">
+<link rel="stylesheet" href="../../css/base-maquettes.css?v=0.2">
+<link rel="stylesheet" href="c.css?v=0.2">
+</head>
+<body>
+<!-- MAQUETTE C « UNE PAGE » v0.2 (choisie le 7 oct.) : tout sur une page qui defile ; la barre du bas
+     saute aux sections ; reglages, ticket et connexion dans des feuilles qui montent du bas.
+     La langue est dans les Reglages (demande du 7 oct.), pas dans l'en-tete. -->
+<header class="c-tete">
+  <div class="logo"><img src="../../img/logo.svg" alt="DRAGLOGICS"></div>
+  <span class="c-mini num" id="cMini"></span>
+  <button type="button" class="c-pilule off" id="cPilule"><span class="point"></span><span id="cPiluleTxt" data-i18n="bConnecter">Connecter</span></button>
+</header>
+
+<main>
+<!-- sans kit : une seule chose a faire, en grand -->
+<section class="c-accueil" id="cAccueil">
+  <h1 data-i18n="c_bienvenue">Connecte ton kit</h1>
+  <p class="aide" data-i18n="c_bienvenueAide">Le kit envoie la vitesse en direct, les temps de chaque run et ses réglages.</p>
+  <button type="button" class="bouton plein large" id="cAccueilBtn" data-i18n="bConnecter">Connecter</button>
+</section>
+
+<section class="c-section" id="s-maintenant">
+  <h2 data-i18n="c_maintenant">Maintenant</h2>
+  <div class="c-maintenant">
+    <div class="c-vit num"><span id="cVit">--</span><small id="cU">km/h</small></div>
+    <div class="c-etat" id="cEtat">—</div>
+    <div class="c-g num"><span data-i18n="lG">G</span> <b id="cG">--</b></div>
+    <button type="button" class="bouton" id="cRejouer" data-i18n="bRejouer">Rejouer un run</button>
+  </div>
+  <canvas class="graphe" id="cvC" role="img" data-i18n-aria="ariaDirect"></canvas>
+</section>
+
+<section class="c-section" id="s-run">
+  <div class="c-titre-run"><h2 id="cRunTitre" data-i18n="c_dernier">Dernier run</h2>
+    <button type="button" class="c-lien" id="cRetourDernier" hidden data-i18n="c_retourDernier">Revenir au dernier run</button></div>
+  <div class="c-chiffres" id="cChiffres"></div>
+  <div class="c-outils">
+    <div class="seg petit" id="cAxe"><button type="button" data-v="t" data-i18n="axeTemps">Temps</button><button type="button" data-v="d" data-i18n="axeDistance">Distance</button></div>
+    <button type="button" class="bouton" id="cTicketBtn"><span data-i18n="c_ticket">Comparer au ticket</span><span class="c-pastille" id="cTicketPastille" hidden></span></button>
+  </div>
+  <canvas class="graphe" id="cvCRun" role="img" data-i18n-aria="ariaRun"></canvas>
+  <div class="legende"><span class="l-v"><i></i><span data-i18n="lgVitesse"></span></span><span class="l-g"><i></i><span data-i18n="lgG"></span></span><span class="l-r"><i></i><span data-i18n="lgJalons"></span></span></div>
+  <div class="lecture num" id="cLecture"></div>
+  <p class="aide" id="cRegRun"></p>
+</section>
+
+<section class="c-section" id="s-historique">
+  <h2 data-i18n="c_historique">Historique</h2>
+  <div id="cCmpBloc" hidden>
+    <h3 data-i18n="c_cmpTitre">Comparaison</h3>
+    <canvas class="graphe" id="cvCCmp" role="img" data-i18n-aria="ariaRun"></canvas>
+    <div class="legende"><span class="l-v"><i></i><span id="cCmpA"></span></span><span class="l-c"><i></i><span id="cCmpB"></span></span><span class="l-r"><i></i><span data-i18n="lgJalons"></span></span></div>
+    <div class="lecture num" id="cCmpLecture"></div>
+  </div>
+  <p class="aide" data-i18n="c_histAide">Touche un run pour le voir en haut. Coche deux runs pour les comparer.</p>
+  <ol class="c-fil" id="cFil"></ol>
+  <p class="vide" id="cFilVide" data-i18n="videRuns">Aucun run.</p>
+</section>
+</main>
+
+<!-- ===== feuille : comparer au ticket de la piste ===== -->
+<div id="voileTk" class="c-voile" hidden></div>
+<div id="feuilleTk" class="c-feuille" hidden role="dialog" aria-modal="true" aria-labelledby="cTkTitre">
+  <div class="c-feuille-tete"><h2 id="cTkTitre" data-i18n="c_ticket">Comparer au ticket</h2><button type="button" class="bouton" id="cTkFermer" data-i18n="fermer">Fermer</button></div>
+  <p class="aide" id="cTkRun"></p>
+  <p class="aide" data-i18n="c_saisir">Entre les temps du ticket, en secondes (ex. 1,290).</p>
+  <div class="c-saisie">
+    <label><span data-i18n="j60"></span><input type="text" inputmode="decimal" id="tk60" autocomplete="off"></label>
+    <label><span data-i18n="j330"></span><input type="text" inputmode="decimal" id="tk330" autocomplete="off"></label>
+    <label><span data-i18n="j660"></span><input type="text" inputmode="decimal" id="tk660" autocomplete="off"></label>
+    <label><span data-i18n="j1320"></span><input type="text" inputmode="decimal" id="tk1320" autocomplete="off"></label>
+    <label><span data-i18n="c_vit18">Vitesse 1/8 (mph)</span><input type="text" inputmode="decimal" id="tkv660" autocomplete="off"></label>
+    <label><span data-i18n="c_vit14">Vitesse 1/4 (mph)</span><input type="text" inputmode="decimal" id="tkv1320" autocomplete="off"></label>
+  </div>
+  <div class="c-boutons"><button type="button" class="bouton" id="cTkDemo" data-i18n="c_remplirDemo">Remplir avec le ticket de démo</button>
+    <button type="button" class="bouton plein" id="cTkComparer" data-i18n="c_comparer2">Comparer</button></div>
+  <p class="msg-err" id="cTkErr" aria-live="polite"></p>
+  <div id="cTkRes" hidden>
+    <table class="c-table"><thead><tr><th data-i18n="c_jalon">Jalon</th><th class="n" data-i18n="c_kit">Kit</th><th class="n" data-i18n="c_tk">Ticket</th><th class="n" data-i18n="c_ecart">Écart</th><th></th></tr></thead><tbody id="cTkCorps"></tbody></table>
+    <p class="c-bilan" id="cTkBilan"></p>
+    <p class="aide" id="cTkConseil"></p>
+  </div>
+</div>
+
+<!-- ===== feuille : reglages ===== -->
+<div id="voileReg" class="c-voile" hidden></div>
+<div id="feuilleReg" class="c-feuille" hidden role="dialog" aria-modal="true" aria-labelledby="cRegTitre">
+  <div class="c-feuille-tete"><h2 id="cRegTitre" data-i18n="bReglages">Réglages</h2><button type="button" class="bouton" id="cRegFermer" data-i18n="fermer">Fermer</button></div>
+
+  <h3 class="c-sous" data-i18n="hApp">Application</h3>
+  <div class="ligne-pref"><span class="nom" data-i18n="langue">Langue</span><div class="seg" id="segLangue"><button type="button" data-v="fr">Français</button><button type="button" data-v="en">English</button></div></div>
+  <div class="ligne-pref"><span class="nom" data-i18n="unite"></span><div class="seg" id="segUnite"><button type="button" data-v="kmh">km/h</button><button type="button" data-v="mph">mph</button></div></div>
+  <div class="ligne-pref"><span class="nom" data-i18n="theme"></span><div class="seg" id="segTheme"><button type="button" data-v="auto" data-i18n="themeAuto"></button><button type="button" data-v="light" data-i18n="themeClair"></button><button type="button" data-v="dark" data-i18n="themeSombre"></button></div></div>
+  <div class="ligne-pref"><span class="nom" data-i18n="texte"></span><div class="seg" id="segTexte"><button type="button" data-v="n" data-i18n="texteN"></button><button type="button" data-v="g" data-i18n="texteG"></button></div></div>
+
+  <h3 class="c-sous" data-i18n="c_chronoKit">Chrono du kit</h3>
+  <form id="cForm" novalidate>
+    <p class="vide" id="cRegVide" data-i18n="videReg">Connecte un kit.</p>
+    <div id="cRegCorps" hidden>
+      <div class="champ"><label for="f-rpo" data-i18n="rpoNom"></label>
+        <div class="pas" data-champ="rpo"><button type="button" data-pas="-1">−1</button><input type="number" id="f-rpo" min="0" max="36" step="1"><button type="button" data-pas="1">+1</button><span class="pieds" id="p-rpo"></span></div>
+        <p class="aide" data-i18n="rpoAide"></p></div>
+      <div class="champ"><label for="f-jpo" data-i18n="jpoNom"></label>
+        <div class="pas" data-champ="jpo"><button type="button" data-pas="-6">−6</button><button type="button" data-pas="-1">−1</button><input type="number" id="f-jpo" min="-120" max="36" step="1"><button type="button" data-pas="1">+1</button><button type="button" data-pas="6">+6</button><span class="pieds" id="p-jpo"></span></div>
+        <p class="aide" data-i18n="jpoAide"></p></div>
+      <details class="c-plus"><summary data-i18n="c_avance">Avancé</summary>
+        <div class="champ"><label for="f-d60" data-i18n="d60Nom"></label>
+          <div class="pas" data-champ="d60"><button type="button" data-pas="-6">−6</button><button type="button" data-pas="-1">−1</button><input type="number" id="f-d60" min="-72" max="72" step="1"><button type="button" data-pas="1">+1</button><button type="button" data-pas="6">+6</button><span class="pieds" id="p-d60"></span></div></div>
+        <div class="c-deux">
+          <div class="champ"><label for="f-cms" data-i18n="cmsNom"></label><input type="number" id="f-cms" min="-600" max="600" step="5"></div>
+          <div class="champ"><label for="f-pfft" data-i18n="pfftNom"></label><select id="f-pfft"></select></div>
+          <div class="champ"><label for="f-hecu" data-i18n="hecuNom"></label><select id="f-hecu"><option value="0">HP — 298</option><option value="1">Dominator</option></select></div>
+          <div class="champ"><label for="f-strig" data-i18n="strigNom"></label><select id="f-strig"><option value="0" data-i18n="strig0"></option><option value="1" data-i18n="strig1"></option><option value="2" data-i18n="strig2"></option></select></div>
+          <div class="champ"><label for="f-mode" data-i18n="modeNom"></label><select id="f-mode"><option value="HOLLEY">Holley</option><option value="FUELTECH">FuelTech</option><option value="LINK">Link</option><option value="ECUMASTER">ECUMaster</option></select></div>
+          <div class="champ"><label for="f-cbr" data-i18n="cbrNom"></label><select id="f-cbr"><option value="250000">250 kbit/s</option><option value="500000">500 kbit/s</option><option value="1000000">1 Mbit/s</option></select></div>
+          <div class="champ"><label for="f-grate" data-i18n="grateNom"></label><select id="f-grate"><option value="40">25 Hz</option><option value="50">20 Hz</option><option value="100">10 Hz</option></select></div>
+          <div class="champ"><label for="f-sfx" data-i18n="sfxNom"></label><input type="text" id="f-sfx" maxlength="5" autocomplete="off" spellcheck="false"></div>
+          <div class="champ"><label for="f-tzh" data-i18n="tzhNom"></label><input type="number" id="f-tzh" min="-12" max="14" step="1"></div>
+        </div>
+      </details>
+      <button type="submit" class="bouton plein large" data-i18n="envoyer">Envoyer au kit</button>
+      <p id="cFormMsg" aria-live="polite"></p>
+    </div>
+  </form>
+
+  <h3 class="c-sous" data-i18n="hKit">Le kit</h3>
+  <dl class="c-fiche" id="cFiche"></dl>
+  <p class="vide" id="cFicheVide" data-i18n="videKit">Aucun kit connecté.</p>
+  <div class="c-boutons"><button type="button" class="bouton" id="cCal" data-i18n="calBtn">Calibrer</button>
+    <button type="button" class="bouton" id="cMaj" data-i18n="majBtn">Passer en mise à jour</button></div>
+  <p class="aide" data-i18n="calAide"></p>
+  <p class="aide" id="cKitMsg" aria-live="polite"></p>
+
+  <h3 class="c-sous" data-i18n="hPrive">Confidentialité</h3>
+  <p class="aide" data-i18n="priveTexte"></p>
+  <button type="button" class="bouton" id="cEffacer" data-i18n="effacer"></button><p class="aide" id="cPriveMsg" aria-live="polite"></p>
+  <p class="aide c-version" id="cVersion"></p>
+</div>
+
+<!-- ===== feuille : connexion ===== -->
+<div id="voile" hidden></div>
+<div id="feuilleCx" class="feuille" hidden role="dialog" aria-modal="true" aria-labelledby="cxTitre">
+  <h2 id="cxTitre" data-i18n="cxTitre">Connecter un kit</h2>
+  <p class="aide" data-i18n="cxPourquoi"></p>
+  <button type="button" class="bouton plein large" id="cxBle" data-i18n="cxBle"></button>
+  <button type="button" class="bouton large" id="cxDemo" data-i18n="cxDemo"></button>
+  <button type="button" class="bouton large" id="cxDeco" hidden data-i18n="cxDeco"></button>
+  <p class="aide" id="cxMsg" aria-live="polite"></p>
+  <button type="button" class="bouton large" id="cxFermer" data-i18n="fermer"></button>
+</div>
+
+<nav class="c-barre" data-i18n-aria="ariaNav">
+  <button type="button" data-cible="s-maintenant" class="actif"><svg viewBox="0 0 24 24"><path d="M4.5 17a8 8 0 1 1 15 0"/><path d="M12 13l4-4"/><circle cx="12" cy="13" r="1.3"/></svg><span data-i18n="c_maintenant">Maintenant</span></button>
+  <button type="button" data-cible="s-run"><svg viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4L17 12H5"/></svg><span data-i18n="c_runCourt">Run</span></button>
+  <button type="button" data-cible="s-historique"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span data-i18n="c_historique">Historique</span></button>
+  <button type="button" id="cBtnReg"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg><span data-i18n="bReglages">Réglages</span></button>
+</nav>
+
+<script src="../../js/i18n.js?v=0.2"></script>
+<script src="../../js/graph.js?v=0.2"></script>
+<script src="../../js/demo-runs.js?v=0.2"></script>
+<script src="../../js/kit.js?v=0.2"></script>
+<script src="../../js/commun.js?v=0.2"></script>
+<script src="c.js?v=0.2"></script>
+</body>
+</html>

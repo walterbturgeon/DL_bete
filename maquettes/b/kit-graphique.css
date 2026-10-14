@@ -1,0 +1,62 @@
+/* La mise en page du kit graphique (pas de l'application). Les composants montres utilisent b.css tel quel. */
+body.kg-corps { padding-bottom:40px; }
+.kg-tete { position:sticky; top:0; z-index:15; display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px; background:var(--bg);
+           padding:calc(10px + env(safe-area-inset-top)) 20px 10px; border-bottom:1px solid var(--line); }
+.kg-tete h1 { margin:0; font-size:20px; }
+.kg-outils { margin-left:auto; display:flex; flex-wrap:wrap; gap:8px; }
+.logo { position:relative; width:150px; height:38px; overflow:hidden; background:#fff; border-radius:8px; flex:none; }
+.logo img { position:absolute; left:0; top:-32px; width:150px; height:100px; }
+.kg-sommaire { display:flex; flex-wrap:wrap; gap:6px; padding:10px 20px; max-width:1240px; margin:0 auto; }
+.kg-sommaire a { padding:6px 12px; border-radius:999px; background:var(--card); border:1px solid var(--line); color:var(--ink); text-decoration:none; font-size:13px; font-weight:700; }
+.kg { max-width:1240px; margin:0 auto; padding:0 20px; }
+.kg-section { padding:22px 0 18px; border-bottom:1px solid var(--line); }
+.kg-section > h2 { margin:0 0 4px; font-size:24px; }
+.kg-section h3 { margin:14px 0 8px; font-size:14px; color:var(--muted); font-weight:700; }
+.kg-ligne { display:grid; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr)); gap:16px; align-items:start; }
+.kg-ex { min-width:0; }
+.kg-ex.b-carte h3 { margin-top:0; }
+.kg-rang { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.kg-etroit { max-width:520px; }
+.kg-tuiles3 { grid-template-columns:repeat(3, minmax(0, 1fr)); max-width:760px; }
+.kg-grille4 { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:10px; }
+.kg-grille4 .b-bandeau { margin:0; }
+.kg-grille3 { display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:10px; }
+.kg-grille3 .b-carte { margin:0; }
+/* les composants fixes (barre du bas, feuille) montres en place */
+.kg-statique .b-barre, .kg-statique .feuille { position:static; max-width:560px; margin:0; }
+.kg-statique .b-barre { border:1px solid var(--line); border-radius:16px; padding-bottom:4px; }
+.kg-statique .feuille { border-radius:18px; }
+
+/* couleurs */
+.kg-regles { display:flex; flex-wrap:wrap; gap:8px 22px; margin:10px 0 14px; }
+.kg-p { display:inline-block; width:14px; height:14px; border-radius:50%; vertical-align:-2px; margin-right:6px; }
+.kg-att { background:var(--att); } .kg-sel { background:var(--sel); } .kg-ok { background:var(--ok); } .kg-lent { background:var(--lent); }
+.kg-nuancier { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:10px; }
+.kg-nuance { display:grid; grid-template-columns:auto 1fr; gap:4px 12px; align-items:center; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:10px 12px; }
+.kg-deux { display:flex; border-radius:10px; overflow:hidden; border:1px solid var(--line); grid-row:span 2; }
+.kg-deux i { width:30px; height:44px; display:block; }
+.kg-nuance b { font-family:ui-monospace,Consolas,monospace; font-size:13px; }
+.kg-nuance span { color:var(--muted); font-size:13px; }
+.kg-nuance code { grid-column:2; font-size:11.5px; color:var(--muted); }
+
+/* textes */
+.kg-types { display:grid; gap:10px; }
+.kg-types > div { display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 16px; padding:8px 0; border-bottom:1px solid var(--line); }
+.kg-types small { color:var(--muted); font-size:12px; font-family:ui-monospace,Consolas,monospace; }
+.kg-t72 { font-size:72px; font-weight:900; line-height:1; } .kg-t24 { font-size:24px; font-weight:800; } .kg-t19 { font-size:19px; font-weight:700; }
+.kg-t18 { font-size:18px; font-weight:700; } .kg-t16 { font-size:16px; } .kg-t14 { font-size:14px; }
+.kg-t12 { font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+
+/* icones */
+.kg-icones { display:grid; grid-template-columns:repeat(auto-fill, minmax(110px, 1fr)); gap:10px; }
+.kg-icones figure { margin:0; display:grid; justify-items:center; gap:8px; padding:14px 6px; background:var(--card); border:1px solid var(--line); border-radius:14px; color:var(--ink); }
+.kg-icones svg { width:32px; height:32px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.kg-icones figcaption { font-size:13px; font-weight:700; }
+
+/* ecrans */
+.kg-ecrans { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:18px; justify-items:center; margin-top:10px; }
+.kg-ecran { display:grid; gap:8px; justify-items:center; }
+.kg-ecran b { font-size:15px; }
+.kg-tel { position:relative; overflow:hidden; border-radius:30px; border:7px solid #1b1e24; background:#000; }
+.kg-tel iframe { position:absolute; left:0; top:0; border:0; transform-origin:0 0; background:#fff; }
+.kg-ecran a { color:var(--sel); font-weight:700; font-size:13px; }

@@ -1,0 +1,132 @@
+/* DRAGLOGICS -- maquette de l'application (v0.1, 6 oct. 2026).
+   Style repris du tableau E3B4 (30 sept.) : jetons de couleur, cartes, barre fixe en bas.
+   ⚠ Toutes les couleurs passent par des variables : les graphiques les lisent (DLGraph.css).
+   Regles de couleur du projet : orange (--att) = SEULEMENT ce qui demande une action ; bleu (--sel) = ce qui est
+   choisi et les reperes ; rouge = plus lent, vert = plus rapide. */
+:root { --bg:#f3f4f6; --card:#fff; --ink:#111; --muted:#667; --line:#e2e4e8; --sel:#1e63d6; --selbg:#e8f0fd;
+        --ok:#1c8f4a; --lent:#c0392b; --att:#e8730c; --tab:#eef0f3; --gros:#0b0d10;
+        --trait:#111; --cmp:#7b55d6; --gcol:#0f9488; --zone:rgba(102,102,119,.10); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+        --bg:#0f1115; --card:#181b21; --ink:#e9ecf1; --muted:#9aa3ae; --line:#2a2f37; --sel:#5b9bff; --selbg:#1b2a44;
+        --ok:#3cc97a; --lent:#ff6b5e; --att:#ff9a3c; --tab:#20242c; --gros:#ffffff;
+        --trait:#e9ecf1; --cmp:#b39cff; --gcol:#37cdbf; --zone:rgba(154,163,174,.10); } }
+:root[data-theme="dark"] { --bg:#0f1115; --card:#181b21; --ink:#e9ecf1; --muted:#9aa3ae; --line:#2a2f37; --sel:#5b9bff; --selbg:#1b2a44;
+        --ok:#3cc97a; --lent:#ff6b5e; --att:#ff9a3c; --tab:#20242c; --gros:#ffffff;
+        --trait:#e9ecf1; --cmp:#b39cff; --gcol:#37cdbf; --zone:rgba(154,163,174,.10); }
+* { box-sizing:border-box; }
+[hidden] { display:none !important; }
+html, body { overscroll-behavior:none; }
+body { margin:0; background:var(--bg); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; font-size:15px;
+       padding:0 env(safe-area-inset-right) calc(78px + env(safe-area-inset-bottom)) env(safe-area-inset-left); -webkit-text-size-adjust:100%; }
+body.texte-g { font-size:17.5px; }
+.num { font-variant-numeric:tabular-nums; }
+button, select, input { font:inherit; }
+:focus-visible { outline:2px solid var(--sel); outline-offset:2px; }
+@media (prefers-reduced-motion: reduce) { * { transition:none !important; animation:none !important; } }
+
+/* l'en-tete */
+.tete { position:sticky; top:0; z-index:10; background:var(--bg); padding:calc(8px + env(safe-area-inset-top)) 16px 8px;
+        display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; border-bottom:1px solid var(--line); }
+.logo { position:relative; width:174px; height:44px; overflow:hidden; background:#fff; border-radius:8px; flex:none; }
+.logo img { position:absolute; left:0; top:-37px; width:174px; height:116px; }
+.chip { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; background:var(--card);
+        border:1px solid var(--line); font-size:13px; }
+.chip.demo { background:var(--tab); font-weight:700; letter-spacing:.06em; }
+.tete .droite { margin-left:auto; display:flex; gap:8px; align-items:center; }
+.point { width:9px; height:9px; border-radius:50%; background:var(--ok); flex:none; }
+.point.off { background:var(--att); }
+
+main { padding:12px 16px 16px; max-width:1280px; margin:0 auto; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 16px; }
+.card h2 { margin:0 0 10px; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+.grille { display:grid; gap:14px; grid-template-columns:1fr; }
+.grille > * { min-width:0; }
+.colonne { display:grid; gap:14px; align-content:start; min-width:0; }
+@media (min-width:1000px) { .grille.deux { grid-template-columns:1fr 1.25fr; } .grille.passages { grid-template-columns:1fr 1.4fr; } }
+
+/* tuiles des jalons */
+.partiels { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:8px; margin-top:12px; }
+.tuile { background:var(--tab); border-radius:10px; padding:8px 10px; }
+.tuile .lab { font-size:11px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; }
+.tuile .val { font-size:22px; font-weight:700; }
+.tuile .vit { font-size:12px; color:var(--muted); min-height:1.2em; }
+.tuile.vient { box-shadow:0 0 0 2px var(--sel) inset; }
+@media (max-width:640px) { .partiels { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+
+/* le direct */
+.direct-haut { display:flex; flex-wrap:wrap; align-items:flex-end; gap:8px 24px; }
+.vitesse { font-size:64px; font-weight:800; line-height:1; color:var(--gros); }
+.vitesse small { font-size:18px; font-weight:600; color:var(--muted); margin-left:8px; }
+.direct-meta { display:grid; gap:6px; padding-bottom:6px; }
+.direct-meta .lab { color:var(--muted); font-size:12px; letter-spacing:.06em; text-transform:uppercase; margin-right:6px; }
+.badge { display:inline-block; padding:3px 10px; border-radius:999px; font-size:12px; font-weight:700; }
+.badge.cl { background:var(--tab); color:var(--ink); border:1px solid var(--line); }
+.badge.court { background:var(--sel); color:#fff; }
+.badge.fini { background:var(--ok); color:#fff; }
+
+/* graphiques */
+.outils-graph { display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center; justify-content:space-between; margin-bottom:8px; }
+canvas.graphe { display:block; width:100%; touch-action:pan-y; border-radius:8px; }
+.legende { display:flex; flex-wrap:wrap; gap:6px 16px; font-size:12px; color:var(--muted); margin-top:6px; }
+.legende i { display:inline-block; width:18px; height:3px; border-radius:2px; vertical-align:middle; margin-right:6px; }
+.legende .l-v i { background:var(--trait); } .legende .l-g i { background:var(--gcol); } .legende .l-c i { background:var(--cmp); }
+.legende .l-r i { background:var(--sel); height:0; border-top:2px dashed var(--sel); }
+.lecture { margin-top:8px; padding:8px 10px; border-radius:8px; background:var(--tab); font-size:13px; min-height:2.6em; }
+.cmp { display:inline-flex; gap:8px; align-items:center; color:var(--muted); font-size:13px; }
+
+/* listes et tableaux */
+table { width:100%; border-collapse:collapse; }
+th, td { text-align:left; padding:8px 6px; border-bottom:1px solid var(--line); white-space:nowrap; }
+th { font-size:11px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; font-weight:600; }
+td.n, th.n { text-align:right; }
+tr.clic { cursor:pointer; } tr.clic:hover td { background:var(--tab); } tr.choisi td { background:var(--selbg); }
+.defile { overflow-x:auto; }
+.nav-run { display:flex; gap:8px; align-items:center; }
+.nav-run .pos { color:var(--muted); margin:0 auto; text-align:center; }
+
+/* boutons, segments, champs */
+.bouton { padding:10px 14px; min-height:44px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; }
+.bouton:disabled { opacity:.45; cursor:default; }
+.bouton.plein { background:var(--sel); border-color:var(--sel); color:#fff; font-weight:600; }
+.bouton.large { width:100%; margin-top:8px; }
+.seg { display:inline-flex; flex-wrap:wrap; }
+.seg button { border:1px solid var(--line); background:var(--card); color:var(--ink); padding:8px 14px; min-height:40px; cursor:pointer; border-radius:0; }
+.seg button:first-child { border-radius:10px 0 0 10px; } .seg button:last-child { border-radius:0 10px 10px 0; }
+.seg button.on { background:var(--sel); border-color:var(--sel); color:#fff; }
+.reglage { display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--line); }
+.reglage:last-child { border-bottom:0; }
+.reglage .nom { font-weight:600; }
+.aide { color:var(--muted); font-size:13px; }
+.vide { color:var(--muted); padding:20px 0; text-align:center; }
+select, input[type=text], input[type=number] { padding:8px 10px; min-height:40px; border-radius:8px; border:1px solid var(--line); background:var(--card); color:var(--ink); }
+fieldset { border:0; border-top:1px solid var(--line); margin:10px 0 0; padding:10px 0 0; }
+legend { font-weight:700; padding-right:8px; }
+.champ { padding:8px 0; }
+.champ label { display:block; font-weight:600; margin-bottom:4px; }
+.champ .aide { margin-top:4px; }
+.pas { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+.pas button { min-width:44px; min-height:40px; border-radius:9px; border:1px solid var(--line); background:var(--tab); color:var(--ink); cursor:pointer; font-weight:700; }
+.pas input { width:90px; text-align:center; }
+.pas .pieds { color:var(--muted); font-size:13px; margin-left:4px; }
+.actions { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:14px; }
+.msg-ok { color:var(--ok); font-weight:600; } .msg-err { color:var(--lent); font-weight:600; }
+dl.fiche { display:grid; grid-template-columns:max-content 1fr; gap:6px 16px; margin:0; }
+dl.fiche dt { color:var(--muted); } dl.fiche dd { margin:0; font-weight:600; }
+
+/* la feuille de connexion */
+#voile { position:fixed; inset:0; z-index:30; background:rgba(0,0,0,.4); }
+.feuille { position:fixed; left:0; right:0; bottom:0; z-index:31; max-width:560px; margin:0 auto; background:var(--card);
+           border-radius:16px 16px 0 0; border:1px solid var(--line); padding:16px 16px calc(16px + env(safe-area-inset-bottom)); }
+.feuille h2 { margin:0 0 8px; font-size:18px; }
+
+/* LA BARRE DU BAS, fixe -- comme le tableau E3B4 et la page TRACLOGICS */
+#barbas { position:fixed; left:0; right:0; bottom:0; z-index:20; display:flex; background:var(--card); border-top:1px solid var(--line);
+          padding:0 calc(2px + env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) calc(2px + env(safe-area-inset-left)); }
+#barbas button { flex:1; background:none; border:0; color:var(--muted); font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+                 padding:10px 1px 6px; min-height:56px; display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; position:relative; }
+#barbas button svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+#barbas button.actif { color:var(--sel); }
+#barbas button.actif::before { content:''; position:absolute; top:0; left:26%; right:26%; height:3px; border-radius:0 0 3px 3px; background:var(--sel); }
+/* connexion : orange quand il faut agir (deconnecte), vert quand le lien tient */
+#barbas button.cx-off { color:var(--att); }
+#barbas button.cx-on { color:var(--ok); }

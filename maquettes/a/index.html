@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>DRAGLOGICS · A</title>
+<link rel="icon" href="../../img/icon-192.webp">
+<link rel="stylesheet" href="../../css/base-maquettes.css">
+<link rel="stylesheet" href="a.css">
+</head>
+<body>
+<!-- MAQUETTE A « COCKPIT » : sombre, tres gros chiffres, 3 boutons en bas, l'essentiel d'abord. -->
+<header class="a-tete">
+  <div class="logo"><img src="../../img/logo.svg" alt="DRAGLOGICS"></div>
+  <button type="button" class="pilule off" id="aPilule"><span class="point"></span><span id="aPiluleTxt" data-i18n="bConnecter">Connecter</span></button>
+</header>
+
+<main>
+<section id="v-direct" class="vue">
+  <div class="a-etat" id="aEtat">—</div>
+  <div class="a-geant num"><span id="aVit">--</span><small id="aU">km/h</small></div>
+  <div class="a-g num"><span data-i18n="lG">G</span> <b id="aG">--</b></div>
+  <div class="a-bloc">
+    <div class="a-lab" id="aDernierLab" data-i18n="a_dernier">Dernier run</div>
+    <div class="a-et num"><span id="aEt">--</span><small>s</small><span class="a-vfin" id="aVfin"></span></div>
+    <div class="a-mini4" id="aTuiles"></div>
+  </div>
+  <div class="a-actions">
+    <button type="button" class="bouton large" id="aRejouer" data-i18n="a_rejouer">Rejouer un run (démo)</button>
+    <button type="button" class="bouton large" id="aCourbeBtn" data-i18n="a_voirCourbe">Voir la courbe</button>
+  </div>
+  <div class="a-bloc" id="aCourbe" hidden>
+    <canvas class="graphe" id="cvA" role="img" data-i18n-aria="ariaDirect"></canvas>
+    <div class="legende"><span class="l-v"><i></i><span data-i18n="lgVitesse">Vitesse</span></span><span class="l-g"><i></i><span data-i18n="lgG">G</span></span></div>
+  </div>
+  <p class="vide" id="aVide" data-i18n="a_vide">Touche « Connecter » en haut pour commencer.</p>
+</section>
+
+<section id="v-runs" class="vue" hidden>
+  <h1 class="a-titre" data-i18n="hRuns">Runs du kit</h1>
+  <div id="aListe" class="a-liste"></div>
+  <p class="vide" id="aRunsVide" data-i18n="videRuns">Aucun run.</p>
+</section>
+
+<section id="v-reglages" class="vue" hidden>
+  <h1 class="a-titre" data-i18n="bReglages">Réglages</h1>
+  <form id="aForm" class="a-bloc" novalidate>
+    <p class="vide" id="aRegVide" data-i18n="videReg">Connecte un kit.</p>
+    <div id="aRegCorps" hidden>
+      <div class="champ"><label for="f-rpo" data-i18n="rpoNom">Roll-out</label>
+        <div class="pas" data-champ="rpo"><button type="button" data-pas="-1">−1</button><input type="number" id="f-rpo" min="0" max="36" step="1"><button type="button" data-pas="1">+1</button><span class="pieds" id="p-rpo"></span></div></div>
+      <div class="champ"><label for="f-jpo" data-i18n="jpoNom">Jalons</label>
+        <div class="pas" data-champ="jpo"><button type="button" data-pas="-6">−6</button><button type="button" data-pas="-1">−1</button><input type="number" id="f-jpo" min="-120" max="36" step="1"><button type="button" data-pas="1">+1</button><button type="button" data-pas="6">+6</button><span class="pieds" id="p-jpo"></span></div></div>
+      <div class="champ"><label for="f-d60" data-i18n="d60Nom">60 pi</label>
+        <div class="pas" data-champ="d60"><button type="button" data-pas="-6">−6</button><button type="button" data-pas="-1">−1</button><input type="number" id="f-d60" min="-72" max="72" step="1"><button type="button" data-pas="1">+1</button><button type="button" data-pas="6">+6</button><span class="pieds" id="p-d60"></span></div></div>
+      <details class="a-plus"><summary data-i18n="a_plus">Plus de réglages</summary>
+        <div class="champ"><label for="f-cms" data-i18n="cmsNom"></label><input type="number" id="f-cms" min="-600" max="600" step="5"></div>
+        <div class="champ"><label for="f-pfft" data-i18n="pfftNom"></label><select id="f-pfft"></select></div>
+        <div class="champ"><label for="f-hecu" data-i18n="hecuNom"></label><select id="f-hecu"><option value="0">HP — 298</option><option value="1">Dominator</option></select></div>
+        <div class="champ"><label for="f-strig" data-i18n="strigNom"></label><select id="f-strig"><option value="0" data-i18n="strig0"></option><option value="1" data-i18n="strig1"></option><option value="2" data-i18n="strig2"></option></select></div>
+        <div class="champ"><label for="f-mode" data-i18n="modeNom"></label><select id="f-mode"><option value="HOLLEY">Holley</option><option value="FUELTECH">FuelTech</option><option value="LINK">Link</option><option value="ECUMASTER">ECUMaster</option></select></div>
+        <div class="champ"><label for="f-cbr" data-i18n="cbrNom"></label><select id="f-cbr"><option value="250000">250 kbit/s</option><option value="500000">500 kbit/s</option><option value="1000000">1 Mbit/s</option></select></div>
+        <div class="champ"><label for="f-grate" data-i18n="grateNom"></label><select id="f-grate"><option value="40">25 Hz</option><option value="50">20 Hz</option><option value="100">10 Hz</option></select></div>
+        <div class="champ"><label for="f-sfx" data-i18n="sfxNom"></label><input type="text" id="f-sfx" maxlength="5" autocomplete="off" spellcheck="false"></div>
+        <div class="champ"><label for="f-tzh" data-i18n="tzhNom"></label><input type="number" id="f-tzh" min="-12" max="14" step="1"></div>
+      </details>
+      <button type="submit" class="bouton plein large" data-i18n="envoyer">Envoyer au kit</button>
+      <p id="aFormMsg" aria-live="polite"></p>
+    </div>
+  </form>
+  <div class="a-bloc">
+    <div class="ligne-pref"><span class="nom" data-i18n="langue">Langue</span><div class="seg" id="segLangue"><button type="button" data-v="fr">FR</button><button type="button" data-v="en">EN</button></div></div>
+    <div class="ligne-pref"><span class="nom" data-i18n="unite">Vitesse</span><div class="seg" id="segUnite"><button type="button" data-v="kmh">km/h</button><button type="button" data-v="mph">mph</button></div></div>
+    <div class="ligne-pref"><span class="nom" data-i18n="theme">Thème</span><div class="seg" id="segTheme"><button type="button" data-v="dark" data-i18n="themeSombre">Sombre</button><button type="button" data-v="light" data-i18n="themeClair">Clair</button></div></div>
+  </div>
+  <div class="a-bloc">
+    <p class="aide" data-i18n="priveTexte"></p>
+    <button type="button" class="bouton" id="aEffacer" data-i18n="effacer">Effacer</button>
+    <p class="aide" id="aPriveMsg" aria-live="polite"></p>
+  </div>
+</section>
+</main>
+
+<!-- le detail d'un run : plein ecran, retour en haut a gauche -->
+<div id="aDetail" class="a-detail" hidden role="dialog" aria-modal="true" aria-labelledby="aDetailTitre">
+  <div class="a-detail-tete"><button type="button" class="bouton" id="aRetour">‹ <span data-i18n="bRuns">Runs</span></button><b id="aDetailTitre"></b></div>
+  <div class="a-et num"><span id="aDEt">--</span><small>s</small><span class="a-vfin" id="aDVfin"></span></div>
+  <div class="a-mini4" id="aDTuiles"></div>
+  <div class="a-outils">
+    <div class="seg" id="aAxe"><button type="button" data-v="t" data-i18n="axeTemps">Temps</button><button type="button" data-v="d" data-i18n="axeDistance">Distance</button></div>
+    <label class="aide"><span data-i18n="comparer">Comparer avec</span> <select id="aCmp"></select></label>
+  </div>
+  <canvas class="graphe" id="cvARun" role="img" data-i18n-aria="ariaRun"></canvas>
+  <div class="legende"><span class="l-v"><i></i><span data-i18n="lgVitesse"></span></span><span class="l-c" id="aLgCmp" hidden><i></i><span data-i18n="lgCmp"></span></span><span class="l-g"><i></i><span data-i18n="lgG"></span></span><span class="l-r"><i></i><span data-i18n="lgJalons"></span></span></div>
+  <div class="lecture num" id="aLecture"></div>
+</div>
+
+<div id="voile" hidden></div>
+<div id="feuilleCx" class="feuille" hidden role="dialog" aria-modal="true" aria-labelledby="cxTitre">
+  <h2 id="cxTitre" data-i18n="cxTitre">Connecter un kit</h2>
+  <p class="aide" data-i18n="cxPourquoi"></p>
+  <button type="button" class="bouton plein large" id="cxBle" data-i18n="cxBle"></button>
+  <button type="button" class="bouton large" id="cxDemo" data-i18n="cxDemo"></button>
+  <button type="button" class="bouton large" id="cxDeco" hidden data-i18n="cxDeco"></button>
+  <p class="aide" id="cxMsg" aria-live="polite"></p>
+  <button type="button" class="bouton large" id="cxFermer" data-i18n="fermer"></button>
+</div>
+
+<nav class="a-barre" data-i18n-aria="ariaNav">
+  <button type="button" data-vue="direct" class="actif"><svg viewBox="0 0 24 24"><path d="M4.5 17a8 8 0 1 1 15 0"/><path d="M12 13l4-4"/><circle cx="12" cy="13" r="1.3"/></svg><span data-i18n="bDirect">Direct</span></button>
+  <button type="button" data-vue="runs"><svg viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4L17 12H5"/></svg><span data-i18n="bRuns">Runs</span></button>
+  <button type="button" data-vue="reglages"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg><span data-i18n="bReglages">Réglages</span></button>
+</nav>
+
+<script src="../../js/i18n.js"></script>
+<script src="../../js/graph.js"></script>
+<script src="../../js/demo-runs.js"></script>
+<script src="../../js/kit.js"></script>
+<script src="../../js/commun.js"></script>
+<script src="a.js"></script>
+</body>
+</html>

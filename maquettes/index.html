@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>DRAGLOGICS · 3 maquettes</title>
+<link rel="icon" href="../img/icon-192.webp">
+<link rel="stylesheet" href="comparer.css">
+</head>
+<body>
+<header>
+  <h1 id="titre">Trois maquettes DRAGLOGICS</h1>
+  <p id="sous">Chaque maquette est connectée au kit de démonstration. Touche, fais défiler, rejoue un run. Note ce que tu aimes dans chacune.</p>
+  <div class="outils">
+    <div class="seg" id="segLangue"><button type="button" data-v="fr" class="on">Français</button><button type="button" data-v="en">English</button></div>
+    <div class="seg" id="segFormat"><button type="button" data-v="tel" class="on" id="fTel">Téléphone</button><button type="button" data-v="tab" id="fTab">Tablette</button></div>
+    <div class="seg" id="segTheme"><button type="button" data-v="" class="on" id="thDef">Thème de la maquette</button><button type="button" data-v="light" id="thClair">Clair</button><button type="button" data-v="dark" id="thSombre">Sombre</button></div>
+  </div>
+</header>
+<main class="grille">
+  <section class="maquette">
+    <h2>A · <span data-t="aNom">Cockpit</span></h2>
+    <ul data-t="aPoints"></ul>
+    <div class="cadre"><iframe id="ifA" title="Maquette A" loading="eager"></iframe></div>
+    <a class="ouvrir" id="lienA" target="_blank" rel="noopener" data-t="ouvrir">Ouvrir seule</a>
+  </section>
+  <section class="maquette">
+    <h2>B · <span data-t="bNom">Guidée</span></h2>
+    <ul data-t="bPoints"></ul>
+    <div class="cadre"><iframe id="ifB" title="Maquette B" loading="eager"></iframe></div>
+    <a class="ouvrir" id="lienB" target="_blank" rel="noopener" data-t="ouvrir">Ouvrir seule</a>
+  </section>
+  <section class="maquette">
+    <h2>C · <span data-t="cNom">Une page</span></h2>
+    <ul data-t="cPoints"></ul>
+    <div class="cadre"><iframe id="ifC" title="Maquette C" loading="eager"></iframe></div>
+    <a class="ouvrir" id="lienC" target="_blank" rel="noopener" data-t="ouvrir">Ouvrir seule</a>
+  </section>
+</main>
+<script src="comparer.js"></script>
+</body>
+</html>
