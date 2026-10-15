@@ -272,11 +272,19 @@ window.DLKit = (function () {
       var p = [ble.ch.telem.startNotifications().then(function () { ble.ch.telem.addEventListener('characteristicvaluechanged', surTelem); })];
       if (ble.ch.dump) p.push(ble.ch.dump.startNotifications().then(function () { ble.ch.dump.addEventListener('characteristicvaluechanged', surDump); }));
       return Promise.all(p).then(function () {
-        st = { connecte: true, mode: 'ble', nom: dev.name || ('DL_' + (cfg.sfx || '?')) };
+        st = { connecte: true, mode: 'ble', nom: nomDuKit(cfg, dev.name) };
         emettre('etat', { connecte: true, mode: 'ble', nom: st.nom });
         return st;
       });
     });
+  }
+  // [0.9.0, 15 oct.] LE NOM VIENT DU KIT, PAS DU SYSTEME. dev.name est le nom que Chrome ou iOS ont GARDE EN CACHE
+  // (iOS : peripheral.name, lu a la derniere connexion) : apres un changement de nom, l'app montrait un vieux nom.
+  // Le firmware s'annonce « CAR » + les 5 premiers caracteres permis du suffixe (buildBleDeviceName) : on le recalcule
+  // depuis la configuration lue dans le kit. Repli sur le nom du systeme si le kit n'a pas de suffixe.
+  function nomDuKit(cfg, nomSysteme) {
+    var s = String(cfg && cfg.sfx != null ? cfg.sfx : '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 5);
+    return s ? 'CAR' + s : (nomSysteme || '?');
   }
   function lireConfigBle() {
     return lireJson(ble.ch.config).then(function (cfg) {
@@ -301,6 +309,8 @@ window.DLKit = (function () {
       return ecrire(ble.ch.config, JSON.stringify(diff)).then(function () { return lireJson(ble.ch.config); }).then(function (apres) {
         var refus = cles.filter(function (k) { return !egal(apres[k], diff[k]); });
         if (refus.length) throw new Error(TT('kitRefus', { x: refus.join(', ') }));
+        // [0.9.0] nouveau nom : l'app le montre tout de suite (le kit l'annonce a son prochain demarrage)
+        if ('sfx' in diff) { st.nom = nomDuKit(apres, st.nom); emettre('etat', { connecte: st.connecte, mode: st.mode, nom: st.nom }); }
         return { envoye: diff };
       });
     });
