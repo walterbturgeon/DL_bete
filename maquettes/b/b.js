@@ -494,6 +494,9 @@
     idxMajCible(); idxMajId();
     var i = lireSec($('bIdxIndex')), m = lireSec($('bIdxMarge'));
     if (isFinite(i) && isFinite(m)) idxGarder({ index: i, marge: m });
+    // [0.9.0, 15 oct.] UN SEUL CHOIX : « Oui » = index actif ET toujours arme (idxam 1), « Non » = coupe (idxam 0).
+    // Plus d'armement a la main pour un run : c'etait un oubli possible de plus (demande de simplicite).
+    $('f-idxam').value = $('f-idxon').value === '1' ? 1 : 0;
   }
   ['bIdxIndex', 'bIdxMarge'].forEach(function (id) { $(id).addEventListener('input', idxMajCible); });
   $('bIdxId').addEventListener('input', idxMajId);
@@ -513,22 +516,13 @@
   function majIdxCourir(t) {
     var on = idxConnu() && Number(cfg.idxon) === 1;
     $('bIdx').hidden = !on; if (!on) return;
-    var ix = t && t.ix, arme = ix ? !!(ix[2] & 1) : !!Number(cfg.idxa), permanent = Number(cfg.idxam) === 1;
+    // arme : bit 0 de l'etat du kit ; « Oui » dans Regler le met toujours (un reglage ancien a la main, non : on le dit)
+    var ix = t && t.ix, arme = ix ? !!(ix[2] & 1) : (Number(cfg.idxam) === 1 || !!Number(cfg.idxa));
     $('bIdxChip').className = 'b-chip' + (arme ? ' sel' : ''); $('bIdxChip').textContent = T(arme ? 'b_idxArme' : 'b_idxPasArme');
     $('bIdxTxt').textContent = Number(cfg.idxc) ? T('b_idxCibleCourte', { c: DLC.sec(Number(cfg.idxc)) }) : T('b_idxCibleVide');
-    $('bIdxArmer').hidden = permanent || !!(t && t.etat === 'COURSE');
-    $('bIdxArmer').textContent = T(arme ? 'b_idxDesarmer' : 'b_idxArmer');
     $('bIdxDirect').textContent = (ix && (t.etat === 'COURSE' || ix[0] > 0))
       ? T('b_idxDirect', { a: ix[1] == null ? '--' : (ix[1] > 0 ? '+' : '') + ix[1], c: ix[0], p: Math.round(ix[0] / 10.23) }) : '';
   }
-  $('bIdxArmer').addEventListener('click', function () {
-    var b = $('bIdxArmer'), msg = $('bIdxCourirMsg'), vers = (dernierTelem && dernierTelem.ix ? (dernierTelem.ix[2] & 1) : Number(cfg && cfg.idxa)) ? 'idxoff' : 'idxarm';
-    b.disabled = true; msg.textContent = '';
-    DLKit.commande(vers).then(function () { return attendre(400); }).then(function () { return DLKit.lireConfig(); })
-      .then(function (c) { cfg = c; if (Number(c.idxa) !== (vers === 'idxarm' ? 1 : 0)) msg.textContent = T('b_idxArmNon'); majIdxCourir(dernierTelem); })
-      .catch(function (e) { msg.textContent = e.message; })
-      .then(function () { b.disabled = false; });
-  });
 
   // ---- [B v0.4] l'etape « Ton ECU » (7 oct.) : la marque pose le mode CAN, le debit et le depart
   //   Holley HP / Terminator X : HOLLEY, hecu 0 (transbrake canal 298), 1 Mbit/s automatique, ID de l'expander au choix

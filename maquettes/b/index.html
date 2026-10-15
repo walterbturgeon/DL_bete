@@ -47,12 +47,11 @@
   <div class="b-etat-kit" id="bEtatKit" hidden><span class="b-gps" id="bGps"><span class="point"></span><span id="bGpsTxt"></span></span>
     <span class="b-chip" id="bTb" hidden></span></div>
   <button type="button" class="bouton plein large b-rearmer" id="bRearmer" hidden data-i18n="b_rearmer">Réarmer le chrono</button>
-  <!-- [B v0.9] la course a index : armee ou non, la cible, et pendant le run l'avance projetee et la commande envoyee -->
+  <!-- [B v0.9] la course a index : active ou non, la cible, et pendant le run l'avance projetee et la commande envoyee.
+       [0.9.0, 15 oct.] plus de bouton « Armer » : « Oui » dans Regler = toujours armee (demande de simplicite). -->
   <div class="b-carte b-idx" id="bIdx" hidden>
     <div class="b-idx-l"><span class="b-chip" id="bIdxChip"></span><span id="bIdxTxt"></span></div>
     <p class="b-idx-direct num" id="bIdxDirect"></p>
-    <button type="button" class="bouton" id="bIdxArmer" data-i18n="b_idxArmer">Armer l'index</button>
-    <p class="aide" id="bIdxCourirMsg" aria-live="polite"></p>
   </div>
   <div class="b-carte b-vitesse"><span class="num" id="bVit">--</span><small id="bU">km/h</small><span class="b-g num"><span data-i18n="lG">G</span> <b id="bG">--</b></span></div>
   <div class="b-carte"><ul class="b-liste-jal" id="bJal"></ul></div>
@@ -200,8 +199,8 @@
            f-idxc (ms) et f-idxid sont caches : b.js les calcule depuis l'index + la marge (s) et l'ID en hexadecimal. -->
       <div class="b-etape" id="bIdxEtape" hidden><span class="rond">5</span><div><h3 data-i18n="b_idxTitre">Course à index</h3>
         <input type="hidden" id="f-idxc"><input type="hidden" id="f-idxid">
-        <div class="champ"><label for="f-idxon" data-i18n="idxonNom">Commande du papillon</label>
-          <select id="f-idxon"><option value="0" data-i18n="b_idxCoupee">Coupée</option><option value="1" data-i18n="b_idxActive">Active</option></select></div>
+        <div class="champ"><label for="f-idxon" data-i18n="idxonNom">Mode index</label>
+          <select id="f-idxon"><option value="0" data-i18n="b_idxCoupee">Non</option><option value="1" data-i18n="b_idxActive">Oui</option></select></div>
         <div class="b-idx-deux">
           <div class="champ"><label for="bIdxIndex" data-i18n="b_idxIndex">Index (s)</label><input type="text" id="bIdxIndex" inputmode="decimal" autocomplete="off"></div>
           <div class="champ"><label for="bIdxMarge" data-i18n="b_idxMarge">Marge (s)</label><input type="text" id="bIdxMarge" inputmode="decimal" autocomplete="off"></div>
@@ -211,8 +210,7 @@
           <select id="bIdxRef"></select></div>
         <button type="button" class="bouton" id="bIdxRefBtn" data-i18n="b_idxRefBtn">Prendre ce run comme référence</button>
         <p class="aide" id="bIdxRefTxt"></p>
-        <div class="champ"><label for="f-idxam" data-i18n="idxamNom">Armement</label>
-          <select id="f-idxam"><option value="0" data-i18n="b_idxam0">À la main, pour un seul run</option><option value="1" data-i18n="b_idxam1">Toujours armée</option></select></div>
+        <input type="hidden" id="f-idxam"><!-- [0.9.0] suit « Mode index » : Oui = 1 (toujours armee), Non = 0 -->
         <p class="aide" data-i18n="b_idxAide"></p>
         <details class="b-plus"><summary data-i18n="b_idxPlus">Commande : réglages avancés</summary>
           <div class="champ"><label for="bIdxId" data-i18n="idxidNom">Trame CAN (ID en hexadécimal)</label><input type="text" id="bIdxId" autocomplete="off" spellcheck="false" maxlength="5"></div>
