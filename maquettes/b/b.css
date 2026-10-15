@@ -147,3 +147,11 @@ dl.b-fiche dt { color:var(--muted); } dl.b-fiche dd { margin:0; font-weight:700;
 .b-barre svg { width:24px; height:24px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
 .b-barre button.actif { color:var(--sel); }
 .b-barre button.actif svg { background:var(--selbg); border-radius:12px; padding:2px; width:44px; height:28px; }
+
+/* [B v0.9] la course a index */
+.b-idx-deux { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:0 12px; }
+.b-idx-deux .champ { min-width:0; } .b-idx-deux input { width:100%; min-width:0; box-sizing:border-box; }
+.b-idx { display:flex; flex-direction:column; gap:8px; }
+.b-idx-l { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; font-size:14px; color:var(--muted); }
+.b-idx-direct { margin:0; font-size:15px; font-weight:600; color:var(--ink); min-height:1.2em; }
+.b-idx .bouton { align-self:flex-start; }

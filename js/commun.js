@@ -114,7 +114,9 @@ window.DLC = (function () {
   // memes bornes que le firmware : le kit refuse un envoi ENTIER pour une seule valeur hors bornes, on le dit avant
   // [B v0.4] + l'ECU : expander Holley, ID lu / envoye du Link, trame CAN de depart (memes bornes que applyConfigJson)
   var BORNES = { rpo: [0, 36], jpo: [-120, 36], d60: [-72, 72], cms: [-600, 600], tzh: [-12, 14],
-                 hid: [0, 2047], lid: [1, 2047], eid: [1, 2046], scby: [0, 7], scmk: [1, 255], sced: [0, 2], strig: [0, 2] };
+                 hid: [0, 2047], lid: [1, 2047], eid: [1, 2046], scby: [0, 7], scmk: [1, 255], sced: [0, 2], strig: [0, 2],
+                 // [B v0.9] la course a index (PT2.1.60) ; idxc (0 ou 3000..30000 ms) est verifiee plus bas
+                 idxon: [0, 1], idxid: [1, 2047], idxz: [0, 200], idxp: [10, 1000], idxf: [0, 3000], idxv: [50, 10230], idxam: [0, 1] };
   function borner(k, v) { var b = BORNES[k]; return Math.max(b[0], Math.min(b[1], v)); }
   function verifier(cfg) {
     var err = null;
@@ -130,12 +132,20 @@ window.DLC = (function () {
       var max = Number(cfg.scext) === 1 ? 0x1FFFFFFF : 0x7FF;
       if (!Number.isInteger(Number(cfg.scid)) || cfg.scid < 0 || cfg.scid > max) err = err || (T('b_scidNom') + ' : 0 … ' + max);
     }
+    // [B v0.9] la cible d'index : 0 (aucune) ou 3,000 a 30,000 s ; la pleine commande doit venir apres la zone morte
+    if (cfg.idxc != null && !isNaN(cfg.idxc)) {
+      var c = Number(cfg.idxc);
+      if (!Number.isInteger(c) || (c !== 0 && (c < 3000 || c > 30000))) err = err || (T('idxcNom') + ' : 3,000 … 30,000 s');
+    }
+    if (cfg.idxz != null && cfg.idxp != null && !isNaN(cfg.idxz) && !isNaN(cfg.idxp) && Number(cfg.idxp) <= Number(cfg.idxz))
+      err = err || (T('idxpNom') + ' > ' + T('idxzNom'));
     return err;
   }
 
   // Les champs du formulaire portent l'id f-<cle> (cle = celle du JSON du kit). Un champ absent de la maquette est ignore.
   var CHAMPS = ['rpo', 'jpo', 'd60', 'cms', 'pfft', 'hecu', 'strig', 'mode', 'cbr', 'grate', 'sfx', 'tzh',
-                'hid', 'lect', 'lid', 'eid', 'scid', 'scext', 'scby', 'scmk', 'sced'];   // [B v0.4] l'ECU et le depart CAN
+                'hid', 'lect', 'lid', 'eid', 'scid', 'scext', 'scby', 'scmk', 'sced',   // [B v0.4] l'ECU et le depart CAN
+                'idxon', 'idxc', 'idxid', 'idxz', 'idxp', 'idxf', 'idxv', 'idxam'];      // [B v0.9] la course a index
   var TEXTES = { mode: 1, sfx: 1, lect: 1 };   // les cles dont la valeur est un mot, pas un nombre
   function majPieds(k) {
     var el = $('p-' + k), inp = $('f-' + k); if (!el || !inp) return;

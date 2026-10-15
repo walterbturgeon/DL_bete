@@ -27,8 +27,8 @@ DLI18n.ajouter({
   b_s3: 'Your start', b_s4: 'To the ECU', b_s5: 'The kit', b_ticketVide: 'No run to compare. Connect the kit and make a run.',
   b_ticketAvecRun: 'Check this run against the slip', b_saisieErr: 'Type at least one time from the slip.', b_vitLab: '{d} speed'
 });
-DLI18n.ajouter({ b_tkPastille: '{n}/{m}', b_version: 'DRAGLOGICS — maquette {v}. Locale : rien n’est publié.' },
-                 { b_tkPastille: '{n}/{m}', b_version: 'DRAGLOGICS — mockup {v}. Local only: nothing is published.' });
+DLI18n.ajouter({ b_tkPastille: '{n}/{m}', b_version: 'DRAGLOGICS {v} — version d’essai. Le kit de démonstration rejoue des runs synthétiques.' },
+                 { b_tkPastille: '{n}/{m}', b_version: 'DRAGLOGICS {v} — test version. The demo kit replays synthetic runs.' });
 // [B v0.8] la lecture automatique du ticket (7 oct.)
 DLI18n.ajouter({
   b_ocrLire: 'Lire le ticket', b_ocrNumero: 'Ton numéro sur le ticket', b_ocrNumeroAide: 'Sert à trouver ton couloir (ex. NT1234).',
@@ -138,4 +138,43 @@ DLI18n.ajouter({
   b_runsManque: '⚠ The kit announces {a} runs but {n} did not arrive: the kit could not send them (firmware).',
   b_majConfirme: 'Put the kit in update mode? It leaves Bluetooth and opens its update WiFi until the next restart.',
   b_majBle: 'The kit is in update mode: join its BPS-GPS-OTA WiFi, then open http://192.168.4.1/update.'
+});
+
+// [B v0.9] la course a index (kit PT2.1.60) : la trame 0x406 vers l'ECU, le run de reference, l'armement
+DLI18n.ajouter({
+  b_idxTitre: 'Course à index', idxonNom: 'Commande du papillon', b_idxCoupee: 'Coupée', b_idxActive: 'Active',
+  b_idxIndex: 'Index (s)', b_idxMarge: 'Marge (s)', idxcNom: 'Cible (index + marge)',
+  b_idxCibleTxt: 'Le kit vise {c} s au 1/4 (temps de la piste). Breakout sous {i} s.',
+  b_idxCibleVide: 'Entre l’index et la marge : sans cible, le kit ne commande rien.',
+  b_idxRef: 'Run de référence', b_idxRefBtn: 'Prendre ce run comme référence', b_idxPasDeRun: 'Aucun 1/4 complet dans le kit',
+  b_idxRefAucune: 'Référence actuelle : aucune. Sans référence, le kit ne commande rien.',
+  b_idxRefActuelle: 'Référence actuelle : le run de {h}, 1/4 à {t} s.',
+  b_idxRefEnvoi: 'Envoi au kit…', b_idxRefOk: 'Référence prise par le kit.',
+  b_idxRefNon: '⚠ Le kit n’a pas pris ce run (pas un 1/4 complet, ou flash pleine). La référence n’a pas changé.',
+  idxamNom: 'Armement', b_idxam0: 'À la main, pour un seul run', b_idxam1: 'Toujours armée',
+  b_idxAide: 'Entre 330 et 1320 pi, le kit projette ton 1/4 avec le run de référence. S’il finirait avant la cible, il envoie à l’ECU une commande de 0 à 1023 qui réduit le papillon, jamais plus vite qu’un pied. 0 = aucune réduction. La limite de la réduction est dans la table de l’ECU.',
+  b_idxPlus: 'Commande : réglages avancés', idxidNom: 'Trame CAN (ID en hexadécimal)', b_idxIdErr: 'ID CAN invalide : 1 à 7FF en hexadécimal.',
+  idxzNom: 'Zone morte (ms d’avance)', idxpNom: 'Commande pleine à (ms d’avance)', idxfNom: 'Filtre (ms)', idxvNom: 'Pente maximale (comptes par seconde)',
+  b_idxTrame: 'Trame de 8 octets, gros-boutiste, 25 fois par seconde : octets 0-1 commande (0-1023), 2 état, 3 compteur, 4-5 avance projetée (ms, signée), 6-7 distance (pi).',
+  b_idxArmer: 'Armer l’index', b_idxDesarmer: 'Désarmer l’index', b_idxArme: 'INDEX ARMÉ', b_idxPasArme: 'INDEX PAS ARMÉ',
+  b_idxCibleCourte: 'cible {c} s', b_idxDirect: 'Avance {a} ms · commande {c} ({p} %)',
+  b_idxArmNon: '⚠ Le kit n’a pas changé l’armement : vérifie la cible, la référence, et qu’aucun run n’est en cours.'
+}, {
+  b_idxTitre: 'Index racing', idxonNom: 'Throttle command', b_idxCoupee: 'Off', b_idxActive: 'On',
+  b_idxIndex: 'Index (s)', b_idxMarge: 'Margin (s)', idxcNom: 'Target (index + margin)',
+  b_idxCibleTxt: 'The kit aims at {c} s in the 1/4 (track time). Breakout under {i} s.',
+  b_idxCibleVide: 'Enter the index and the margin: without a target, the kit commands nothing.',
+  b_idxRef: 'Reference run', b_idxRefBtn: 'Use this run as the reference', b_idxPasDeRun: 'No full 1/4 in the kit',
+  b_idxRefAucune: 'Current reference: none. Without a reference, the kit commands nothing.',
+  b_idxRefActuelle: 'Current reference: the run of {h}, 1/4 in {t} s.',
+  b_idxRefEnvoi: 'Sending to the kit…', b_idxRefOk: 'Reference taken by the kit.',
+  b_idxRefNon: '⚠ The kit did not take this run (not a full 1/4, or flash full). The reference did not change.',
+  idxamNom: 'Arming', b_idxam0: 'By hand, for one run', b_idxam1: 'Always armed',
+  b_idxAide: 'Between 330 and 1320 ft, the kit projects your 1/4 with the reference run. If you would finish before the target, it sends the ECU a 0 to 1023 command that reduces the throttle, never faster than a foot. 0 = no reduction. The reduction limit is in the ECU table.',
+  b_idxPlus: 'Command: advanced settings', idxidNom: 'CAN frame (hexadecimal ID)', b_idxIdErr: 'Invalid CAN ID: 1 to 7FF in hexadecimal.',
+  idxzNom: 'Dead band (ms of lead)', idxpNom: 'Full command at (ms of lead)', idxfNom: 'Filter (ms)', idxvNom: 'Maximum slope (counts per second)',
+  b_idxTrame: '8-byte frame, big-endian, 25 times per second: bytes 0-1 command (0-1023), 2 state, 3 counter, 4-5 projected lead (ms, signed), 6-7 distance (ft).',
+  b_idxArmer: 'Arm the index', b_idxDesarmer: 'Disarm the index', b_idxArme: 'INDEX ARMED', b_idxPasArme: 'INDEX NOT ARMED',
+  b_idxCibleCourte: 'target {c} s', b_idxDirect: 'Lead {a} ms · command {c} ({p} %)',
+  b_idxArmNon: '⚠ The kit did not change the arming: check the target, the reference, and that no run is in progress.'
 });

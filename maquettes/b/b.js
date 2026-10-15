@@ -3,7 +3,7 @@
 // [B v0.2] (7 oct. : retour a la B) la langue est SEULEMENT dans Regler ; l'en-tete montre la connexion ;
 // repris de la maquette C : fiche du kit (calibration, mise a jour), ticket garde par run avec sa pastille n/m.
 (function () {
-  var VERSION = 'B v0.8';
+  var VERSION = '0.9.0';   // = MARKETING_VERSION de l'app iPhone (ios/App/App.xcodeproj)
   var $ = DLC.$, T = DLI18n.T;
   // les textes de B sont dans b-textes.js (charge avant ce fichier)
   // [B v0.2] les tickets de demonstration et la comparaison viennent du noyau commun (DLC) ; les tickets tapes
@@ -51,7 +51,7 @@
     if (DLKit.etat().mode === 'ble') { $('tRunsSous').textContent = T('b_runsLecture'); $('bRunsVide').textContent = T('b_runsLecture'); }
     DLKit.listerRuns().then(function (l) {
       runs = DLC.trier(l); $('bRunsVide').textContent = T('b_aucunRun');
-      rendreListe(); rendreAccueil(); preparerTicket(); if (apres) apres();
+      rendreListe(); rendreAccueil(); preparerTicket(); if (idxConnu()) idxListeRuns(); if (apres) apres();
       // [B v0.4] le kit annonce plus de runs qu'il n'en envoie : on le dit (vu sur un kit : 8 annonces, 0 recu)
       if (l.manque) {
         var txt = T('b_runsManque', { n: l.manque, a: l.annonce }) + (l.refus && l.refus.length ? ' ' + l.refus.join(' ; ') : '');
@@ -131,6 +131,7 @@
     }
     // Rearmer : quand le kit attend un reset, jamais pendant une course
     $('bRearmer').hidden = !(t && (t.etat === 'FINI' || t.etat === 'ABANDON' || t.etat === 'ATTENTE'));
+    majIdxCourir(t);   // [B v0.9] la course a index
   }
   $('bRearmer').addEventListener('click', function () {
     $('bRearmer').disabled = true;
@@ -428,8 +429,106 @@
 
   // ---- regler
   DLC.brancherPas($('bForm'));
-  function rendreRegl() { $('bRegVide').hidden = !!cfg; $('bRegCorps').hidden = !cfg; $('bFormMsg').textContent = ''; if (cfg) { DLC.remplirForm(cfg); ecuDepuisCfg(); } }
-  $('bForm').addEventListener('submit', function (ev) { ev.preventDefault(); DLC.envoyerForm($('bFormMsg'), function (c) { cfg = c; ecuDepuisCfg(); rendreFiche(); }); });
+  function rendreRegl() { $('bRegVide').hidden = !!cfg; $('bRegCorps').hidden = !cfg; $('bFormMsg').textContent = ''; if (cfg) { DLC.remplirForm(cfg); ecuDepuisCfg(); idxDepuisCfg(); } }
+  $('bForm').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    idxVersForm();   // [B v0.9] index + marge -> f-idxc, ID hexadecimal -> f-idxid (gardes dans l'appareil)
+    DLC.envoyerForm($('bFormMsg'), function (c) { cfg = c; ecuDepuisCfg(); idxDepuisCfg(); rendreFiche(); majIdxCourir(dernierTelem); });
+  });
+
+  // ---- [B v0.9] LA COURSE A INDEX (kit PT2.1.60, 15 oct.) : la cible = index + marge (temps de la piste), le run de
+  // reference, l'armement. Le kit envoie a l'ECU une commande 0-1023 (trame 0x406) qui ne fait que REDUIRE le papillon.
+  // Le kit ne repond pas a ses commandes (idxref, idxarm) : l'ecran relit la config et dit si rien n'a change.
+  var IDX_CLE = 'dlxB_idx';
+  function idxPrefs() { try { return JSON.parse(localStorage.getItem(IDX_CLE)) || {}; } catch (e) { return {}; } }
+  function idxGarder(p) { try { localStorage.setItem(IDX_CLE, JSON.stringify(p)); } catch (e) {} }
+  function lireSec(el) { var v = parseFloat(String(el.value).replace(',', '.').replace(/\s/g, '')); return isFinite(v) ? v : NaN; }
+  function idxConnu() { return !!(cfg && cfg.idxon != null); }
+  function idxRefTexte(r) {
+    if (!r) return T('b_idxRefAucune');
+    var p = String(r).split(';');
+    return T('b_idxRefActuelle', { h: p[1] || '?', t: p[2] ? DLC.sec(Number(p[2])) : '?' });
+  }
+  // le run choisi est-il celui que le kit a pris ? demo : « id;hh:mm:ss;t » ; vrai kit : « seq;hh:mm:ss;t » et l'id
+  // du run porte l'heure (hhmmss) et le temps au 1/4 (voir analyserDump)
+  function idxRefEst(id, r) {
+    if (!r) return false;
+    var p = String(r).split(';');
+    return p[0] === id || (id.indexOf('_' + (p[1] || '').replace(/:/g, '') + '_') >= 0 && id.indexOf('_' + p[2] + '_') >= 0);
+  }
+  function idxMajCible() {
+    var i = lireSec($('bIdxIndex')), m = lireSec($('bIdxMarge')), ok = isFinite(i) && isFinite(m) && i > 0 && m >= 0;
+    $('f-idxc').value = ok ? Math.round((i + m) * 1000) : '';
+    $('bIdxCible').textContent = ok ? T('b_idxCibleTxt', { c: DLC.sec(Math.round((i + m) * 1000)), i: DLC.sec(Math.round(i * 1000)) }) : T('b_idxCibleVide');
+  }
+  function idxMajId() {
+    var h = $('bIdxId').value.trim().replace(/^0x/i, ''), v = /^[0-9a-f]{1,3}$/i.test(h) ? parseInt(h, 16) : NaN, ok = v >= 1 && v <= 0x7FF;
+    $('f-idxid').value = ok ? v : '';
+    $('bIdxMsg').className = ok || !h ? '' : 'msg-err'; $('bIdxMsg').textContent = ok || !h ? '' : T('b_idxIdErr');
+  }
+  function idxListeRuns() {
+    var sel = $('bIdxRef'), avant = sel.value;
+    var pleins = runs.filter(function (r) { return r.jalons && r.jalons['1320']; });
+    sel.innerHTML = pleins.length ? pleins.map(function (r) {
+      return '<option value="' + r.id + '">' + T('b_run') + ' ' + (runs.length - runs.indexOf(r)) + ' · ' + DLC.quand(r.quand) + ' · ' + DLC.sec(r.jalons['1320'].t) + ' s</option>';
+    }).join('') : '<option value="">' + T('b_idxPasDeRun') + '</option>';
+    if (avant && pleins.some(function (r) { return r.id === avant; })) sel.value = avant;
+    else { var actuel = pleins.filter(function (r) { return idxRefEst(r.id, cfg && cfg.idxr); })[0]; if (actuel) sel.value = actuel.id; }
+    $('bIdxRefBtn').disabled = !pleins.length;
+  }
+  function idxDepuisCfg() {
+    $('bIdxEtape').hidden = !idxConnu();
+    if (!idxConnu()) return;
+    var p = idxPrefs(), c = Number(cfg.idxc) || 0;
+    if (c && p.index != null && p.marge != null && Math.round((p.index + p.marge) * 1000) === c) {
+      $('bIdxIndex').value = decimal(p.index, 3); $('bIdxMarge').value = decimal(p.marge, 3);
+    } else if (c) { $('bIdxIndex').value = decimal((c - 100) / 1000, 3); $('bIdxMarge').value = decimal(0.1, 3); }
+    else { $('bIdxIndex').value = p.index != null ? decimal(p.index, 3) : ''; $('bIdxMarge').value = decimal(p.marge != null ? p.marge : 0.1, 3); }
+    $('bIdxId').value = (Number(cfg.idxid) || 0x406).toString(16).toUpperCase();
+    idxMajCible(); idxMajId();
+    $('bIdxRefTxt').textContent = idxRefTexte(cfg.idxr);
+    idxListeRuns();
+  }
+  function idxVersForm() {
+    if (!idxConnu()) return;
+    idxMajCible(); idxMajId();
+    var i = lireSec($('bIdxIndex')), m = lireSec($('bIdxMarge'));
+    if (isFinite(i) && isFinite(m)) idxGarder({ index: i, marge: m });
+  }
+  ['bIdxIndex', 'bIdxMarge'].forEach(function (id) { $(id).addEventListener('input', idxMajCible); });
+  $('bIdxId').addEventListener('input', idxMajId);
+  function attendre(ms) { return new Promise(function (ok) { setTimeout(ok, ms); }); }
+  $('bIdxRefBtn').addEventListener('click', function () {
+    var id = $('bIdxRef').value, msg = $('bIdxMsg'), btn = $('bIdxRefBtn'); if (!id) return;
+    btn.disabled = true; msg.className = ''; msg.textContent = T('b_idxRefEnvoi');
+    // le kit lit le run en flash dans sa boucle : on lui laisse 1,2 s avant de relire
+    DLKit.commande('idxref:' + id).then(function () { return attendre(1200); }).then(function () { return DLKit.lireConfig(); })
+      .then(function (c) {
+        cfg = c; $('bIdxRefTxt').textContent = idxRefTexte(c.idxr);
+        var pris = idxRefEst(id, c.idxr); msg.className = pris ? 'msg-ok' : 'msg-err'; msg.textContent = T(pris ? 'b_idxRefOk' : 'b_idxRefNon');
+        majIdxCourir(dernierTelem);
+      }).catch(function (e) { msg.className = 'msg-err'; msg.textContent = e.message; })
+      .then(function () { btn.disabled = false; });
+  });
+  function majIdxCourir(t) {
+    var on = idxConnu() && Number(cfg.idxon) === 1;
+    $('bIdx').hidden = !on; if (!on) return;
+    var ix = t && t.ix, arme = ix ? !!(ix[2] & 1) : !!Number(cfg.idxa), permanent = Number(cfg.idxam) === 1;
+    $('bIdxChip').className = 'b-chip' + (arme ? ' sel' : ''); $('bIdxChip').textContent = T(arme ? 'b_idxArme' : 'b_idxPasArme');
+    $('bIdxTxt').textContent = Number(cfg.idxc) ? T('b_idxCibleCourte', { c: DLC.sec(Number(cfg.idxc)) }) : T('b_idxCibleVide');
+    $('bIdxArmer').hidden = permanent || !!(t && t.etat === 'COURSE');
+    $('bIdxArmer').textContent = T(arme ? 'b_idxDesarmer' : 'b_idxArmer');
+    $('bIdxDirect').textContent = (ix && (t.etat === 'COURSE' || ix[0] > 0))
+      ? T('b_idxDirect', { a: ix[1] == null ? '--' : (ix[1] > 0 ? '+' : '') + ix[1], c: ix[0], p: Math.round(ix[0] / 10.23) }) : '';
+  }
+  $('bIdxArmer').addEventListener('click', function () {
+    var b = $('bIdxArmer'), msg = $('bIdxCourirMsg'), vers = (dernierTelem && dernierTelem.ix ? (dernierTelem.ix[2] & 1) : Number(cfg && cfg.idxa)) ? 'idxoff' : 'idxarm';
+    b.disabled = true; msg.textContent = '';
+    DLKit.commande(vers).then(function () { return attendre(400); }).then(function () { return DLKit.lireConfig(); })
+      .then(function (c) { cfg = c; if (Number(c.idxa) !== (vers === 'idxarm' ? 1 : 0)) msg.textContent = T('b_idxArmNon'); majIdxCourir(dernierTelem); })
+      .catch(function (e) { msg.textContent = e.message; })
+      .then(function () { b.disabled = false; });
+  });
 
   // ---- [B v0.4] l'etape « Ton ECU » (7 oct.) : la marque pose le mode CAN, le debit et le depart
   //   Holley HP / Terminator X : HOLLEY, hecu 0 (transbrake canal 298), 1 Mbit/s automatique, ID de l'expander au choix

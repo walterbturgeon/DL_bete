@@ -8,7 +8,7 @@ aucun Mac n'est nécessaire.
 |---|---|
 | Nom de l'app | DRAGLOGICS |
 | Bundle ID | `com.bps.draglogics` (permanent) |
-| Version | 0.8.0 ; numéro de build = numéro de l'exécution GitHub |
+| Version | 0.9.0 ; numéro de build = numéro de l'exécution GitHub |
 | Appareils | iPhone seulement, portrait, iOS 15 ou plus récent |
 | Compilation | Xcode 26 et SDK iOS 26 (obligatoires depuis le 28 avril 2026), Mac `macos-26` de GitHub |
 | Signature | automatique « cloud » : Apple garde le certificat de distribution ; une clé API Admin suffit |

@@ -1,6 +1,6 @@
 {
   "name": "draglogics",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "private": true,
   "description": "DRAGLOGICS : application de chrono de drag (iPhone, Android, web) qui parle au kit DRAGLOGICS par le Bluetooth",
   "license": "UNLICENSED",

@@ -7,7 +7,7 @@
 <title>DRAGLOGICS · B</title>
 <link rel="icon" href="../../img/icon-192.webp">
 <link rel="stylesheet" href="../../css/base-maquettes.css?v=0.3">
-<link rel="stylesheet" href="b.css?v=0.3">
+<link rel="stylesheet" href="b.css?v=0.9">
 </head>
 <body>
 <!-- MAQUETTE B « GUIDEE » : clair, un accueil a 4 grandes tuiles, les etapes, et la comparaison au ticket. -->
@@ -47,6 +47,13 @@
   <div class="b-etat-kit" id="bEtatKit" hidden><span class="b-gps" id="bGps"><span class="point"></span><span id="bGpsTxt"></span></span>
     <span class="b-chip" id="bTb" hidden></span></div>
   <button type="button" class="bouton plein large b-rearmer" id="bRearmer" hidden data-i18n="b_rearmer">Réarmer le chrono</button>
+  <!-- [B v0.9] la course a index : armee ou non, la cible, et pendant le run l'avance projetee et la commande envoyee -->
+  <div class="b-carte b-idx" id="bIdx" hidden>
+    <div class="b-idx-l"><span class="b-chip" id="bIdxChip"></span><span id="bIdxTxt"></span></div>
+    <p class="b-idx-direct num" id="bIdxDirect"></p>
+    <button type="button" class="bouton" id="bIdxArmer" data-i18n="b_idxArmer">Armer l'index</button>
+    <p class="aide" id="bIdxCourirMsg" aria-live="polite"></p>
+  </div>
   <div class="b-carte b-vitesse"><span class="num" id="bVit">--</span><small id="bU">km/h</small><span class="b-g num"><span data-i18n="lG">G</span> <b id="bG">--</b></span></div>
   <div class="b-carte"><ul class="b-liste-jal" id="bJal"></ul></div>
   <div class="b-carte">
@@ -189,6 +196,32 @@
         <div class="champ"><label for="f-tzh" data-i18n="tzhNom"></label><input type="number" id="f-tzh" min="-12" max="14" step="1"></div>
         <div class="champ"><label for="f-pfft" data-i18n="pfftNom"></label><select id="f-pfft"></select></div>
         <div class="champ"><label for="f-cms" data-i18n="cmsNom"></label><input type="number" id="f-cms" min="-600" max="600" step="5"><p class="aide" data-i18n="cmsAide"></p></div></div></div>
+      <!-- [B v0.9] LA COURSE A INDEX (kit PT2.1.60, cle idxon). Montree seulement si le kit la connait.
+           f-idxc (ms) et f-idxid sont caches : b.js les calcule depuis l'index + la marge (s) et l'ID en hexadecimal. -->
+      <div class="b-etape" id="bIdxEtape" hidden><span class="rond">5</span><div><h3 data-i18n="b_idxTitre">Course à index</h3>
+        <input type="hidden" id="f-idxc"><input type="hidden" id="f-idxid">
+        <div class="champ"><label for="f-idxon" data-i18n="idxonNom">Commande du papillon</label>
+          <select id="f-idxon"><option value="0" data-i18n="b_idxCoupee">Coupée</option><option value="1" data-i18n="b_idxActive">Active</option></select></div>
+        <div class="b-idx-deux">
+          <div class="champ"><label for="bIdxIndex" data-i18n="b_idxIndex">Index (s)</label><input type="text" id="bIdxIndex" inputmode="decimal" autocomplete="off"></div>
+          <div class="champ"><label for="bIdxMarge" data-i18n="b_idxMarge">Marge (s)</label><input type="text" id="bIdxMarge" inputmode="decimal" autocomplete="off"></div>
+        </div>
+        <p class="aide" id="bIdxCible"></p>
+        <div class="champ"><label for="bIdxRef" data-i18n="b_idxRef">Run de référence</label>
+          <select id="bIdxRef"></select></div>
+        <button type="button" class="bouton" id="bIdxRefBtn" data-i18n="b_idxRefBtn">Prendre ce run comme référence</button>
+        <p class="aide" id="bIdxRefTxt"></p>
+        <div class="champ"><label for="f-idxam" data-i18n="idxamNom">Armement</label>
+          <select id="f-idxam"><option value="0" data-i18n="b_idxam0">À la main, pour un seul run</option><option value="1" data-i18n="b_idxam1">Toujours armée</option></select></div>
+        <p class="aide" data-i18n="b_idxAide"></p>
+        <details class="b-plus"><summary data-i18n="b_idxPlus">Commande : réglages avancés</summary>
+          <div class="champ"><label for="bIdxId" data-i18n="idxidNom">Trame CAN (ID en hexadécimal)</label><input type="text" id="bIdxId" autocomplete="off" spellcheck="false" maxlength="5"></div>
+          <div class="champ"><label for="f-idxz" data-i18n="idxzNom">Zone morte (ms d'avance)</label><input type="number" id="f-idxz" min="0" max="200" step="1"></div>
+          <div class="champ"><label for="f-idxp" data-i18n="idxpNom">Commande pleine à (ms d'avance)</label><input type="number" id="f-idxp" min="10" max="1000" step="1"></div>
+          <div class="champ"><label for="f-idxf" data-i18n="idxfNom">Filtre (ms)</label><input type="number" id="f-idxf" min="0" max="3000" step="10"></div>
+          <div class="champ"><label for="f-idxv" data-i18n="idxvNom">Pente maximale (comptes par seconde)</label><input type="number" id="f-idxv" min="50" max="10230" step="1"></div>
+          <p class="aide" data-i18n="b_idxTrame"></p></details>
+        <p class="aide" id="bIdxMsg" aria-live="polite"></p></div></div>
       <div class="b-envoi"><button type="submit" class="bouton plein large" data-i18n="envoyer">Envoyer au kit</button><p id="bFormMsg" aria-live="polite"></p></div>
     </div>
   </form>
@@ -235,10 +268,11 @@
 <script src="../../js/i18n.js?v=0.3"></script>
 <script src="../../js/graph.js?v=0.3"></script>
 <script src="../../js/demo-runs.js?v=0.3"></script>
-<script src="../../js/kit.js?v=0.3"></script>
-<script src="../../js/commun.js?v=0.3"></script>
+<script src="../../js/index-calc.js?v=0.9"></script>
+<script src="../../js/kit.js?v=0.9"></script>
+<script src="../../js/commun.js?v=0.9"></script>
 <script src="../../js/ocr-ticket.js?v=0.8"></script>
-<script src="b-textes.js?v=0.3"></script>
-<script src="b.js?v=0.3"></script>
+<script src="b-textes.js?v=0.9"></script>
+<script src="b.js?v=0.9"></script>
 </body>
 </html>
