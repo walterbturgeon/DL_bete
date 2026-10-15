@@ -47,9 +47,9 @@ pour chacun :
 
 | Nom du secret | Valeur |
 |---|---|
-| `ASC_KEY_ID` | le Key ID |
-| `ASC_ISSUER_ID` | l'Issuer ID |
-| `ASC_KEY_P8` | tout le contenu du fichier `.p8`, de `-----BEGIN PRIVATE KEY-----` à `-----END PRIVATE KEY-----` compris |
+| `APP_STORE_CONNECT_KEY_ID` | le Key ID |
+| `APP_STORE_CONNECT_ISSUER_ID` | l'Issuer ID |
+| `APP_STORE_CONNECT_API_KEY` | tout le contenu du fichier `.p8`, de `-----BEGIN PRIVATE KEY-----` à `-----END PRIVATE KEY-----` compris (le même texte encodé en base64 est aussi accepté) |
 | `APPLE_TEAM_ID` | le Team ID |
 
 GitHub ne montre plus jamais un secret après son enregistrement, et ne le montre pas dans les journaux.
