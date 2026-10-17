@@ -136,6 +136,14 @@
         <table class="b-table"><thead><tr><th data-i18n="b_jalon">Jalon</th><th class="n" data-i18n="b_kit">Kit</th><th class="n" data-i18n="b_tk">Ticket</th><th class="n" data-i18n="b_ecart">Écart</th><th></th></tr></thead><tbody id="bResCorps"></tbody></table>
         <p class="b-bilan" id="bBilan"></p>
         <p class="aide" id="bConseil"></p>
+        <!-- [0.10.0] LE CALAGE AUTOMATIQUE : le depart qui colle a ce ticket, la valeur du milieu des 5 derniers tickets
+             du kit, ecrit dans le kit. « Annuler » remet le depart d'avant. -->
+        <div class="b-calage" id="bCalage" hidden>
+          <h3 data-i18n="b_calTitre">Calage automatique</h3>
+          <p id="bCalTxt" aria-live="polite"></p>
+          <p class="aide num" id="bCalPrevu"></p>
+          <button type="button" class="bouton" id="bCalAnnuler" hidden data-i18n="b_calAnnuler">Annuler le calage</button>
+        </div>
       </div>
     </div>
   </div>
@@ -146,6 +154,19 @@
   <form id="bForm" novalidate>
     <p class="vide" id="bRegVide" data-i18n="videReg">Connecte un kit.</p>
     <div id="bRegCorps" hidden>
+      <!-- [0.10.0] LA REGLE UNIFORME (kit PT2.1.64) : un seul choix, le type de vehicule. Le depart est cale tout seul
+           par chaque ticket compare (« Comparer au ticket ») ; a la main seulement sous « Régler le départ à la main ».
+           f-veh et f-dep (demi-pouces) sont caches : b.js les pose. Un kit sans la cle « veh » garde les etapes d'avant. -->
+      <div class="b-etape" id="bVehEtape" hidden><span class="rond">1</span><div><h3 data-i18n="b_vehTitre">Ton véhicule</h3>
+        <input type="hidden" id="f-veh"><input type="hidden" id="f-dep">
+        <div class="seg" id="segVeh"><button type="button" data-v="1" data-i18n="b_vehVoiture">Voiture</button><button type="button" data-v="2" data-i18n="b_vehMoto">Moto</button></div>
+        <p class="b-depart" id="bDepart"></p>
+        <p class="aide" data-i18n="b_vehAide"></p>
+        <details class="b-plus" id="bDepMain"><summary data-i18n="b_depMain">Régler le départ à la main</summary>
+          <div class="pas"><button type="button" id="bDepMoins">−½</button><span class="b-dep-val num" id="bDepVal"></span><button type="button" id="bDepPlus">+½</button></div>
+          <p class="aide" data-i18n="b_depMainAide"></p></details></div></div>
+      <div id="bAncien">
+      <p class="aide b-maj-kit" id="bVehMaj" hidden></p>
       <div class="b-etape"><span class="rond">1</span><div><h3 data-i18n="b_s1">Où le chrono part</h3>
         <div class="pas" data-champ="rpo"><button type="button" data-pas="-1">−1</button><input type="number" id="f-rpo" min="0" max="36" step="1" data-i18n-aria="rpoNom"><button type="button" data-pas="1">+1</button><span class="pieds" id="p-rpo"></span></div>
         <p class="aide" data-i18n="rpoAide"></p></div></div>
@@ -155,6 +176,7 @@
         <details class="b-plus"><summary data-i18n="b_s2b">Si le 60 pi reste à part</summary>
           <div class="pas" data-champ="d60"><button type="button" data-pas="-6">−6</button><button type="button" data-pas="-1">−1</button><input type="number" id="f-d60" min="-72" max="72" step="1" data-i18n-aria="d60Nom"><button type="button" data-pas="1">+1</button><button type="button" data-pas="6">+6</button><span class="pieds" id="p-d60"></span></div>
           <p class="aide" data-i18n="d60Aide"></p></details></div></div>
+      </div>
       <!-- [B v0.4] UNE etape « Ton ECU » (7 oct.) : la marque choisit le mode CAN, le debit et le depart ;
            on ne montre que ce qui se regle pour cette marque. f-mode et f-hecu sont caches : b.js les pose. -->
       <div class="b-etape"><span class="rond">3</span><div><h3 data-i18n="b_s3e">Ton ECU</h3>
@@ -194,7 +216,7 @@
         <div class="champ"><label for="f-grate" data-i18n="grateNom"></label><select id="f-grate"><option value="40">25 Hz</option><option value="50">20 Hz</option><option value="100">10 Hz</option></select></div>
         <div class="champ"><label for="f-tzh" data-i18n="tzhNom"></label><input type="number" id="f-tzh" min="-12" max="14" step="1"></div>
         <div class="champ"><label for="f-pfft" data-i18n="pfftNom"></label><select id="f-pfft"></select></div>
-        <div class="champ"><label for="f-cms" data-i18n="cmsNom"></label><input type="number" id="f-cms" min="-600" max="600" step="5"><p class="aide" data-i18n="cmsAide"></p></div></div></div>
+        <div class="champ" id="bChCms"><label for="f-cms" data-i18n="cmsNom"></label><input type="number" id="f-cms" min="-600" max="600" step="5"><p class="aide" data-i18n="cmsAide"></p></div></div></div>
       <!-- [B v0.9] LA COURSE A INDEX (kit PT2.1.60, cle idxon). Montree seulement si le kit la connait.
            f-idxc (ms) et f-idxid sont caches : b.js les calcule depuis l'index + la marge (s) et l'ID en hexadecimal. -->
       <div class="b-etape" id="bIdxEtape" hidden><span class="rond">5</span><div><h3 data-i18n="b_idxTitre">Course à index</h3>
@@ -267,10 +289,11 @@
 <script src="../../js/graph.js?v=0.3"></script>
 <script src="../../js/demo-runs.js?v=0.3"></script>
 <script src="../../js/index-calc.js?v=0.9"></script>
-<script src="../../js/kit.js?v=0.9"></script>
-<script src="../../js/commun.js?v=0.9"></script>
+<script src="../../js/chrono.js?v=0.10"></script>
+<script src="../../js/kit.js?v=0.10"></script>
+<script src="../../js/commun.js?v=0.10"></script>
 <script src="../../js/ocr-ticket.js?v=0.8"></script>
-<script src="b-textes.js?v=0.9"></script>
-<script src="b.js?v=0.9"></script>
+<script src="b-textes.js?v=0.10"></script>
+<script src="b.js?v=0.10"></script>
 </body>
 </html>

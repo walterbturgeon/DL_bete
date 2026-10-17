@@ -24,12 +24,14 @@ window.DLKit = (function () {
 
   // Bornes des reglages = celles du firmware PT2.1.56 (un envoi hors bornes est refuse en entier par le kit).
   // [B v0.9] + la course a index (PT2.1.60) ; idxc (0 ou 3000..30000) est verifiee a part.
-  var BORNES = { rpo: [0, 36], jpo: [-120, 36], d60: [-72, 72], cms: [-600, 600], tzh: [-12, 14],
+  // [0.10.0] + le type de vehicule (veh 0..2) et le depart en demi-pouces (dep 0..72, 0 = defaut du type) : PT2.1.64
+  var BORNES = { rpo: [0, 36], jpo: [-120, 36], d60: [-72, 72], cms: [-600, 600], tzh: [-12, 14], veh: [0, 2], dep: [0, 72],
                  idxid: [1, 2047], idxz: [0, 200], idxp: [10, 1000], idxf: [0, 3000], idxv: [50, 10230], idxam: [0, 1], idxon: [0, 1] };
 
   // ---------------------------------------------------------------- le kit de demonstration
   var demo = {
-    cfg: { fw: 'PT2.1.56', app: 'dlg', sfx: 'DEMO', board: 'DEMO00000000', rpo: 12, jpo: 12, cms: 0, d60: 0, pfft: 0,
+    // [0.10.0] comme un kit PT2.1.64 de type voiture : depart par defaut 8 po (16 demi-pouces), jalons a D - 50 po
+    cfg: { fw: 'PT2.1.64', app: 'dlg', sfx: 'DEMO', board: 'DEMO00000000', rpo: 8, jpo: -50, cms: 0, d60: 0, veh: 1, dep: 16, pfft: 0,
            mode: 'HOLLEY', cbr: 1000000, hecu: 1, strig: 1, scid: 1280, grate: 40, dynm: 8, imuf: 2, tzh: -4,
            imu: 1, cal: 1, sats: 14, fix: 3, hz: 25,
            // [B v0.4] l'ECU et le depart CAN, memes cles que le JSON du kit
@@ -364,8 +366,11 @@ window.DLKit = (function () {
       return {
         id: carte + '_' + x.heure.replace(/:/g, '') + '_' + (fin ? fin.t : 0) + '_' + x.R.length,
         quand: x.heure, ordre: x.ordre, genre: '', src: x.kv.src, statut: x.kv.statut,
+        // [0.10.0] kit PT2.1.64 : « veh=moto|voiture » (type de vehicule) et le depart au demi-pouce (rollout_po=10.5) ;
+        // dyn = le modele GPS du run (le calage n'utilise que les runs en modele 8)
         reglages: { rpo: +(x.kv.rollout_po || 12), jpo: +(x.kv.jalons_po != null ? x.kv.jalons_po : (x.kv.rollout_po || 12)),
-                    cms: +(x.kv.corr_ms || 0), d60: +(x.kv.dec60_po || 0) },
+                    cms: +(x.kv.corr_ms || 0), d60: +(x.kv.dec60_po || 0),
+                    veh: x.kv.veh === 'voiture' ? 1 : x.kv.veh === 'moto' ? 2 : 0, dyn: x.kv.dyn != null ? +x.kv.dyn : null },
         jalons: x.J, colonnes: ['t_ms', 'kmh', 'pi', 'g_long'],
         // colonnes du kit : elapsed_ms, kmh_x100, dist_ft, ax, ay, az (mg)... ; G long = -(ay - ay au repos), comme la demo
         ech: x.R.map(function (e) { return [e[0], e[1] / 100, e[2], Math.round(-(e[4] - ay0)) / 1000]; })
@@ -422,8 +427,16 @@ window.DLKit = (function () {
       if (!st.connecte) return Promise.reject(new Error('hors-ligne'));
       if (st.mode === 'ble') return ecrireConfigBle(cfg);
       try { verifier(cfg); } catch (e) { return Promise.reject(e); }
-      Object.keys(cfg).forEach(function (k) { if (k !== 'idxa' && k !== 'idxr') demo.cfg[k] = cfg[k]; });
+      Object.keys(cfg).forEach(function (k) {
+        if (k !== 'idxa' && k !== 'idxr' && !(typeof cfg[k] === 'number' && isNaN(cfg[k]))) demo.cfg[k] = cfg[k];
+      });
       if (!Number(demo.cfg.idxon)) demo.cfg.idxa = 0;   // [B v0.9] comme le kit : fonction coupee = desarmee
+      // [0.10.0] comme le kit PT2.1.64 (chronoParType) : le type fixe tout le chrono sauf le depart
+      var ty = window.DLChrono && DLChrono.TYPES[Number(demo.cfg.veh)];
+      if (ty) {
+        if (!Number(demo.cfg.dep)) demo.cfg.dep = ty.dep2;
+        demo.cfg.jpo = ty.jal; demo.cfg.cms = 0; demo.cfg.d60 = 0; demo.cfg.dynm = 8; demo.cfg.rpo = Math.round(Number(demo.cfg.dep) / 2);
+      }
       return Promise.resolve(true);
     },
     listerRuns: function () {

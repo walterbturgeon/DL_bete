@@ -113,7 +113,8 @@ window.DLC = (function () {
   // ---------------------------------------------------------------- reglages du kit
   // memes bornes que le firmware : le kit refuse un envoi ENTIER pour une seule valeur hors bornes, on le dit avant
   // [B v0.4] + l'ECU : expander Holley, ID lu / envoye du Link, trame CAN de depart (memes bornes que applyConfigJson)
-  var BORNES = { rpo: [0, 36], jpo: [-120, 36], d60: [-72, 72], cms: [-600, 600], tzh: [-12, 14],
+  // [0.10.0] + le type de vehicule et le depart en demi-pouces (kit PT2.1.64)
+  var BORNES = { rpo: [0, 36], jpo: [-120, 36], d60: [-72, 72], cms: [-600, 600], tzh: [-12, 14], veh: [0, 2], dep: [0, 72],
                  hid: [0, 2047], lid: [1, 2047], eid: [1, 2046], scby: [0, 7], scmk: [1, 255], sced: [0, 2], strig: [0, 2],
                  // [B v0.9] la course a index (PT2.1.60) ; idxc (0 ou 3000..30000 ms) est verifiee plus bas
                  idxon: [0, 1], idxid: [1, 2047], idxz: [0, 200], idxp: [10, 1000], idxf: [0, 3000], idxv: [50, 10230], idxam: [0, 1] };
@@ -145,7 +146,8 @@ window.DLC = (function () {
   // Les champs du formulaire portent l'id f-<cle> (cle = celle du JSON du kit). Un champ absent de la maquette est ignore.
   var CHAMPS = ['rpo', 'jpo', 'd60', 'cms', 'pfft', 'hecu', 'strig', 'mode', 'cbr', 'grate', 'sfx', 'tzh',
                 'hid', 'lect', 'lid', 'eid', 'scid', 'scext', 'scby', 'scmk', 'sced',   // [B v0.4] l'ECU et le depart CAN
-                'idxon', 'idxc', 'idxid', 'idxz', 'idxp', 'idxf', 'idxv', 'idxam'];      // [B v0.9] la course a index
+                'idxon', 'idxc', 'idxid', 'idxz', 'idxp', 'idxf', 'idxv', 'idxam',       // [B v0.9] la course a index
+                'veh', 'dep'];                                                           // [0.10.0] type et depart (PT2.1.64)
   var TEXTES = { mode: 1, sfx: 1, lect: 1 };   // les cles dont la valeur est un mot, pas un nombre
   function majPieds(k) {
     var el = $('p-' + k), inp = $('f-' + k); if (!el || !inp) return;
@@ -221,10 +223,11 @@ window.DLC = (function () {
 
   // ---------------------------------------------------------------- comparaison au ticket de la piste
   // Tickets FICTIFS des runs de demonstration synthetiques (outils/gen_demo_runs.py), en secondes et en mph.
+  // [0.10.0] la piste fictive part a 8,5 po (le kit de demo a 8 po) : le calage automatique de la demo trouve 8,5 po
   var TICKETS_DEMO = {
-    'demo-1': { 60: 1.290, 330: 3.223, 660: 4.781, 1320: 7.306, v660: 156.66, v1320: 195.46 },
-    'demo-2': { 60: 1.278, 330: 3.239, 660: 4.890, 1320: 8.705, v660: 139.78, v1320: 100.58 },
-    'demo-3': { 60: 1.895, 330: 4.955, 660: 7.534, 1320: 11.687, v660: 95.03, v1320: 117.58 }
+    'demo-1': { 60: 1.229, 330: 3.216, 660: 4.794, 1320: 7.304, v660: 156.24, v1320: 195.24 },
+    'demo-2': { 60: 1.238, 330: 3.252, 660: 4.882, 1320: 8.696, v660: 140.06, v1320: 100.92 },
+    'demo-3': { 60: 1.835, 330: 4.944, 660: 7.527, 1320: 11.694, v660: 94.78, v1320: 117.45 }
   };
   DLI18n.ajouter({
     tk_conseil60: 'Le 60 pi seul est en retard : essaie « Position des jalons » ou « Décalage du 60 pi ».',

@@ -3,7 +3,8 @@
 # Modele physique simple d'une voiture de drag fictive : adherence (montee sur 150 ms), puissance, trainee.
 # Le meme format qu'un run du kit DLPT2 :
 #   ech = [temps depuis le declenchement (ms), vitesse (km/h), distance depuis l'arret (pi), G longitudinal (g)], ~25 Hz
-#   jalons = temps du kit (ms) : t(D + 1 pi) - t(1 pi), roll-out 12 po ; vitesse au jalon (km/h), aucune au 60 pi
+#   jalons = temps du kit (ms) : comme un kit PT2.1.64 de type voiture (voir JAL_PO, DEP_KIT_PO plus bas) ;
+#   vitesse au jalon (km/h), aucune au 60 pi
 # Graine fixe : la sortie est la meme a chaque execution. Tickets fictifs imprimes pour js/commun.js (TICKETS_DEMO).
 #   python outils/gen_demo_runs.py
 import json, math, os, random
@@ -66,6 +67,38 @@ def t_a_distance(trace, d_pi):
     raise SystemExit('!!! distance %s pi jamais atteinte' % d_pi)
 
 
+# [0.10.0] Le kit de demo est un kit PT2.1.64 de type VOITURE : jalons a D - 50 po, depart par defaut 8 po. Ses temps
+# sortent du MEME calcul que le kit et l'app (js/chrono.js) : distance integree sur la vitesse des echantillons.
+# La piste fictive part a 8,5 po : le calage automatique de la demo trouve donc 8,5 po.
+JAL_PO, DEP_KIT_PO, DEP_PISTE_PO = -50, 8.0, 8.5
+FT_PAR_M = 3.28084
+
+
+def points_kit(ech):
+    # la voiture est a l'arret au declenchement : la distance part du declenchement (voir js/chrono.js)
+    avant = [e for e in ech if -1500 <= e[0] < 0]
+    v_der = avant[-1][1] if avant else 0.0
+    if v_der >= 1.1:
+        raise SystemExit('!!! demo : la voiture roule au declenchement, cas pas prevu ici')
+    pts, d, t_prec, v_prec = [(0, v_der, 0.0)], 0.0, 0, v_der
+    for e in ech:
+        if e[0] < 0:
+            continue
+        dt = e[0] - t_prec
+        if 0 < dt < 500:
+            d += (v_prec + e[1]) / 2 / 3.6 * dt / 1000 * FT_PAR_M
+        pts.append((e[0], e[1], d))
+        t_prec, v_prec = e[0], e[1]
+    return pts
+
+
+def t_pts(pts, x):
+    for a, b in zip(pts, pts[1:]):
+        if a[2] < x <= b[2]:
+            return a[0] + (b[0] - a[0]) * (x - a[2]) / (b[2] - a[2])
+    raise SystemExit('!!! distance %s pi jamais atteinte (kit)' % x)
+
+
 def run(rid, quand, genre, part_p, part_a, leve_pi, rnd):
     tr = simuler(part_p, part_a, leve_pi, rnd)
     t_fin = tr[-1][0]
@@ -81,39 +114,45 @@ def run(rid, quand, genre, part_p, part_a, leve_pi, rnd):
             g = a / G + rnd.gauss(0, 0.04)
         ech.append([int(round(t * 1000)), round(kmh, 2), round(pi, 1), round(g, 3)])
         t += 0.040 + rnd.uniform(-0.002, 0.002)                                           # GPS 25 Hz, un peu de gigue
-    t1 = t_a_distance(tr, 1.0)
+    # les temps du KIT : depart 8 po, jalons a D - 50 po, sur ses propres echantillons
+    pts = points_kit(ech)
+    t0k = t_pts(pts, DEP_KIT_PO / 12)
     jalons = {}
     for D in (60, 330, 660, 1320):
-        tD = t_a_distance(tr, D + 1.0)
-        v = None if D == 60 else round(a_l_instant(tr, tD)[1] * 3.6, 2)
-        jalons[str(D)] = {'t': int(round((tD - t1) * 1000)), 'v': v}
+        tD = t_pts(pts, D + JAL_PO / 12)
+        v = None if D == 60 else round(a_l_instant(tr, tD / 1000)[1] * 3.6, 2)
+        jalons[str(D)] = {'t': int(round(tD - t0k)), 'v': v}
+    # les temps de la PISTE fictive (pour le ticket) : la vraie trajectoire, depart 8,5 po, memes jalons
+    t0p = t_a_distance(tr, DEP_PISTE_PO / 12)
+    piste = {D: t_a_distance(tr, D + JAL_PO / 12) - t0p for D in (60, 330, 660, 1320)}
     # vitesses du ticket : moyenne sur les 66 pi avant le jalon (piege de la piste), en mph
     def piege(D):
-        ta, tb = t_a_distance(tr, D - 66 + 1.0), t_a_distance(tr, D + 1.0)
+        ta, tb = t_a_distance(tr, D - 66 + JAL_PO / 12), t_a_distance(tr, D + JAL_PO / 12)
         return 66 * FT / (tb - ta) * 3600 / 1609.344
     r = {'id': rid, 'quand': quand, 'genre': genre, 'src': 'TRANSBRAKE',
-         'reglages': {'rpo': 12, 'jpo': 12, 'cms': 0, 'd60': 0}, 'jalons': jalons,
+         'reglages': {'rpo': DEP_KIT_PO, 'jpo': JAL_PO, 'cms': 0, 'd60': 0, 'veh': 1, 'dyn': 8}, 'jalons': jalons,
          'colonnes': ['t_ms', 'kmh', 'pi', 'g_long'], 'ech': ech}
-    return r, {'v660': piege(660), 'v1320': piege(1320)}
+    return r, {'v660': piege(660), 'v1320': piege(1320), 'piste': piste}
 
 
 def main():
     rnd = random.Random(20260613)
     runs, tickets = [], {}
-    # ecart ticket - kit (s) : fictif, pour montrer la comparaison (demo-1 : le 60 pi seul est en retard)
-    ECARTS = {'demo-1': (0.031, 0.008, -0.004, 0.012), 'demo-2': (0.006, -0.009, 0.011, 0.004), 'demo-3': (0.012, 0.010, 0.014, 0.009)}
+    # [0.10.0] le ticket = la piste fictive (depart 8,5 po) + un petit bruit de chronometrage fictif (s)
+    BRUIT = {'demo-1': (0.002, -0.001, 0.001, -0.002), 'demo-2': (-0.001, 0.002, -0.002, 0.001), 'demo-3': (0.001, 0.001, -0.001, 0.002)}
     for rid, quand, genre, pp, pa, lv in RUNS:
         r, pg = run(rid, quand, genre, pp, pa, lv, rnd)
         runs.append(r)
-        e = ECARTS[rid]
-        tickets[rid] = {str(D): round(r['jalons'][str(D)]['t'] / 1000 + e[i], 3) for i, D in enumerate((60, 330, 660, 1320))}
+        e = BRUIT[rid]
+        tickets[rid] = {str(D): round(pg['piste'][D] + e[i], 3) for i, D in enumerate((60, 330, 660, 1320))}
         tickets[rid].update({'v660': round(pg['v660'], 2), 'v1320': round(pg['v1320'], 2)})
         print('%s %-5s n=%d  60=%d 330=%d 660=%d 1320=%d ms  v660=%s v1320=%s km/h' % (
             rid, genre, len(r['ech']), *[r['jalons'][k]['t'] for k in ('60', '330', '660', '1320')],
             r['jalons']['660']['v'], r['jalons']['1320']['v']))
     entete = ("// Jeu de demonstration : 3 runs SYNTHETIQUES (modele physique d'une voiture fictive, aucune donnee reelle).\n"
               "// Genere par outils/gen_demo_runs.py (graine fixe). Colonnes de ech : temps depuis le declenchement (ms),\n"
-              "// vitesse (km/h), distance depuis l'arret (pi), G longitudinal (g). Temps des jalons = comme le kit (ms).\n"
+              "// vitesse (km/h), distance depuis l'arret (pi), G longitudinal (g). Temps des jalons = comme un kit PT2.1.64\n"
+              "// de type voiture (depart 8 po, jalons a D - 50 po), en ms.\n"
               "'use strict';\n")
     with open(SORTIE, 'w', encoding='utf-8', newline='\n') as f:
         f.write(entete + 'window.DL_DEMO_RUNS = ' + json.dumps(runs, separators=(',', ':')) + ';\n')

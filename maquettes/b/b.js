@@ -3,7 +3,7 @@
 // [B v0.2] (7 oct. : retour a la B) la langue est SEULEMENT dans Regler ; l'en-tete montre la connexion ;
 // repris de la maquette C : fiche du kit (calibration, mise a jour), ticket garde par run avec sa pastille n/m.
 (function () {
-  var VERSION = '0.9.0';   // = MARKETING_VERSION de l'app iPhone (ios/App/App.xcodeproj)
+  var VERSION = '0.10.0';   // = MARKETING_VERSION de l'app iPhone (ios/App/App.xcodeproj)
   var $ = DLC.$, T = DLI18n.T;
   // les textes de B sont dans b-textes.js (charge avant ce fichier)
   // [B v0.2] les tickets de demonstration et la comparaison viennent du noyau commun (DLC) ; les tickets tapes
@@ -12,6 +12,11 @@
   var TK_CLE = 'dlxB_tickets', tickets = {};
   try { tickets = JSON.parse(localStorage.getItem(TK_CLE) || '{}'); } catch (e) {}
   function garderTickets() { try { localStorage.setItem(TK_CLE, JSON.stringify(tickets)); } catch (e) {} }
+  // [0.10.0] le calage automatique, par kit (cle = numero de carte du kit) : { veh, liste: [{ d: depart en demi-pouces,
+  // run, q: date }] }, les 5 derniers tickets. Garde dans l'appareil seulement, comme les tickets.
+  var CAL_CLE = 'dlxB_calage', calages = {};
+  try { calages = JSON.parse(localStorage.getItem(CAL_CLE) || '{}'); } catch (e) {}
+  function garderCalages() { try { localStorage.setItem(CAL_CLE, JSON.stringify(calages)); } catch (e) {} }
   var prefs = new DLC.Prefs('dlxB_prefs', { langue: null, unite: null, theme: 'auto', texte: 'n', vue: 'accueil', numero: '' });
   DLC.brancher(prefs);
   DLI18n.choisir(prefs.v.langue);
@@ -257,6 +262,7 @@
     remplirSaisie(r && tickets[r.id]);
     $('bRemplirDemo').hidden = !(r && DLKit.etat().mode === 'demo' && TICKETS_DEMO[r.id]);
     if (r && tickets[r.id]) montrerResultat(DLC.comparerTicket(r, tickets[r.id])); else $('bResultat').hidden = true;
+    $('bCalage').hidden = true; calAvant = null;   // [0.10.0] le calage se fait seulement sur « Comparer »
     afficherPhoto(r);
   }
   $('bTRun').addEventListener('change', montrerTicketRun);
@@ -412,6 +418,80 @@
     montrerResultat(DLC.comparerTicket(r, tk));
     rendreListe(); if (runA && runA.id === r.id) pastille($('bTicketPastille'), runA);
     ticketFait = true; rendreAccueil();
+    calerAvecTicket(r, tk);   // [0.10.0]
+  });
+
+  // ---- [0.10.0] LE CALAGE AUTOMATIQUE (16 oct. : « quand on compare le slip en photo ou importe, l'app calibre
+  // automatiquement »). Etude sur des runs reels avec ticket : le depart cale sur UN ticket (jalons du type), juge
+  // sur les autres runs du meme kit, tient la cible (0,020 s au 60 pi, 0,015 s ensuite) ; caler aussi les jalons
+  // sur un seul ticket fait pire. Garde-fous : le ticket doit tenir lui-meme dans la cible apres calage ; l'app doit
+  // refaire les temps du kit a 3 ms pres ; seuls les runs en modele GPS 8 comptent ; la valeur du milieu des 5
+  // derniers tickets ; un ticket qui s'ecarte de plus de 2 po pose une question.
+  var calAvant = null;   // { board, dep, liste } : de quoi annuler le dernier calage
+  function signe(e) { return (e >= 0 ? '+' : '−') + DLC.nf(Math.abs(e), 3); }
+  function calerAvecTicket(r, tk) {
+    var box = $('bCalage'), txt = $('bCalTxt');
+    $('bCalPrevu').textContent = ''; $('bCalAnnuler').hidden = true; calAvant = null;
+    function dire(cle, v, ok) { box.hidden = false; txt.className = ok ? 'msg-ok' : ok === false ? 'msg-err' : ''; txt.textContent = T(cle, v); }
+    var veh = typeDuKit();
+    if (veh == null) { box.hidden = true; return; }                 // kit d'avant la PT2.1.64 : pas de calage
+    if (!DLChrono.TYPES[veh]) return dire('b_calSansType', null, false);
+    var tks = { '60': tk['60'], '330': tk['330'], '660': tk['660'], '1320': tk['1320'] };
+    if (tks['60'] == null || !['330', '660', '1320'].some(function (k) { return tks[k] != null; })) return dire('b_calPeu', null, false);
+    var board = cfg.board;
+    DLKit.lireRun(r.id).then(function (run) {
+      var g = run.reglages || {};
+      if (g.dyn != null && g.dyn !== 8) return dire('b_calDyn', { m: g.dyn }, false);
+      var ck = DLChrono.controleKit(run);
+      if (ck != null && ck > DLChrono.ECART_KIT_MS) {
+        console.error('[B] calage refuse : l\'app refait les temps du run ' + run.id + ' a ' + ck + ' ms de ceux du kit');
+        return dire('b_calDiverge', { n: ck }, false);
+      }
+      var c = DLChrono.caler(run, tks, veh);
+      if (!c) return dire('b_calRien', null, false);
+      if (c.hors) {
+        var k = Object.keys(c.ecarts).sort(function (a, b) { return Math.abs(c.ecarts[b]) - Math.abs(c.ecarts[a]); })[0];
+        return dire('b_calRefus', { j: T('j' + k), e: signe(c.ecarts[k]) }, false);
+      }
+      if (!cfg || cfg.board !== board) throw new Error('hors-ligne');   // le kit a change pendant le calcul
+      var kc = calages[board];
+      if (!kc || kc.veh !== veh) kc = calages[board] = { veh: veh, liste: [] };
+      var avant = { board: board, dep: Number(cfg.dep), liste: kc.liste.slice() };
+      var autres = kc.liste.filter(function (x) { return x.run !== run.id; });   // un ticket recompare remplace le sien
+      var mAutres = DLChrono.mediane(autres.map(function (x) { return x.d; }));
+      if (mAutres != null && Math.abs(c.dep2 - mAutres) > 4) {
+        if (window.confirm(T('b_calLoin', { n: depPo(c.dep2), m: depPo(mAutres) }))) autres = [];
+        else return dire('b_calIgnore', { n: depPo(c.dep2) }, null);
+      }
+      autres.push({ d: c.dep2, run: run.id, q: new Date().toISOString() });
+      while (autres.length > 5) autres.shift();
+      kc.liste = autres; garderCalages();
+      var cible = DLChrono.mediane(autres.map(function (x) { return x.d; }));
+      var t = DLChrono.temps(run, { depPo: cible / 2, jal: DLChrono.TYPES[veh].jal, depuisArret: true });
+      var e = DLChrono.ecarts(t, tks);
+      $('bCalPrevu').textContent = T('b_calPrevu', { d: depPo(cible) }) + ' ' +
+        Object.keys(e).map(function (k) { return T('j' + k) + ' ' + signe(e[k]); }).join(' · ');
+      if (cible === Number(cfg.dep)) { majDepart(); return dire('b_calDeja', { d: depPo(cible), n: autres.length }, true); }
+      return DLKit.ecrireConfig({ dep: cible }).then(function () { return DLKit.lireConfig(); }).then(function (c2) {
+        cfg = c2; rendreRegl(); rendreFiche();
+        calAvant = avant; $('bCalAnnuler').hidden = false;
+        dire('b_calFait', { d: depPo(cible), a: depPo(avant.dep), n: autres.length }, true);
+      });
+    }).catch(function (err) {
+      console.error('[B] calage', err);
+      dire('b_calErr', { x: err.message === 'hors-ligne' ? T('horsLigneMsg') : err.message }, false);
+    });
+  }
+  $('bCalAnnuler').addEventListener('click', function () {
+    var a = calAvant; if (!a || !cfg || cfg.board !== a.board) return;
+    $('bCalAnnuler').disabled = true;
+    DLKit.ecrireConfig({ dep: a.dep }).then(function () { return DLKit.lireConfig(); }).then(function (c2) {
+      if (calages[a.board]) { calages[a.board].liste = a.liste; garderCalages(); }   // AVANT rendreRegl : il le montre
+      cfg = c2; rendreRegl(); rendreFiche();
+      calAvant = null; $('bCalAnnuler').hidden = true; $('bCalPrevu').textContent = '';
+      $('bCalTxt').className = ''; $('bCalTxt').textContent = T('b_calAnnule', { d: depPo(a.dep) });
+    }, function (err) { $('bCalTxt').className = 'msg-err'; $('bCalTxt').textContent = T('b_calErr', { x: err.message }); })
+      .then(function () { $('bCalAnnuler').disabled = false; });
   });
   var CONSEILS_B = { tk_conseil60: 'b_conseil60', tk_conseilTous: 'b_conseilTous', tk_conseilOk: 'b_conseilOk' };
   function montrerResultat(c) {
@@ -424,17 +504,77 @@
     })).join('');
     $('bResultat').hidden = false;
     $('bBilan').textContent = c.nTot ? T('b_bilan', { n: c.nOk, m: c.nTot }) : '';
-    $('bConseil').textContent = c.conseil ? T(CONSEILS_B[c.conseil]) : '';
+    // [0.10.0] avec un type de vehicule, le calage automatique remplace les conseils de reglage ; un kit PT2.1.64
+    // sans type : on propose de choisir le type
+    var veh = typeDuKit();
+    $('bConseil').textContent = veh ? '' : veh === 0 ? T('b_conseilType') : c.conseil ? T(CONSEILS_B[c.conseil]) : '';
   }
 
   // ---- regler
   DLC.brancherPas($('bForm'));
-  function rendreRegl() { $('bRegVide').hidden = !!cfg; $('bRegCorps').hidden = !cfg; $('bFormMsg').textContent = ''; if (cfg) { DLC.remplirForm(cfg); ecuDepuisCfg(); idxDepuisCfg(); } }
+  function rendreRegl() { $('bRegVide').hidden = !!cfg; $('bRegCorps').hidden = !cfg; $('bFormMsg').textContent = ''; if (cfg) { DLC.remplirForm(cfg); ecuDepuisCfg(); idxDepuisCfg(); vehDepuisCfg(); } }
   $('bForm').addEventListener('submit', function (ev) {
     ev.preventDefault();
     idxVersForm();   // [B v0.9] index + marge -> f-idxc, ID hexadecimal -> f-idxid (gardes dans l'appareil)
-    DLC.envoyerForm($('bFormMsg'), function (c) { cfg = c; ecuDepuisCfg(); idxDepuisCfg(); rendreFiche(); majIdxCourir(dernierTelem); });
+    DLC.envoyerForm($('bFormMsg'), function (c) { cfg = c; ecuDepuisCfg(); idxDepuisCfg(); vehDepuisCfg(); rendreFiche(); majIdxCourir(dernierTelem); });
   });
+
+  // ---- [0.10.0] LA REGLE UNIFORME (kit PT2.1.64, 16 oct.) : « il faut une regle uniforme... un parametre pour le type
+  // de vehicule et un reglage fin... tres simple ». Le pilote choisit Voiture ou Moto ; le type fixe les jalons, la
+  // correction et le modele GPS dans le kit. Le seul reglage fin, le DEPART (demi-pouces), est cale par chaque ticket
+  // compare (voir calerAvecTicket). Un kit sans la cle « veh » (firmware d'avant) garde les etapes d'avant.
+  function typeDuKit() { return cfg && cfg.veh != null ? Number(cfg.veh) : null; }
+  function depPo(d2) { return DLC.nf(d2 / 2, d2 % 2 ? 1 : 0); }
+  // les numeros des etapes visibles se suivent (1, 2, 3...), quel que soit le kit
+  function renumeroter() {
+    var n = 1, corps = $('bRegCorps');
+    document.querySelectorAll('#bRegCorps .b-etape').forEach(function (e) {
+      // cachee = elle-meme ou un parent JUSQU'A bRegCorps (l'ecran Regler peut etre cache pendant le calcul)
+      for (var p = e; p && p !== corps; p = p.parentElement) if (p.hidden) return;
+      e.querySelector('.rond').textContent = n++;
+    });
+  }
+  function vehDepuisCfg() {
+    var veh = typeDuKit(), ty = veh != null && DLChrono.TYPES[veh];
+    $('bVehEtape').hidden = veh == null;
+    $('bAncien').hidden = !!ty;                 // type pose : jalons, roll-out et 60 pi sont fixes par le kit
+    $('bChCms').hidden = !!ty;
+    $('bVehMaj').hidden = veh != null;
+    if (veh == null) $('bVehMaj').textContent = T('b_vehMajKit', { fw: cfg && cfg.fw || '?' });
+    else {
+      $('f-veh').value = veh; $('f-dep').value = cfg.dep;
+      DLC.segment('segVeh', veh ? String(veh) : '', function (v) { choisirType(Number(v)); });
+      majDepart();
+    }
+    renumeroter();
+  }
+  function choisirType(v) {
+    $('f-veh').value = v;
+    $('f-dep').value = v === typeDuKit() ? cfg.dep : 0;   // un autre type : le kit prend le depart par defaut du type
+    majDepart();
+  }
+  function majDepart() {
+    var veh = Number($('f-veh').value), ty = DLChrono.TYPES[veh], d2 = Number($('f-dep').value);
+    $('bDepMain').hidden = !ty;
+    if (!ty) { $('bDepart').textContent = T('b_vehChoisir'); return; }
+    var eff = d2 || ty.dep2, c = cfg && cfg.board && calages[cfg.board], src;
+    if (c && c.veh !== veh) c = null;
+    if (veh !== typeDuKit() || !d2) src = T('b_depDefaut', { t: T('b_vehNom' + veh) });
+    else if (d2 !== Number(cfg.dep)) src = T('b_depMainTxt');
+    else if (c && c.liste.length && DLChrono.mediane(c.liste.map(function (x) { return x.d; })) === d2)
+      src = T('b_depCale', { n: c.liste.length, q: DLC.quand(c.liste[c.liste.length - 1].q) });
+    else if (d2 === ty.dep2) src = T('b_depDefaut', { t: T('b_vehNom' + veh) });
+    else src = T('b_depMainTxt');
+    $('bDepart').textContent = T('b_depLigne', { d: depPo(eff), src: src });
+    $('bDepVal').textContent = depPo(eff) + ' ' + T('b_po');
+  }
+  function pasDepart(p) {
+    var ty = DLChrono.TYPES[Number($('f-veh').value)]; if (!ty) return;
+    var d2 = Number($('f-dep').value) || ty.dep2;
+    $('f-dep').value = Math.max(1, Math.min(72, d2 + p)); majDepart();
+  }
+  $('bDepMoins').addEventListener('click', function () { pasDepart(-1); });
+  $('bDepPlus').addEventListener('click', function () { pasDepart(1); });
 
   // ---- [B v0.9] LA COURSE A INDEX (kit PT2.1.60, 15 oct.) : la cible = index + marge (temps de la piste), le run de
   // reference, l'armement. Le kit envoie a l'ECU une commande 0-1023 (trame 0x406) qui ne fait que REDUIRE le papillon.
@@ -640,6 +780,7 @@
   }
   $('bEffacer').addEventListener('click', function () {
     prefs.effacer(); tickets = {}; try { localStorage.removeItem(TK_CLE); } catch (e) {}
+    calages = {}; try { localStorage.removeItem(CAL_CLE); } catch (e) {}   // [0.10.0] l'historique du calage aussi
     Photos.toutEffacer().catch(function (e) { console.error('[B] photos pas effacees', e); });   // [B v0.7] les photos aussi
     $('bPriveMsg').textContent = T('priveOk'); rendreListe(); preparerTicket();
   });
@@ -649,7 +790,7 @@
     var e = DLKit.etat();
     $('bPiluleTxt').textContent = e.connecte ? e.nom.replace('DRAGLOG_', '') : T('bConnecter');
     prefsApp(); rendreAccueil(); majCourir(dernierTelem); listeJal('bJal', live); rendreListe(); preparerTicket(); rendreFiche();
-    if (cfg) { DLC.remplirForm(cfg); ecuDepuisCfg(); }
+    if (cfg) { DLC.remplirForm(cfg); ecuDepuisCfg(); vehDepuisCfg(); }
     dessinerDirect(); rendreDetail();
   }
   prefsApp(); rendreAccueil(); majCourir(null); listeJal('bJal', null); rendreListe(); rendreRegl(); rendreFiche(); preparerTicket();

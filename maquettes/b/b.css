@@ -155,3 +155,9 @@ dl.b-fiche dt { color:var(--muted); } dl.b-fiche dd { margin:0; font-weight:700;
 .b-idx-l { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; font-size:14px; color:var(--muted); }
 .b-idx-direct { margin:0; font-size:15px; font-weight:600; color:var(--ink); min-height:1.2em; }
 .b-idx .bouton { align-self:flex-start; }
+/* [0.10.0] le type de vehicule, le depart, le calage automatique par ticket */
+.b-depart { margin:8px 0 2px; font-weight:700; }
+.b-dep-val { flex:1.6 1 0; min-width:80px; text-align:center; font-weight:800; }
+.b-maj-kit { margin:0 0 10px; padding:10px 12px; border-radius:12px; background:var(--selbg); }
+.b-calage { margin-top:14px; padding-top:12px; border-top:1px solid var(--line); }
+.b-calage h3 { margin:0 0 6px; font-size:16px; }

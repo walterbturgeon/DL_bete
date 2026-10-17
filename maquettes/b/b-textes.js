@@ -140,6 +140,51 @@ DLI18n.ajouter({
   b_majBle: 'The kit is in update mode: join its BPS-GPS-OTA WiFi, then open http://192.168.4.1/update.'
 });
 
+// [0.10.0] la regle uniforme (kit PT2.1.64) : le type de vehicule, le depart, le calage automatique par ticket
+DLI18n.ajouter({
+  b_vehTitre: 'Ton véhicule', b_vehVoiture: 'Voiture', b_vehMoto: 'Moto', b_vehNom1: 'voiture', b_vehNom2: 'moto', b_po: 'po',
+  b_vehAide: 'Le type règle tout le chrono. Il reste un seul réglage, le départ : l’app le cale toute seule chaque fois que tu compares un ticket.',
+  b_vehChoisir: 'Choisis le type de ton véhicule, puis « Envoyer au kit ».',
+  b_vehMajKit: 'Le firmware {fw} n’a pas le type de véhicule : mets le kit à jour (PT2.1.64 ou plus) pour le réglage simple et le calage automatique.',
+  b_depLigne: 'Départ : {d} po — {src}', b_depDefaut: 'valeur par défaut d’une {t}, pas encore calée sur un ticket',
+  b_depCale: 'calé sur {n} ticket(s), le dernier le {q}', b_depMainTxt: 'réglé à la main',
+  b_depMain: 'Régler le départ à la main', b_depMainAide: 'Par demi-pouce, puis « Envoyer au kit ». Le prochain ticket comparé recale le départ.',
+  b_conseilType: 'Choisis le type de véhicule dans Régler : l’app calera ensuite le kit avec chaque ticket.',
+  b_calTitre: 'Calage automatique', b_calAnnuler: 'Annuler le calage',
+  b_calFait: '✓ Calé : départ {d} po (avant {a} po). Valeur du milieu de {n} ticket(s). Le kit l’utilise dès le prochain run.',
+  b_calDeja: '✓ Le kit est déjà calé : départ {d} po (valeur du milieu de {n} ticket(s)).',
+  b_calPrevu: 'Ce run avec le départ {d} po :', b_calAnnule: 'Calage annulé : départ remis à {d} po.',
+  b_calSansType: 'Pas de calage : choisis d’abord le type de véhicule dans Régler.',
+  b_calPeu: 'Pas de calage : il faut le 60 pi et au moins un autre temps du ticket.',
+  b_calDyn: 'Pas de calage : ce run vient d’avant la mise à jour du kit (modèle GPS {m}). Compare un run plus récent.',
+  b_calDiverge: '⚠ Pas de calage : l’app ne refait pas les temps de ce run comme le kit (écart de {n} ms). Signale-le.',
+  b_calRefus: 'Pas de calage : ce ticket ne concorde pas avec ce run (le {j} reste à {e} s). Vérifie le run choisi et les temps lus.',
+  b_calRien: 'Pas de calage : le run est trop court pour ce ticket.',
+  b_calLoin: 'Ce ticket demande un départ de {n} po, loin des tickets d’avant ({m} po).\n\nAs-tu déplacé le kit ou l’antenne GPS ?\n\nOK : recommencer le calage avec ce ticket.\nAnnuler : ignorer ce ticket.',
+  b_calIgnore: 'Ticket ignoré pour le calage (il demandait {n} po).', b_calErr: '⚠ Calage pas fait : {x}'
+}, {
+  b_vehTitre: 'Your vehicle', b_vehVoiture: 'Car', b_vehMoto: 'Motorcycle', b_vehNom1: 'car', b_vehNom2: 'motorcycle', b_po: 'in',
+  b_vehAide: 'The type sets the whole timer. One setting is left, the start: the app sets it by itself each time you compare a time slip.',
+  b_vehChoisir: 'Pick your vehicle type, then “Send to the kit”.',
+  b_vehMajKit: 'Firmware {fw} has no vehicle type: update the kit (PT2.1.64 or later) for the simple setting and the automatic calibration.',
+  b_depLigne: 'Start: {d} in — {src}', b_depDefaut: 'default for a {t}, not set from a slip yet',
+  b_depCale: 'set from {n} slip(s), the last on {q}', b_depMainTxt: 'set by hand',
+  b_depMain: 'Set the start by hand', b_depMainAide: 'In half inches, then “Send to the kit”. The next slip you compare sets the start again.',
+  b_conseilType: 'Pick the vehicle type in Set up: the app then calibrates the kit with each slip.',
+  b_calTitre: 'Automatic calibration', b_calAnnuler: 'Undo the calibration',
+  b_calFait: '✓ Set: start {d} in (was {a} in). Middle value of {n} slip(s). The kit uses it from the next run.',
+  b_calDeja: '✓ The kit is already set: start {d} in (middle value of {n} slip(s)).',
+  b_calPrevu: 'This run with a {d} in start:', b_calAnnule: 'Calibration undone: start back to {d} in.',
+  b_calSansType: 'No calibration: first pick the vehicle type in Set up.',
+  b_calPeu: 'No calibration: the 60 ft and at least one other time from the slip are needed.',
+  b_calDyn: 'No calibration: this run was made before the kit update (GPS model {m}). Compare a newer run.',
+  b_calDiverge: '⚠ No calibration: the app does not compute this run like the kit (difference of {n} ms). Report it.',
+  b_calRefus: 'No calibration: this slip does not match this run (the {j} stays at {e} s). Check the chosen run and the times read.',
+  b_calRien: 'No calibration: the run is too short for this slip.',
+  b_calLoin: 'This slip asks for a {n} in start, far from the slips before ({m} in).\n\nDid you move the kit or the GPS antenna?\n\nOK: start the calibration again with this slip.\nCancel: ignore this slip.',
+  b_calIgnore: 'Slip ignored for the calibration (it asked for {n} in).', b_calErr: '⚠ Calibration not done: {x}'
+});
+
 // [B v0.9] la course a index (kit PT2.1.60) : la trame 0x406 vers l'ECU, le run de reference.
 // [0.9.0, 15 oct.] un seul choix Oui / Non (Oui = toujours armee) : plus de menu d'armement ni de bouton Armer.
 DLI18n.ajouter({
