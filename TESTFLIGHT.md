@@ -1,6 +1,6 @@
 # DRAGLOGICS sur iPhone : envoi à TestFlight
 
-L'app iPhone est la page `maquettes/b/` dans une app native **Capacitor 8**, avec le module Bluetooth natif
+L'app iPhone est la page `maquettes/e/` (l'habit « Piste », sur la logique de `maquettes/b/`) dans une app native **Capacitor 8**, avec le module Bluetooth natif
 `@capacitor-community/bluetooth-le`. Un **Mac de GitHub Actions** la compile et l'envoie à TestFlight :
 aucun Mac n'est nécessaire.
 
@@ -106,7 +106,7 @@ Une nouvelle build = recommencer l'étape 4. Le numéro de build monte tout seul
 |---|---|
 | `package.json`, `package-lock.json` | Capacitor 8.5.3 et le module Bluetooth 8.3.0, versions figées |
 | `capacitor.config.json` | `com.bps.draglogics`, dossier web `www`, textes de la liste des kits |
-| `outils/construire_www.py` | construit `www/` : la page B seule, à plat, plus Tesseract.js et Capacitor |
+| `outils/construire_www.py` | construit `www/` : la page E seule (avec les fichiers de B qu'elle charge), à plat, plus Tesseract.js et Capacitor |
 | `js/kit.js` | le Bluetooth natif (BleClient) habillé comme le Bluetooth Web ; `?natif=1` l'essaie dans Chrome |
 | `ios/App/App/Info.plist` | textes des permissions, `ITSAppUsesNonExemptEncryption`, portrait seulement |
 | `ios/App/App/PrivacyInfo.xcprivacy` | manifeste de confidentialité : aucun suivi, aucune donnée collectée |

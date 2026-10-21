@@ -1,0 +1,169 @@
+/* MAQUETTE E « PISTE » (21 oct.) : l'habit de l'app, aux couleurs du logo DRAGLOGICS (b.css reste charge
+   avant : seule la mise en page des blocs de B est reprise).
+     - une bande rouge pleine porte le titre (et le chevron retour dans une sous-page) ;
+     - l'ecran GO : un tableau de chrono sur fond rouge ; le logo sans kit, la vitesse et la barre de piste avec le kit ;
+     - des groupes de lignes blanches sur fond gris clair, chaque ligne : icone au trait, nom, valeur grise, chevron ;
+     - des boutons en pilule ; la barre du bas blanche, l'onglet actif en rouge.
+   Rouge #e7121a = le rouge du logo officiel DL (21 oct.) ; rouge fonce #c22428. Polices de l'appareil seulement.
+   [21 oct.] L'anneau de l'ecran GO est retire : un tableau de chrono le remplace. */
+:root { --bg:#efeff4; --card:#ffffff; --ink:#1c1c1e; --muted:#8e8e93; --line:#e5e5ea; --sel:#e7121a; --selbg:#fde8e8;
+        --ok:#28a745; --lent:#e7121a; --att:#f5a400; --tab:#f2f2f7; --trait:#1c1c1e; --cmp:#8e8e93; --gcol:#0a84ff;
+        --zone:rgba(0,0,0,.05); --doux:#e6f6ea; --doux-att:#fff4dc;
+        --rouge:#e7121a; --rouge-fonce:#c22428; --sur-rouge:#ffffff; --texte2:#3a3a3c; --chevron:#c7c7cc; --anneau:#ececec;
+        --ombre:0 8px 22px rgba(0,0,0,.22); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+        --bg:#000000; --card:#1c1c1e; --ink:#f2f2f7; --muted:#8e8e93; --line:#38383a; --sel:#ff453a; --selbg:#3a1416;
+        --ok:#32d74b; --lent:#ff453a; --att:#ffd60a; --tab:#2c2c2e; --trait:#f2f2f7; --cmp:#98989d; --gcol:#64d2ff;
+        --zone:rgba(255,255,255,.06); --doux:#12301b; --doux-att:#3a3000;
+        --rouge:#c22428; --rouge-fonce:#9e1b1f; --texte2:#d1d1d6; --chevron:#5a5a5e; --anneau:#3a3a3c; --ombre:0 8px 22px rgba(0,0,0,.6); } }
+:root[data-theme="dark"] {
+        --bg:#000000; --card:#1c1c1e; --ink:#f2f2f7; --muted:#8e8e93; --line:#38383a; --sel:#ff453a; --selbg:#3a1416;
+        --ok:#32d74b; --lent:#ff453a; --att:#ffd60a; --tab:#2c2c2e; --trait:#f2f2f7; --cmp:#98989d; --gcol:#64d2ff;
+        --zone:rgba(255,255,255,.06); --doux:#12301b; --doux-att:#3a3000;
+        --rouge:#c22428; --rouge-fonce:#9e1b1f; --texte2:#d1d1d6; --chevron:#5a5a5e; --anneau:#3a3a3c; --ombre:0 8px 22px rgba(0,0,0,.6); }
+
+body.e { background:var(--bg); color:var(--ink); }
+body.e::before { background:var(--rouge); }                         /* la zone de l'heure de l'iPhone : rouge aussi */
+body.e main { padding-top:0; }
+body.e .num { font-variant-numeric:tabular-nums; }
+
+/* ---- la bande rouge : titre au centre, chevron a gauche, etat du kit a droite */
+body.e .e-bande { position:sticky; top:0; z-index:20; display:grid; grid-template-columns:56px 1fr auto; align-items:center;
+                  min-height:56px; padding:var(--sa-h) 12px 0 4px; background:var(--rouge); color:var(--sur-rouge); }
+body.e .e-titre { grid-column:2; margin:0; text-align:center; font-size:18px; font-weight:600; letter-spacing:.01em;
+                  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+body.e .e-marque { grid-column:1; grid-row:1; width:34px; height:34px; margin-left:10px; border-radius:8px; }
+body.e .e-retour:not([hidden]) + .e-marque { display:none; }
+body.e .e-retour { grid-column:1; grid-row:1; width:48px; height:48px; border:0; background:none; color:inherit; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+body.e .e-retour svg { width:26px; height:26px; stroke:currentColor; fill:none; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; }
+body.e .b-pilule { grid-column:3; min-height:32px; padding:4px 12px; border:0; border-radius:999px; background:rgba(255,255,255,.18);
+                   color:#fff; font-size:13px; font-weight:600; }
+body.e .b-pilule .point { width:8px; height:8px; }
+body.e .b-pilule.off { color:#fff; background:rgba(0,0,0,.22); }
+body.e .b-pilule.off .point { background:var(--att); }
+body.e .b-pilule.on { color:#fff; } body.e .b-pilule.on .point { background:#3ee26a; }
+
+/* ---- les groupes : un titre gris, puis des lignes blanches de bord a bord */
+body.e .e-groupe { margin:22px 0 6px; padding:0 4px; color:var(--muted); font-size:13px; font-weight:500; text-transform:uppercase; letter-spacing:.04em; }
+body.e .e-liste, body.e .b-carte, body.e .b-etape { background:var(--card); margin:0 -16px; padding:4px 16px; border:0; border-top:1px solid var(--line);
+                  border-bottom:1px solid var(--line); border-radius:0; box-shadow:none; }
+body.e .b-etape { display:block; padding:6px 16px 14px; margin-bottom:18px; }
+body.e .b-etape .rond { display:none; }
+body.e .b-etape h3 { margin:-6px -16px 10px; padding:22px 20px 6px; background:var(--bg); color:var(--muted); font-size:13px; font-weight:500;
+                     text-transform:uppercase; letter-spacing:.04em; border-bottom:1px solid var(--line); }
+body.e .e-liste + .e-liste { margin-top:18px; }
+body.e .aide { color:var(--muted); }
+body.e .vide { color:var(--muted); }
+
+/* ---- une ligne de menu : icone au trait, nom, valeur grise, chevron */
+body.e .e-ligne { display:flex; align-items:center; gap:14px; width:calc(100% + 16px); min-height:58px; margin-right:-16px; padding:0 16px 0 0;
+                  background:none; border:0; border-bottom:1px solid var(--line); color:var(--texte2); font-size:17px; text-align:left; cursor:pointer; }
+body.e .e-ligne:last-child { border-bottom:0; }
+body.e .e-ligne:active { background:var(--tab); }
+body.e .e-ligne::after { content:''; flex:none; width:9px; height:9px; margin-left:4px; border-right:2px solid var(--chevron); border-top:2px solid var(--chevron); transform:rotate(45deg); }
+body.e .e-ic { flex:none; width:30px; height:30px; display:flex; align-items:center; justify-content:center; }
+body.e .e-ic svg { width:28px; height:28px; fill:none; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+body.e .e-ic-rouge svg { stroke:var(--rouge); } body.e .e-ic-fonce svg { stroke:var(--rouge-fonce); }
+body.e .e-ic-noir svg { stroke:var(--ink); } body.e .e-ic-gris svg { stroke:var(--muted); }
+body.e .e-nom { flex:1; min-width:0; }
+body.e .e-val { flex:0 1 auto; min-width:0; color:var(--muted); font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:48%; }
+
+/* ---- l'ecran GO */
+body.e[data-vue="courir"] .e-bande { background:var(--rouge); }
+body.e .e-go { margin:0 -16px; padding:18px 16px 26px; background:var(--rouge); display:flex; flex-direction:column; align-items:center; gap:16px; color:#fff; }
+/* [21 oct.] le TABLEAU DE CHRONO (plus d'anneau) : une carte blanche ; un filet en haut suit l'etat du chrono
+   (gris = pas de kit, vert = pret ou fini, noir = en course, jaune = il faut agir) */
+body.e .e-tableau { position:relative; display:flex; flex-direction:column; align-items:stretch; gap:14px; width:100%; max-width:460px;
+                    padding:22px 18px 16px; border:0; border-radius:18px; background:var(--card); color:var(--ink); box-shadow:var(--ombre);
+                    cursor:pointer; overflow:hidden; text-align:left; }
+body.e .e-tableau::before { content:''; position:absolute; left:0; right:0; top:0; height:6px; background:var(--chevron); transition:background .25s; }
+body.e .e-tableau[data-etat="pret"]::before, body.e .e-tableau[data-etat="fini"]::before { background:var(--ok); }
+body.e .e-tableau[data-etat="course"]::before { background:var(--ink); }
+body.e .e-tableau[data-etat="att"]::before { background:var(--att); }
+/* [21 oct.] le logo officiel DL : un carreau noir, comme une icone d'app */
+body.e .e-logo { align-self:center; width:132px; height:132px; border-radius:26px; box-shadow:0 4px 12px rgba(0,0,0,.25); }
+body.e .e-mesure { display:none; align-items:flex-end; justify-content:space-between; gap:10px; }
+body.e .e-vit { display:flex; align-items:baseline; gap:6px; }
+body.e .e-vit .num { font-size:78px; font-weight:800; line-height:.9; letter-spacing:-.03em; }
+body.e .e-vit small { font-size:16px; font-weight:600; color:var(--muted); }
+body.e .e-tableau .b-g { margin:0 0 6px; font-size:16px; color:var(--muted); }
+body.e .e-tableau .b-g b { color:var(--ink); font-size:22px; }
+body.e.e-connecte .e-logo { display:none; }
+body.e.e-connecte .e-mesure { display:flex; }
+/* la barre de piste : 4 troncons ; plein = jalon passe ; le troncon en cours bat pendant le run */
+body.e .e-piste { display:none; gap:4px; }
+body.e.e-connecte .e-piste { display:flex; }
+body.e .e-troncon { flex:1; display:flex; flex-direction:column; gap:5px; }
+body.e .e-troncon i { display:block; height:10px; border-radius:3px; background:var(--tab); }
+body.e .e-troncon small { font-size:11px; font-weight:600; color:var(--muted); text-align:right; text-transform:uppercase; letter-spacing:.03em; }
+body.e .e-troncon.passe i { background:var(--rouge); }
+body.e .e-troncon.passe small { color:var(--ink); }
+body.e .e-troncon.en-cours i { background:var(--rouge); animation:e-bat .7s ease-in-out infinite alternate; }
+@keyframes e-bat { from { opacity:.25; } to { opacity:.85; } }
+body.e .e-go .b-bandeau { margin:0; padding:12px 26px; min-width:200px; border-radius:999px; background:var(--card); color:var(--rouge);
+                          font-size:16px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; box-shadow:0 4px 10px rgba(0,0,0,.25); }
+body.e:not(.e-connecte) .e-go .b-bandeau { cursor:pointer; }
+body.e .e-go .b-bandeau.course { color:var(--ink); }
+body.e .e-go .b-bandeau.fini { color:var(--ok); }
+body.e .e-go .b-bandeau.pret { color:var(--ok); }
+body.e .e-go .b-bandeau.att { color:#8a5a00; background:#fff3cd; }
+body.e .e-go .b-etat-kit { margin:-6px 0 0; color:rgba(255,255,255,.9); font-size:13px; }
+body.e .e-go .b-gps .point { background:rgba(255,255,255,.7); }
+body.e .e-go .b-gps.on .point { background:#3ee26a; } body.e .e-go .b-gps.off { color:#fff; } body.e .e-go .b-gps.off .point { background:var(--att); }
+/* .bouton.b-rearmer : plus fort que « .bouton.plein » (rouge, defini plus bas), sinon le bouton se fond dans le fond rouge */
+body.e .e-go .bouton.b-rearmer { margin:0; width:auto; min-width:200px; background:#1c1c1e; border-color:#1c1c1e; color:#fff; }
+body.e .e-sous-go { padding-bottom:8px; }
+body.e .e-sous-go > .vide { display:none; }            /* le bouton « Connecter » sous l'anneau le dit deja */
+
+/* ---- les jalons et les runs en lignes */
+body.e .b-liste-jal li { min-height:52px; align-items:center; border-bottom:1px solid var(--line); padding:8px 0; }
+body.e .b-liste-jal .l { color:var(--texte2); font-weight:500; }
+body.e .b-liste-jal .t { font-size:22px; font-weight:700; }
+body.e .b-liste-jal .v { color:var(--muted); }
+body.e .b-liste-jal li.vient .t { color:var(--rouge); }
+body.e .b-ligne { min-height:58px; border-bottom:1px solid var(--line); padding:8px 0; color:var(--texte2); }
+body.e .b-ligne::after { content:''; flex:none; width:9px; height:9px; margin-left:2px; border-right:2px solid var(--chevron); border-top:2px solid var(--chevron); transform:rotate(45deg); }
+body.e .b-ligne.choisi { background:none; border-radius:0; }
+body.e .b-ligne .q { font-weight:500; }
+body.e .b-ligne .et { font-size:19px; font-weight:700; color:var(--ink); }
+body.e #bDetailTitre { display:none; }                 /* la bande porte deja le titre du run (e.js le lit ici) */
+body.e .e-plus { margin-top:18px; }
+body.e .e-plus summary, body.e .b-plus summary { color:var(--rouge); font-weight:600; min-height:44px; display:flex; align-items:center; cursor:pointer; }
+body.e .e-courbe { padding-top:10px; padding-bottom:12px; }
+body.e .lecture { border-radius:10px; background:var(--tab); }
+
+/* ---- boutons en pilule, segments, champs */
+body.e .bouton { border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--rouge); font-weight:600; min-height:46px; padding:10px 20px; }
+body.e .bouton.plein { background:var(--rouge); border-color:var(--rouge); color:#fff; }
+body.e .bouton:active { filter:brightness(.92); }
+body.e .e-pilule-btn { display:flex; align-items:center; justify-content:center; gap:8px; width:calc(100% - 16px); margin:22px 8px 6px; min-height:52px; font-size:17px; }
+body.e .seg { background:var(--tab); padding:2px; border-radius:10px; gap:2px; }
+body.e .seg button, body.e .seg button:first-child, body.e .seg button:last-child { border:0; border-radius:8px; background:transparent; color:var(--texte2); min-height:38px; font-weight:600; }
+body.e .seg button.on { background:var(--rouge); color:#fff; box-shadow:0 1px 3px rgba(0,0,0,.18); }
+body.e select, body.e input[type=text], body.e input[type=number] { border-radius:10px; border:1px solid #d1d1d6; background:var(--card); font-size:17px; }
+body.e .pas button { border-radius:10px; border:1px solid var(--line); background:var(--tab); color:var(--ink); }
+body.e .champ > label, body.e .champ > .nom { color:var(--texte2); font-weight:600; font-size:15px; }
+body.e .ligne-pref { min-height:56px; }
+body.e .ligne-pref .nom { color:var(--texte2); font-weight:500; }
+body.e .e-ligne-champ select { width:100%; border:0; padding-left:0; font-size:17px; background:transparent; }
+body.e .b-chip, body.e .b-pastille { border-radius:999px; }
+body.e .marque { border-radius:6px; }
+body.e .b-table th { color:var(--muted); font-weight:500; }
+body.e .b-bilan { font-weight:700; }
+body.e .b-ecu-resume, body.e .b-maj-kit { border-radius:10px; }
+body.e .b-photo-fig img { border-radius:10px; }
+body.e #bResultat, body.e #bCalage { scroll-margin-top:72px; }
+body.e .b-calage { border-top:0; margin-top:0; padding-top:0; }
+
+/* ---- la barre du bas : blanche, icones grises au trait, l'onglet actif en rouge ; GO en lettres grasses */
+body.e .b-barre { background:var(--card); border-top:1px solid var(--line); }
+body.e .b-barre button { color:var(--muted); font-weight:500; font-size:11px; }
+body.e .b-barre svg { stroke-width:1.6; }
+body.e .b-barre button.actif { color:var(--rouge); }
+body.e .b-barre button.actif svg { background:none; padding:0; width:24px; height:24px; }
+body.e .e-go-txt { font-size:24px; line-height:24px; font-weight:900; font-style:italic; letter-spacing:-.02em; }
+body.e .b-envoi { background:var(--bg); }
+
+/* ---- la feuille de connexion */
+body.e .feuille { border-radius:16px 16px 0 0; border:0; }
+body.e .feuille .bouton { width:100%; }

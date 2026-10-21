@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
-# Construit www/ : le dossier web de l'APP NATIVE (Capacitor, iPhone et Android) = la maquette B SEULE, a plat.
-#   - maquettes/b/index.html devient www/index.html (chemins « ../../ » retires) ; b.js, b.css, b-textes.js a cote ;
-#   - js/, css/, img/ : seulement les fichiers que B charge ; lib/tesseract/ en entier (avec ses licences) ;
+# Construit www/ : le dossier web de l'APP NATIVE (Capacitor, iPhone et Android) = la maquette E « Piste » SEULE, a plat.
+#   [0.11.0, 21 oct.] E = l'habit (e.css) et la navigation (e.js) sur la logique de B (b.js), inchangee ; avant : B seule.
+#   - maquettes/e/index.html devient www/index.html (chemins « ../../ » et « ../b/ » retires) ;
+#     b.js, b.css, b-textes.js (de maquettes/b/) et e.js, e.css, e-textes.js (de maquettes/e/) a cote ;
+#   - js/, css/, img/ : seulement les fichiers que la page charge ; lib/tesseract/ en entier (avec ses licences) ;
 #   - lib/capacitor/ : le coeur Capacitor et le module Bluetooth (node_modules), charges AVANT js/kit.js.
-# Rien d'autre : pas les maquettes A et C, pas l'apercu iPhone, pas le kit graphique, pas les outils.
+# Rien d'autre : pas les maquettes A, C et D, pas l'apercu iPhone, pas le kit graphique, pas les outils.
 # Chaque remplacement est compte ; un fichier manquant ou un compte faux arrete tout (un echec doit se voir).
 #   python outils/construire_www.py        (npm install d'abord, pour node_modules)
 import os, re, shutil, sys
@@ -11,6 +13,8 @@ import os, re, shutil, sys
 ICI = os.path.dirname(os.path.abspath(__file__))
 RACINE = os.path.normpath(os.path.join(ICI, '..'))
 WWW = os.path.join(RACINE, 'www')
+LOCAUX_B = ('b.css', 'b-textes.js', 'b.js')      # charges par la page E depuis ../b/
+LOCAUX_E = ('e.css', 'e-textes.js', 'e.js')      # charges par la page E depuis son dossier
 
 
 def lire(rel):
@@ -49,9 +53,14 @@ def main():
         shutil.rmtree(WWW)
     os.makedirs(WWW)
 
-    # 1) la page : B a plat, et le Bluetooth natif charge avant js/kit.js
-    page = lire('maquettes/b/index.html')
+    # 1) la page : E a plat (ses fichiers de B a cote d'elle), et le Bluetooth natif charge avant js/kit.js
+    page = lire('maquettes/e/index.html')
     page = remplacer(page, '../../', '', page.count('../../'), 'index.html')
+    for f in LOCAUX_B:
+        page = remplacer(page, '"../b/' + f, '"' + f, 1, 'index.html')
+    if '../' in page:
+        sys.exit('!!! index.html : un chemin « ../ » reste dans la page')
+    page = remplacer(page, '<title>DRAGLOGICS · E</title>', '<title>DRAGLOGICS</title>', 1, 'index.html')
     if page.count('src="js/kit.js') != 1:
         sys.exit('!!! index.html : js/kit.js pas trouve une seule fois')
     page = page.replace('<script src="js/kit.js',
@@ -60,17 +69,19 @@ def main():
                         '<script src="js/kit.js', 1)
     ecrire('index.html', page)
 
-    # 2) les fichiers propres a B
+    # 2) les fichiers propres a B (la logique) et a E (l'habit et la navigation)
     b = lire('maquettes/b/b.js')
     b = remplacer(b, "'../../lib/tesseract/'", "'lib/tesseract/'", 1, 'b.js')
     ecrire('b.js', b)
     for f in ('b.css', 'b-textes.js'):
         copier('maquettes/b/' + f, f)
+    for f in LOCAUX_E:
+        copier('maquettes/e/' + f, f)
 
-    # 3) ce que la page charge (relu dans la page : un fichier ajoute a B est pris sans retoucher ce script)
+    # 3) ce que la page charge (relu dans la page : un fichier ajoute a la page est pris sans retoucher ce script)
     refs = re.findall(r'(?:src|href)="([^"?#]+)', page)
     for r in refs:
-        if r.startswith(('lib/capacitor/', 'http', 'data:')) or r in ('b.js', 'b.css', 'b-textes.js'):
+        if r.startswith(('lib/capacitor/', 'http', 'data:')) or r in LOCAUX_B or r in LOCAUX_E:
             continue
         copier(r, r)
 

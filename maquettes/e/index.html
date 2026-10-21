@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>DRAGLOGICS · E</title>
+<link rel="icon" href="../../img/dl-logo.webp">
+<link rel="stylesheet" href="../../css/base-maquettes.css?v=0.3">
+<link rel="stylesheet" href="../b/b.css?v=0.10">
+<link rel="stylesheet" href="e.css?v=0.1">
+</head>
+<body class="e">
+<!-- MAQUETTE E « PISTE » (21 oct.), aux couleurs du logo DRAGLOGICS ; c'est l'app iPhone depuis la 0.11.0
+     (outils/construire_www.py). Une bande rouge pleine avec le titre ; l'ecran GO autour d'un tableau de chrono ; des
+     listes a lignes (icone, valeur, chevron) qui ouvrent des sous-pages au lieu d'un long defilement ; la barre du bas sobre.
+     Rouge #e7121a = le rouge du logo officiel DL (img/dl-logo.webp) ; rouge fonce #c22428 ; noir, blanc.
+     MEMES ELEMENTS (memes id) QUE LA MAQUETTE B : la logique est celle de B (maquettes/b/b.js). Seuls l'habit (e.css)
+     et la navigation par sous-pages (e.js) changent. -->
+<header class="e-bande">
+  <button type="button" class="e-retour" id="eRetour" hidden data-i18n-aria="e_retour"><svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7"/></svg></button>
+  <!-- [21 oct.] le logo officiel DL (img/dl-logo.webp) : la marque a gauche de la bande, sauf quand le retour est la -->
+  <img class="e-marque" src="../../img/dl-logo.webp" alt="">
+  <h1 class="e-titre" id="eTitre"></h1>
+  <button type="button" class="b-pilule off" id="bPilule"><span class="point"></span><span id="bPiluleTxt" data-i18n="bConnecter">Connecter</span></button>
+</header>
+
+<main>
+<!-- ====== ACCUEIL ====== pas montre dans E : l'ecran GO (Courir) le remplace. Les elements restent pour b.js. -->
+<section id="v-accueil" class="vue" hidden>
+  <div class="b-tuiles">
+    <button type="button" class="b-tuile att" id="tKit"><b data-i18n="b_monKit">Mon kit</b><span class="sous" id="tKitSous"></span></button>
+    <button type="button" class="b-tuile" id="tCourir"><b data-i18n="b_pret">Prêt à courir</b><span class="sous" id="tCourirSous"></span></button>
+    <button type="button" class="b-tuile" id="tRuns"><b data-i18n="b_mesRuns">Mes runs</b><span class="sous" id="tRunsSous"></span></button>
+    <button type="button" class="b-tuile" id="tTicket"><b data-i18n="b_ticket">Comparer au ticket</b><span class="sous" data-i18n="b_ticketSous">Vérifie ton kit</span></button>
+  </div>
+  <ol class="b-etapes" id="bEtapes">
+    <li id="e1"><span class="rond">1</span><span data-i18n="b_e1">Connecter le kit</span></li>
+    <li id="e2"><span class="rond">2</span><span data-i18n="b_e2">Faire un run</span></li>
+    <li id="e3"><span class="rond">3</span><span data-i18n="b_e3">Comparer au ticket</span></li>
+  </ol>
+</section>
+
+<!-- ====== GO (COURIR) ====== [21 oct.] un tableau de chrono.
+     Sans kit : le logo. Avec le kit : la vitesse en gros et la barre de piste en 4 troncons (60 pi, 330 pi, 1/8, 1/4)
+     qui se remplissent au passage des jalons ; le filet du haut de la carte suit l'etat du chrono (e.js). -->
+<section id="v-courir" class="vue" hidden>
+  <div class="e-go">
+    <button type="button" class="e-tableau" id="eTableau">
+      <img class="e-logo" src="../../img/dl-logo.webp" alt="DRAGLOGICS">
+      <span class="e-mesure">
+        <span class="e-vit"><span class="num" id="bVit">--</span><small id="bU">km/h</small></span>
+        <span class="b-g num"><span data-i18n="lG">G</span> <b id="bG">--</b></span>
+      </span>
+      <span class="e-piste" id="ePiste" aria-hidden="true">
+        <span class="e-troncon" data-j="60"><i></i><small data-i18n="j60">60 pi</small></span>
+        <span class="e-troncon" data-j="330"><i></i><small data-i18n="j330">330 pi</small></span>
+        <span class="e-troncon" data-j="660"><i></i><small data-i18n="j660">1/8</small></span>
+        <span class="e-troncon" data-j="1320"><i></i><small data-i18n="j1320">1/4</small></span>
+      </span>
+    </button>
+    <div class="b-bandeau" id="bBandeau">—</div>
+    <div class="b-etat-kit" id="bEtatKit" hidden><span class="b-gps" id="bGps"><span class="point"></span><span id="bGpsTxt"></span></span>
+      <span class="b-chip" id="bTb" hidden></span></div>
+    <button type="button" class="bouton plein b-rearmer" id="bRearmer" hidden data-i18n="b_rearmer">Réarmer le chrono</button>
+  </div>
+  <div class="e-sous-go">
+    <p class="vide" id="bCourirVide" data-i18n="b_pretOff">Connecte le kit d'abord.</p>
+    <div class="b-carte b-idx" id="bIdx" hidden>
+      <div class="b-idx-l"><span class="b-chip" id="bIdxChip"></span><span id="bIdxTxt"></span></div>
+      <p class="b-idx-direct num" id="bIdxDirect"></p>
+    </div>
+    <h2 class="e-groupe" data-i18n="e_gJalons">Jalons</h2>
+    <div class="e-liste"><ul class="b-liste-jal" id="bJal"></ul></div>
+    <details class="e-plus"><summary data-i18n="e_courbe">Courbe du run</summary>
+      <div class="e-liste e-courbe">
+        <canvas class="graphe" id="cvB" role="img" data-i18n-aria="ariaDirect"></canvas>
+        <div class="legende"><span class="l-v"><i></i><span data-i18n="lgVitesse"></span></span><span class="l-g"><i></i><span data-i18n="lgG"></span></span></div>
+      </div></details>
+    <button type="button" class="bouton e-pilule-btn" id="bRejouer" data-i18n="bRejouer">Rejouer un run</button>
+    <details class="b-plus" id="bBanc" hidden><summary data-i18n="b_banc">Banc d'essai</summary>
+      <p class="aide" data-i18n="b_simAvert"></p>
+      <button type="button" class="bouton e-pilule-btn" id="bSim" data-i18n="b_sim">Course simulée du kit (banc)</button></details>
+  </div>
+</section>
+
+<!-- ====== RUNS ====== l'historique en lignes ; un run ouvre sa page (chevron retour dans la bande) -->
+<section id="v-runs" class="vue" hidden>
+  <div class="e-page" id="pRuListe">
+    <h2 class="e-groupe" data-i18n="e_gRuns">Runs gardés dans le kit</h2>
+    <div class="e-liste"><div id="bListe" class="b-liste"></div>
+      <p class="vide" id="bRunsVide" data-i18n="b_aucunRun">Aucun run.</p></div>
+  </div>
+  <div class="e-page" id="pRuDetail" hidden>
+    <div id="bDetail" hidden>
+      <h2 class="e-groupe" id="bDetailTitre"></h2>
+      <div class="e-liste"><ul class="b-liste-jal" id="bDJal"></ul></div>
+      <h2 class="e-groupe" data-i18n="e_courbe">Courbe du run</h2>
+      <div class="e-liste e-courbe">
+        <div class="b-outils">
+          <div class="seg" id="bAxe"><button type="button" data-v="t" data-i18n="axeTemps"></button><button type="button" data-v="d" data-i18n="axeDistance"></button></div>
+          <label class="aide"><span data-i18n="comparer"></span> <select id="bCmp"></select></label>
+        </div>
+        <canvas class="graphe" id="cvBRun" role="img" data-i18n-aria="ariaRun"></canvas>
+        <div class="legende"><span class="l-v"><i></i><span data-i18n="lgVitesse"></span></span><span class="l-c" id="bLgCmp" hidden><i></i><span data-i18n="lgCmp"></span></span><span class="l-g"><i></i><span data-i18n="lgG"></span></span><span class="l-r"><i></i><span data-i18n="lgJalons"></span></span></div>
+        <div class="lecture num" id="bLecture"></div>
+      </div>
+      <button type="button" class="bouton plein e-pilule-btn" id="bVersTicket"><span data-i18n="b_ticketAvecRun">Comparer ce run au ticket</span><span class="b-pastille" id="bTicketPastille" hidden></span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ====== TICKET ====== une page en groupes : le run, la photo, les temps, le resultat -->
+<section id="v-ticket" class="vue" hidden>
+  <p class="vide" id="bTicketVide" data-i18n="b_ticketVide">Aucun run à comparer.</p>
+  <div id="bTicketCorps" hidden>
+    <h2 class="e-groupe" data-i18n="b_run">Run</h2>
+    <div class="e-liste e-ligne-champ"><select id="bTRun" data-i18n-aria="b_run"></select></div>
+    <h2 class="e-groupe" data-i18n="e_gPhoto">Photo du ticket</h2>
+    <div class="e-liste b-photo">
+      <div class="b-boutons">
+        <label class="bouton" for="bPhotoCam" data-i18n="b_photoPrendre">Prendre une photo</label>
+        <input type="file" id="bPhotoCam" class="b-cache" accept="image/*" capture="environment">
+        <label class="bouton" for="bPhotoFich" data-i18n="b_photoImporter">Importer une image</label>
+        <input type="file" id="bPhotoFich" class="b-cache" accept="image/*">
+      </div>
+      <figure class="b-photo-fig" id="bPhotoFig" hidden>
+        <img id="bPhotoImg" alt="">
+        <figcaption class="b-boutons"><button type="button" class="bouton" id="bPhotoAgrandir" data-i18n="b_photoAgrandir">Agrandir</button>
+          <button type="button" class="bouton" id="bPhotoRetirer" data-i18n="b_photoRetirer">Retirer la photo</button></figcaption>
+      </figure>
+      <p class="aide" id="bPhotoMsg" aria-live="polite" data-i18n="b_photoAide"></p>
+      <div class="b-ocr" id="bOcr" hidden>
+        <div class="champ"><label for="bNumero" data-i18n="b_ocrNumero">Ton numéro sur le ticket</label>
+          <input type="text" id="bNumero" maxlength="10" autocomplete="off" spellcheck="false" autocapitalize="characters"><p class="aide" data-i18n="b_ocrNumeroAide"></p></div>
+        <button type="button" class="bouton plein" id="bOcrLire" data-i18n="b_ocrLire">Lire le ticket</button>
+        <div class="ligne-pref" id="bOcrCoteL" hidden><span class="nom" data-i18n="b_ocrCote">Ton couloir</span>
+          <div class="seg" id="bOcrCote"><button type="button" data-v="gauche" data-i18n="b_ocrGauche">Gauche</button><button type="button" data-v="droite" data-i18n="b_ocrDroite">Droite</button></div></div>
+        <p class="aide" id="bOcrMsg" aria-live="polite"></p>
+      </div>
+    </div>
+    <h2 class="e-groupe" data-i18n="e_gTemps">Temps du ticket</h2>
+    <div class="e-liste">
+      <p class="aide" data-i18n="b_saisir">Entre les temps du ticket (en secondes).</p>
+      <div class="b-saisie">
+        <label><span data-i18n="j60">60 pi</span><input type="text" inputmode="decimal" id="tk60" autocomplete="off"></label>
+        <label><span data-i18n="j330">330 pi</span><input type="text" inputmode="decimal" id="tk330" autocomplete="off"></label>
+        <label><span data-i18n="j660">1/8</span><input type="text" inputmode="decimal" id="tk660" autocomplete="off"></label>
+        <label><span data-i18n="j1320">1/4</span><input type="text" inputmode="decimal" id="tk1320" autocomplete="off"></label>
+        <label><span data-i18n="b_vit18">Vitesse 1/8 (mph)</span><input type="text" inputmode="decimal" id="tkv660" autocomplete="off"></label>
+        <label><span data-i18n="b_vit14">Vitesse 1/4 (mph)</span><input type="text" inputmode="decimal" id="tkv1320" autocomplete="off"></label>
+      </div>
+      <button type="button" class="bouton" id="bRemplirDemo" data-i18n="b_remplirDemo">Remplir avec le ticket de démo</button>
+    </div>
+    <button type="button" class="bouton plein e-pilule-btn" id="bComparer" data-i18n="b_comparer">Comparer</button>
+    <div id="bResultat" hidden>
+      <h2 class="e-groupe" data-i18n="e_gResultat">Résultat</h2>
+      <div class="e-liste">
+        <table class="b-table"><thead><tr><th data-i18n="b_jalon">Jalon</th><th class="n" data-i18n="b_kit">Kit</th><th class="n" data-i18n="b_tk">Ticket</th><th class="n" data-i18n="b_ecart">Écart</th><th></th></tr></thead><tbody id="bResCorps"></tbody></table>
+        <p class="b-bilan" id="bBilan"></p>
+        <p class="aide" id="bConseil"></p>
+      </div>
+      <div class="b-calage" id="bCalage" hidden>
+        <h2 class="e-groupe" data-i18n="b_calTitre">Calage automatique</h2>
+        <div class="e-liste">
+          <p id="bCalTxt" aria-live="polite"></p>
+          <p class="aide num" id="bCalPrevu"></p>
+          <button type="button" class="bouton" id="bCalAnnuler" hidden data-i18n="b_calAnnuler">Annuler le calage</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== REGLAGES ====== le menu en lignes (icone, valeur, chevron) ; chaque ligne ouvre sa page. « Envoyer au kit »
+     seulement sur les pages du kit. Les valeurs a droite sont relues dans les champs par e.js. -->
+<section id="v-regler" class="vue" hidden>
+  <form id="bForm" novalidate>
+    <p class="vide" id="bRegVide" data-i18n="videReg">Connecte un kit.</p>
+    <div class="e-page" id="pReMenu">
+      <h2 class="e-groupe e-kit-seul" data-i18n="e_gKit">Le kit</h2>
+      <div class="e-liste e-menu e-kit-seul">
+        <button type="button" class="e-ligne" data-page="pReVeh"><span class="e-ic e-ic-rouge"><svg viewBox="0 0 24 24"><path d="M3 15l2-5h14l2 5v3H3z"/><circle cx="7.5" cy="18" r="1.6"/><circle cx="16.5" cy="18" r="1.6"/></svg></span>
+          <span class="e-nom" data-i18n="e_mVehicule">Véhicule</span><span class="e-val" data-val="veh"></span></button>
+        <button type="button" class="e-ligne" data-page="pReEcu"><span class="e-ic e-ic-noir"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/></svg></span>
+          <span class="e-nom" data-i18n="e_mEcu">ECU et CAN</span><span class="e-val" data-val="ecu"></span></button>
+        <button type="button" class="e-ligne" data-page="pReKit"><span class="e-ic e-ic-fonce"><svg viewBox="0 0 24 24"><path d="M9 2v6M15 2v6"/><path d="M6 8h12v3a6 6 0 0 1-12 0V8Z"/><path d="M12 17v5"/></svg></span>
+          <span class="e-nom" data-i18n="e_mKit">Kit et GPS</span><span class="e-val" data-val="kit"></span></button>
+        <button type="button" class="e-ligne" data-page="pReIdx" id="eLigneIdx"><span class="e-ic e-ic-gris"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 3"/></svg></span>
+          <span class="e-nom" data-i18n="b_idxTitre">Course à index</span><span class="e-val" data-val="idx"></span></button>
+      </div>
+      <h2 class="e-groupe" data-i18n="hApp">Application</h2>
+      <div class="e-liste e-menu">
+        <button type="button" class="e-ligne" data-page="pReApp"><span class="e-ic e-ic-gris"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></span>
+          <span class="e-nom" data-i18n="e_mApp">Langue, unités, affichage</span><span class="e-val" data-val="app"></span></button>
+        <button type="button" class="e-ligne" data-page="pRePrive"><span class="e-ic e-ic-gris"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+          <span class="e-nom" data-i18n="hPrive">Confidentialité</span><span class="e-val" data-val="version"></span></button>
+      </div>
+    </div>
+    <div id="bRegCorps" class="e-contenu" hidden>
+      <div class="e-page e-page-kit" id="pReVeh" hidden>
+        <div class="b-etape" id="bVehEtape" hidden><span class="rond">1</span><div><h3 data-i18n="b_vehTitre">Ton véhicule</h3>
+          <input type="hidden" id="f-veh"><input type="hidden" id="f-dep">
+          <div class="seg" id="segVeh"><button type="button" data-v="1" data-i18n="b_vehVoiture">Voiture</button><button type="button" data-v="2" data-i18n="b_vehMoto">Moto</button></div>
+          <p class="b-depart" id="bDepart"></p>
+          <p class="aide" data-i18n="b_vehAide"></p>
+          <details class="b-plus" id="bDepMain"><summary data-i18n="b_depMain">Régler le départ à la main</summary>
+            <div class="pas"><button type="button" id="bDepMoins">−½</button><span class="b-dep-val num" id="bDepVal"></span><button type="button" id="bDepPlus">+½</button></div>
+            <p class="aide" data-i18n="b_depMainAide"></p></details></div></div>
+        <div id="bAncien">
+        <p class="aide b-maj-kit" id="bVehMaj" hidden></p>
+        <div class="b-etape"><span class="rond">1</span><div><h3 data-i18n="b_s1">Où le chrono part</h3>
+          <div class="pas" data-champ="rpo"><button type="button" data-pas="-1">−1</button><input type="number" id="f-rpo" min="0" max="36" step="1" data-i18n-aria="rpoNom"><button type="button" data-pas="1">+1</button><span class="pieds" id="p-rpo"></span></div>
+          <p class="aide" data-i18n="rpoAide"></p></div></div>
+        <div class="b-etape"><span class="rond">2</span><div><h3 data-i18n="b_s2">Où sont les jalons</h3>
+          <div class="pas" data-champ="jpo"><button type="button" data-pas="-6">−6</button><button type="button" data-pas="-1">−1</button><input type="number" id="f-jpo" min="-120" max="36" step="1" data-i18n-aria="jpoNom"><button type="button" data-pas="1">+1</button><button type="button" data-pas="6">+6</button><span class="pieds" id="p-jpo"></span></div>
+          <p class="aide" data-i18n="jpoAide"></p>
+          <details class="b-plus"><summary data-i18n="b_s2b">Si le 60 pi reste à part</summary>
+            <div class="pas" data-champ="d60"><button type="button" data-pas="-6">−6</button><button type="button" data-pas="-1">−1</button><input type="number" id="f-d60" min="-72" max="72" step="1" data-i18n-aria="d60Nom"><button type="button" data-pas="1">+1</button><button type="button" data-pas="6">+6</button><span class="pieds" id="p-d60"></span></div>
+            <p class="aide" data-i18n="d60Aide"></p></details></div></div>
+        </div>
+      </div>
+      <div class="e-page e-page-kit" id="pReEcu" hidden>
+        <div class="b-etape"><span class="rond">3</span><div><h3 data-i18n="b_s3e">Ton ECU</h3>
+          <input type="hidden" id="f-mode"><input type="hidden" id="f-hecu">
+          <div class="champ"><label for="bEcu" data-i18n="b_ecuNom">Marque de l'ECU</label>
+            <select id="bEcu"><option value="holley_hp" data-i18n="b_ecuHp">Holley HP / Terminator X</option><option value="holley_dom" data-i18n="b_ecuDom">Holley Dominator</option>
+              <option value="fueltech" data-i18n="b_ecuFt">FuelTech FT450 / FT550 / FT600</option><option value="link" data-i18n="b_ecuLink">Link</option>
+              <option value="ecumaster" data-i18n="b_ecuEcum">ECUMaster</option><option value="autre" data-i18n="b_ecuAutre">Autre (mode ancien)</option></select></div>
+          <p class="b-ecu-resume" id="bEcuResume"></p>
+          <div class="champ" id="bChAutre" hidden><label for="bModeAutre" data-i18n="modeNom"></label>
+            <select id="bModeAutre"><option value="LINK_AEM">AEM 30-2206 (Link)</option><option value="FUELTECH_GPS">FuelTech GPS</option><option value="VAG_WHEELSPEED">FuelTech VSS (0x4A0)</option></select></div>
+          <div class="champ" id="bChCbr" hidden><label for="f-cbr" data-i18n="cbrNom"></label>
+            <select id="f-cbr"><option value="125000">125 kbit/s</option><option value="250000">250 kbit/s</option><option value="500000">500 kbit/s</option><option value="1000000">1 Mbit/s</option></select></div>
+          <div class="champ" id="bChHid" hidden><label for="f-hid" data-i18n="b_hidNom">ID de l'expander (logiciel Holley)</label>
+            <input type="number" id="f-hid" min="0" max="2047" step="1"><p class="aide" data-i18n="b_hidAide"></p></div>
+          <div class="champ" id="bChLect" hidden><label for="f-lect" data-i18n="b_lectNom">Flux lu sur le Link</label>
+            <select id="f-lect"><option value="LINK_GD">Generic Dash</option><option value="LINK_STRADA">Strada (AIM MXS)</option></select></div>
+          <div class="champ" id="bChLid" hidden><label for="f-lid" data-i18n="b_lidNom">ID lu (entrée)</label>
+            <input type="number" id="f-lid" min="1" max="2047" step="1"><p class="aide b-hex" id="h-lid"></p></div>
+          <div class="champ" id="bChEid" hidden><label for="f-eid" data-i18n="b_eidNom">ID envoyé (sortie)</label>
+            <input type="number" id="f-eid" min="1" max="2046" step="1"><p class="aide b-hex" id="h-eid"></p></div>
+          <ul class="b-voies" id="bVoiesFt" hidden></ul>
+          <p class="msg-err" id="bEcuAvert" hidden></p>
+          <details class="b-plus" id="bDepartPlus"><summary data-i18n="b_departPlus">Départ : réglages avancés</summary>
+            <div class="champ"><label for="f-scid" data-i18n="b_scidNom">Trame CAN de départ (ID, 0 = aucune)</label>
+              <input type="number" id="f-scid" min="0" step="1"><p class="aide b-hex" id="h-scid"></p></div>
+            <div class="champ"><label for="f-scext" data-i18n="b_scextNom">Format de l'ID</label>
+              <select id="f-scext"><option value="0" data-i18n="b_scext0">Standard 11 bits</option><option value="1" data-i18n="b_scext1">Étendu 29 bits</option></select></div>
+            <div class="champ"><label for="f-scby" data-i18n="b_scbyNom">Octet (0 à 7)</label><input type="number" id="f-scby" min="0" max="7" step="1"></div>
+            <div class="champ"><label for="f-scmk" data-i18n="b_scmkNom">Masque des bits (1 à 255)</label><input type="number" id="f-scmk" min="1" max="255" step="1"></div>
+            <div class="champ"><label for="f-sced" data-i18n="b_scedNom">Front qui donne le départ</label>
+              <select id="f-sced"><option value="0" data-i18n="strig0"></option><option value="1" data-i18n="strig1"></option><option value="2" data-i18n="strig2"></option></select></div>
+            <div class="champ"><label for="f-strig" data-i18n="strigNom"></label><select id="f-strig"><option value="0" data-i18n="strig0"></option><option value="1" data-i18n="strig1"></option><option value="2" data-i18n="strig2"></option></select></div>
+          </details></div></div>
+      </div>
+      <div class="e-page e-page-kit" id="pReKit" hidden>
+        <div class="b-etape"><span class="rond">4</span><div><h3 data-i18n="b_s5">Le kit</h3>
+          <div class="champ"><label for="f-sfx" data-i18n="sfxNom"></label><input type="text" id="f-sfx" maxlength="5" autocomplete="off" spellcheck="false"></div>
+          <div class="champ"><label for="f-grate" data-i18n="grateNom"></label><select id="f-grate"><option value="40">25 Hz</option><option value="50">20 Hz</option><option value="100">10 Hz</option></select></div>
+          <div class="champ"><label for="f-tzh" data-i18n="tzhNom"></label><input type="number" id="f-tzh" min="-12" max="14" step="1"></div>
+          <div class="champ"><label for="f-pfft" data-i18n="pfftNom"></label><select id="f-pfft"></select></div>
+          <div class="champ" id="bChCms"><label for="f-cms" data-i18n="cmsNom"></label><input type="number" id="f-cms" min="-600" max="600" step="5"><p class="aide" data-i18n="cmsAide"></p></div></div></div>
+        <h2 class="e-groupe" data-i18n="e_hFiche">Fiche du kit</h2>
+        <div class="e-liste">
+          <dl class="b-fiche" id="bFiche"></dl>
+          <p class="vide" id="bFicheVide" data-i18n="videKit">Aucun kit connecté.</p>
+          <div class="b-boutons"><button type="button" class="bouton" id="bCal" data-i18n="calBtn">Calibrer</button>
+            <button type="button" class="bouton" id="bMaj" data-i18n="majBtn">Passer en mise à jour</button></div>
+          <p class="aide" data-i18n="calAide"></p>
+          <p class="aide" id="bKitMsg" aria-live="polite"></p>
+        </div>
+      </div>
+      <div class="e-page e-page-kit" id="pReIdx" hidden>
+        <div class="b-etape" id="bIdxEtape" hidden><span class="rond">5</span><div><h3 data-i18n="b_idxTitre">Course à index</h3>
+          <input type="hidden" id="f-idxc"><input type="hidden" id="f-idxid">
+          <div class="champ"><label for="f-idxon" data-i18n="idxonNom">Mode index</label>
+            <select id="f-idxon"><option value="0" data-i18n="b_idxCoupee">Non</option><option value="1" data-i18n="b_idxActive">Oui</option></select></div>
+          <div class="b-idx-deux">
+            <div class="champ"><label for="bIdxIndex" data-i18n="b_idxIndex">Index (s)</label><input type="text" id="bIdxIndex" inputmode="decimal" autocomplete="off"></div>
+            <div class="champ"><label for="bIdxMarge" data-i18n="b_idxMarge">Marge (s)</label><input type="text" id="bIdxMarge" inputmode="decimal" autocomplete="off"></div>
+          </div>
+          <p class="aide" id="bIdxCible"></p>
+          <div class="champ"><label for="bIdxRef" data-i18n="b_idxRef">Run de référence</label>
+            <select id="bIdxRef"></select></div>
+          <button type="button" class="bouton" id="bIdxRefBtn" data-i18n="b_idxRefBtn">Prendre ce run comme référence</button>
+          <p class="aide" id="bIdxRefTxt"></p>
+          <input type="hidden" id="f-idxam">
+          <p class="aide" data-i18n="b_idxAide"></p>
+          <details class="b-plus"><summary data-i18n="b_idxPlus">Commande : réglages avancés</summary>
+            <div class="champ"><label for="bIdxId" data-i18n="idxidNom">Trame CAN (ID en hexadécimal)</label><input type="text" id="bIdxId" autocomplete="off" spellcheck="false" maxlength="5"></div>
+            <div class="champ"><label for="f-idxz" data-i18n="idxzNom">Zone morte (ms d'avance)</label><input type="number" id="f-idxz" min="0" max="200" step="1"></div>
+            <div class="champ"><label for="f-idxp" data-i18n="idxpNom">Commande pleine à (ms d'avance)</label><input type="number" id="f-idxp" min="10" max="1000" step="1"></div>
+            <div class="champ"><label for="f-idxf" data-i18n="idxfNom">Filtre (ms)</label><input type="number" id="f-idxf" min="0" max="3000" step="10"></div>
+            <div class="champ"><label for="f-idxv" data-i18n="idxvNom">Pente maximale (comptes par seconde)</label><input type="number" id="f-idxv" min="50" max="10230" step="1"></div>
+            <p class="aide" data-i18n="b_idxTrame"></p></details>
+          <p class="aide" id="bIdxMsg" aria-live="polite"></p></div></div>
+      </div>
+    </div>
+    <div class="e-page" id="pReApp" hidden>
+      <h2 class="e-groupe" data-i18n="hApp">Application</h2>
+      <div class="e-liste">
+        <div class="ligne-pref"><span class="nom" data-i18n="langue"></span><div class="seg" id="segLangue"><button type="button" data-v="fr">Français</button><button type="button" data-v="en">English</button></div></div>
+        <div class="ligne-pref"><span class="nom" data-i18n="unite"></span><div class="seg" id="segUnite"><button type="button" data-v="kmh">km/h</button><button type="button" data-v="mph">mph</button></div></div>
+        <div class="ligne-pref"><span class="nom" data-i18n="theme"></span><div class="seg" id="segTheme"><button type="button" data-v="auto" data-i18n="themeAuto"></button><button type="button" data-v="light" data-i18n="themeClair"></button><button type="button" data-v="dark" data-i18n="themeSombre"></button></div></div>
+        <div class="ligne-pref"><span class="nom" data-i18n="texte"></span><div class="seg" id="segTexte"><button type="button" data-v="n" data-i18n="texteN"></button><button type="button" data-v="g" data-i18n="texteG"></button></div></div>
+      </div>
+    </div>
+    <div class="e-page" id="pRePrive" hidden>
+      <h2 class="e-groupe" data-i18n="hPrive"></h2>
+      <div class="e-liste"><p class="aide" data-i18n="priveTexte"></p>
+        <button type="button" class="bouton" id="bEffacer" data-i18n="effacer"></button><p class="aide" id="bPriveMsg" aria-live="polite"></p><p class="aide" id="bVersion"></p></div>
+    </div>
+    <div class="b-envoi" id="eEnvoi" hidden><button type="submit" class="bouton plein e-pilule-btn" data-i18n="envoyer">Envoyer au kit</button><p id="bFormMsg" aria-live="polite"></p></div>
+  </form>
+</section>
+</main>
+
+<div id="voile" hidden></div>
+<div id="feuilleCx" class="feuille" hidden role="dialog" aria-modal="true" aria-labelledby="cxTitre">
+  <h2 id="cxTitre" data-i18n="cxTitre">Connecter un kit</h2>
+  <p class="aide" data-i18n="cxPourquoi"></p>
+  <button type="button" class="bouton plein large" id="cxBle" data-i18n="cxBle"></button>
+  <button type="button" class="bouton large" id="cxDemo" data-i18n="cxDemo"></button>
+  <button type="button" class="bouton large" id="cxDeco" hidden data-i18n="cxDeco"></button>
+  <p class="aide" id="cxMsg" aria-live="polite"></p>
+  <button type="button" class="bouton large" id="cxFermer" data-i18n="fermer"></button>
+</div>
+
+<!-- la barre du bas : GO en lettres, puis les icones au trait -->
+<nav class="b-barre" data-i18n-aria="ariaNav">
+  <button type="button" data-vue="courir"><b class="e-go-txt">GO</b><span data-i18n="b_courir">Courir</span></button>
+  <button type="button" data-vue="runs"><svg viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4h12l-2.5 4L17 12H5"/></svg><span data-i18n="bRuns">Runs</span></button>
+  <button type="button" data-vue="ticket"><svg viewBox="0 0 24 24"><path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2V3Z"/><path d="M9 8h6M9 12h6"/></svg><span data-i18n="e_oTicket">Ticket</span></button>
+  <button type="button" data-vue="regler"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg><span data-i18n="b_regler">Régler</span></button>
+</nav>
+
+<script src="../../js/i18n.js?v=0.3"></script>
+<script src="../../js/graph.js?v=0.3"></script>
+<script src="../../js/demo-runs.js?v=0.3"></script>
+<script src="../../js/index-calc.js?v=0.9"></script>
+<script src="../../js/chrono.js?v=0.10"></script>
+<script src="../../js/kit.js?v=0.10"></script>
+<script src="../../js/commun.js?v=0.10"></script>
+<script src="../../js/ocr-ticket.js?v=0.8"></script>
+<script src="../b/b-textes.js?v=0.10"></script>
+<script src="e-textes.js?v=0.1"></script>
+<script src="../b/b.js?v=0.10"></script>
+<script src="e.js?v=0.1"></script>
+</body>
+</html>

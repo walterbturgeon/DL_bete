@@ -1,0 +1,160 @@
+/* MAQUETTE D « BRUT » (21 oct.) : l'habit brutaliste par-dessus la mise en page de B (b.css reste charge avant).
+   Regles : coins CARRES partout ; bordures noires de 2-3 px ; ombres franches decalees, sans flou ; titres en capitales ;
+   chiffres en police a chasse fixe (tableau de chrono) ; une couleur forte par role, jamais en degrade :
+     rouge  = l'action principale (texte noir dessus : contraste 5,9)
+     jaune  = il faut agir (remplace l'orange de B ; texte noir dessus)
+     vert   = dans la cible / fait        bleu = choisi, jalons, comparaison
+   Polices de l'appareil seulement (rien a telecharger : la politique de securite de l'app l'interdit). */
+:root { --bg:#f2f1ec; --card:#ffffff; --ink:#0b0b0b; --muted:#4f4d48; --line:#c4c1b8; --sel:#2340ff; --selbg:#fff1a1;
+        --ok:#00893d; --lent:#e00b00; --att:#ffd000; --tab:#e4e2db; --trait:#0b0b0b; --cmp:#2340ff; --gcol:#e00b00;
+        --zone:rgba(11,11,11,.07); --doux:#cdf3db; --doux-att:#fff1a1;
+        --rouge:#ff3d00; --sur-rouge:#0b0b0b; --sur-ink:#ffffff;
+        --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
+        --b2:2px solid var(--ink); --b3:3px solid var(--ink); --o3:3px 3px 0 var(--ink); --o4:4px 4px 0 var(--ink); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+        --bg:#0b0b0b; --card:#161616; --ink:#f2f1ec; --muted:#aaa79f; --line:#3d3c38; --sel:#7088ff; --selbg:#3b3300;
+        --ok:#25d46c; --lent:#ff5236; --att:#ffd000; --tab:#262624; --trait:#f2f1ec; --cmp:#7088ff; --gcol:#ff5236;
+        --zone:rgba(242,241,236,.08); --doux:#0f2f1c; --doux-att:#3b3300; --rouge:#ff5a1f; --sur-rouge:#0b0b0b; --sur-ink:#0b0b0b; } }
+:root[data-theme="dark"] {
+        --bg:#0b0b0b; --card:#161616; --ink:#f2f1ec; --muted:#aaa79f; --line:#3d3c38; --sel:#7088ff; --selbg:#3b3300;
+        --ok:#25d46c; --lent:#ff5236; --att:#ffd000; --tab:#262624; --trait:#f2f1ec; --cmp:#7088ff; --gcol:#ff5236;
+        --zone:rgba(242,241,236,.08); --doux:#0f2f1c; --doux-att:#3b3300; --rouge:#ff5a1f; --sur-rouge:#0b0b0b; --sur-ink:#0b0b0b; }
+
+/* ---- base : plus aucun arrondi ; les points d'etat deviennent des carres */
+body.d *, body.d *::before, body.d *::after { border-radius:0 !important; }
+body.d { background:var(--bg); }
+body.d .num, body.d .b-hex, body.d input[type=number], body.d .b-saisie input { font-family:var(--mono); font-variant-numeric:tabular-nums; }
+body.d h2, body.d h3 { text-transform:uppercase; letter-spacing:.06em; font-weight:900; }
+body.d .aide { color:var(--muted); }
+body.d :focus-visible { outline:3px solid var(--sel); outline-offset:1px; }
+body.d svg { stroke-linecap:square !important; stroke-linejoin:miter !important; }
+
+/* ---- en-tete : une barre, le logo dans une case, l'etat de la connexion en etiquette */
+body.d .b-tete { border-bottom:var(--b3); padding-bottom:10px; margin-bottom:10px; background:var(--bg); }
+body.d .logo { border:var(--b2); box-shadow:var(--o3); height:40px; }
+body.d .b-pilule { border:var(--b2); box-shadow:var(--o3); text-transform:uppercase; letter-spacing:.06em; font-size:13px; font-weight:900; min-height:40px; }
+body.d .b-pilule.off { background:var(--att); color:#0b0b0b; border-color:var(--ink); }
+body.d .b-pilule.on { background:var(--ink); color:var(--sur-ink); }
+body.d .b-pilule.on .point { background:var(--ok); }
+body.d .b-pilule:active, body.d .bouton:active, body.d .b-tuile:active { transform:translate(3px, 3px); box-shadow:none; }
+
+/* ---- cartes : bord noir, ombre franche ; le titre devient une bande noire pleine largeur */
+body.d .b-carte, body.d .b-etape { border:var(--b2); box-shadow:var(--o4); background:var(--card); padding:14px; margin-bottom:18px; }
+body.d .b-carte > h2, body.d .b-etape h3 { margin:-14px -14px 12px; padding:8px 14px; background:var(--ink); color:var(--sur-ink); font-size:13px; }
+body.d .b-etape { grid-template-columns:1fr; }
+body.d .b-etape .rond { display:none; }
+body.d .d-titre { font-size:18px; margin:0 0 8px; line-height:1.1; }
+
+/* ---- boutons : bord noir, ombre qui disparait a l'appui (le bouton « s'enfonce ») */
+body.d .bouton { border:var(--b2); box-shadow:var(--o3); background:var(--card); text-transform:uppercase; letter-spacing:.04em; font-weight:800; font-size:14px; }
+body.d .bouton.plein { background:var(--rouge); border-color:var(--ink); color:var(--sur-rouge); font-weight:900; }
+body.d .bouton:disabled { box-shadow:none; opacity:.4; }
+body.d .seg { gap:0; }
+body.d .seg button { border:var(--b2); margin-left:-2px; text-transform:uppercase; font-weight:800; font-size:13px; letter-spacing:.04em; background:var(--card); }
+body.d .seg button:first-child { margin-left:0; }
+body.d .seg button.on { background:var(--ink); border-color:var(--ink); color:var(--sur-ink); }
+body.d select, body.d input[type=text], body.d input[type=number] { border:var(--b2); background:var(--card); font-weight:700; }
+body.d .pas button { border:var(--b2); background:var(--tab); box-shadow:none; }
+body.d .pas button:active { background:var(--ink); color:var(--sur-ink); }
+body.d .champ > label, body.d .champ > .nom, body.d .ligne-pref .nom { text-transform:uppercase; letter-spacing:.05em; font-size:12px; font-weight:900; }
+body.d .ligne-pref { border-bottom:1px solid var(--line); }
+body.d .b-plus summary { color:var(--ink); text-transform:uppercase; letter-spacing:.05em; font-size:13px; font-weight:900; list-style:none; }
+body.d .b-plus summary::-webkit-details-marker { display:none; }
+body.d .b-plus summary::before { content:'+'; font-family:var(--mono); display:inline-flex; width:24px; height:24px; align-items:center; justify-content:center;
+                                  border:var(--b2); margin-right:10px; font-weight:900; }
+body.d .b-plus[open] > summary::before { content:'−'; background:var(--ink); color:var(--sur-ink); }
+
+/* ---- accueil : quatre cases carrees */
+body.d .b-tuiles { gap:16px; }
+body.d .b-tuile { border:var(--b2); box-shadow:5px 5px 0 var(--ink); background:var(--card); min-height:138px; }
+body.d .b-tuile .ic { background:var(--ink); color:var(--sur-ink); }
+body.d .b-tuile svg { stroke-width:2.2; }
+body.d .b-tuile b { text-transform:uppercase; letter-spacing:.02em; font-weight:900; font-size:17px; line-height:1.1; }
+body.d .b-tuile .sous { color:var(--muted); font-size:13px; }
+body.d .b-tuile.att { background:var(--att); color:#0b0b0b; border-color:var(--ink); }
+body.d .b-tuile.att .sous { color:#3a3500; }
+body.d .b-tuile.att .ic { background:#0b0b0b; color:var(--att); }
+body.d .b-tuile.ok { background:var(--doux); border-color:var(--ink); }
+body.d .b-tuile.ok .ic { background:var(--ok); color:#fff; }
+body.d .rond { border:var(--b2); background:var(--card); color:var(--ink); font-family:var(--mono); }
+body.d .b-etapes li.fait .rond { background:var(--ok); color:#fff; border-color:var(--ink); }
+
+/* ---- courir : le bandeau, la vitesse geante, les jalons en tableau de chrono */
+body.d .b-bandeau { border:var(--b3); box-shadow:var(--o4); text-transform:uppercase; letter-spacing:.03em; font-size:19px; font-weight:900; margin:0 0 14px; }
+/* texte « sur-ink » : blanc en clair, noir en sombre (le bleu et le vert du theme sombre sont trop clairs pour du blanc) */
+body.d .b-bandeau.course { background:var(--sel); color:var(--sur-ink); }
+body.d .b-bandeau.fini { background:var(--ok); color:var(--sur-ink); }
+body.d .marque.ok, body.d .b-pastille.ok, body.d .b-tuile.ok .ic, body.d .b-etapes li.fait .rond { color:var(--sur-ink); }
+body.d .b-bandeau.pret { background:var(--doux); color:var(--ink); }
+body.d .b-bandeau.att { background:var(--att); color:#0b0b0b; }
+body.d .b-etat-kit { margin:-4px 0 12px; }
+body.d .b-gps.off { color:var(--ink); background:var(--att); padding:2px 8px; border:var(--b2); color:#0b0b0b; }
+body.d .b-vitesse > .num:not(.b-g) { font-size:84px; font-weight:800; letter-spacing:-.04em; }
+body.d .b-vitesse small { text-transform:uppercase; font-weight:900; letter-spacing:.06em; }
+body.d .b-liste-jal li { border-bottom:1px solid var(--line); }
+body.d .b-liste-jal .l { text-transform:uppercase; letter-spacing:.05em; font-size:13px; font-weight:900; }
+body.d .b-liste-jal .t { font-family:var(--mono); font-size:26px; font-weight:800; }
+body.d .b-liste-jal li.vient { background:var(--selbg); }
+body.d .b-liste-jal li.vient .t { color:var(--ink); }
+body.d .b-chip, body.d .b-pastille, body.d .marque { border:var(--b2); text-transform:uppercase; letter-spacing:.04em; font-weight:900; }
+body.d .b-pastille.hors, body.d .marque.hors { background:var(--att); color:#0b0b0b; }
+
+/* ---- runs, ticket : rangees franches, tableau a tete noire */
+body.d .b-ligne { border-bottom:1px solid var(--line); }
+body.d .b-ligne .et { font-family:var(--mono); font-weight:800; }
+body.d .b-ligne.choisi { background:var(--ink); color:var(--sur-ink); }
+body.d .b-ligne.choisi .vf { color:var(--sur-ink); opacity:.75; }
+body.d .lecture { border:var(--b2); background:var(--tab); font-family:var(--mono); }
+body.d .legende { text-transform:uppercase; letter-spacing:.05em; font-weight:800; font-size:11px; }
+body.d .b-table th { background:var(--ink); color:var(--sur-ink); letter-spacing:.06em; border-bottom:0; }
+body.d .b-table td { border-bottom:1px solid var(--line); }
+body.d .b-table td.n { font-family:var(--mono); font-weight:700; }
+body.d .b-bilan { text-transform:uppercase; letter-spacing:.02em; font-weight:900; }
+body.d .b-saisie label { text-transform:uppercase; letter-spacing:.05em; font-size:12px; font-weight:900; }
+body.d .b-saisie input { font-size:20px; }
+body.d .b-saisie input.ocr-sur { border:3px solid var(--ok); }
+body.d .b-saisie input.ocr-verif { border:3px solid var(--ink); background:var(--att); color:#0b0b0b; }
+body.d .b-photo-fig img { border:var(--b2); }
+body.d .b-ocr, body.d .b-calage { border-top:var(--b2); }
+body.d .b-ecu-resume, body.d .b-maj-kit { border:var(--b2); background:var(--selbg); }
+body.d .d-champ-run select { width:100%; font-size:17px; }
+body.d .d-photo-mini { margin:0 0 12px; border:var(--b2); background:var(--tab); cursor:zoom-in; }
+body.d .d-photo-mini img { display:block; width:100%; max-height:120px; object-fit:contain; }
+body.d .d-photo-mini.grand { cursor:zoom-out; }
+body.d .d-photo-mini.grand img { max-height:none; }
+body.d .d-deux { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:0 12px; }
+body.d .d-deux .champ { min-width:0; } body.d .d-deux input, body.d .d-deux select { width:100%; min-width:0; }
+
+/* ---- feuille de connexion et barre du bas */
+body.d #voile { background:rgba(0,0,0,.62); }
+body.d .feuille { border:0; border-top:var(--b3); box-shadow:none; }
+body.d .feuille h2 { text-transform:uppercase; }
+body.d .b-barre { border-top:var(--b3); background:var(--card); }
+body.d .b-barre button { color:var(--ink); text-transform:uppercase; letter-spacing:.06em; font-size:11px; font-weight:900; border-left:2px solid var(--ink); }
+body.d .b-barre button:first-child { border-left:0; }
+body.d .b-barre svg { stroke-width:2.2; }
+body.d .b-barre button.actif { background:var(--ink); color:var(--sur-ink); }
+body.d .b-barre button.actif svg { background:none; padding:0; width:24px; height:24px; }
+body.d .b-envoi { border-top:var(--b2); margin-top:-4px; }
+body.d .d-sans-envoi .b-envoi, body.d .d-sans-kit .b-envoi { display:none; }
+
+/* ==== LES ONGLETS QUI GLISSENT ====
+   .d-onglets : la rangee d'onglets, collee en haut pendant le defilement ; le numero (i) est pose par d.js.
+   .d-glisse  : la piste ; un .d-panneau = la largeur de l'ecran, on glisse de l'un a l'autre (accroche franche).
+   La hauteur de la piste suit le panneau montre (d.js) : sans ca, le plus grand panneau imposerait sa hauteur. */
+body.d .d-onglets { position:sticky; top:var(--sa-h); z-index:12; display:flex; overflow-x:auto; scrollbar-width:none;
+                    margin:0 -16px 16px; background:var(--bg); border-top:var(--b3); border-bottom:var(--b3); }
+body.d .d-onglets::-webkit-scrollbar { display:none; }
+body.d .d-onglets button { flex:1 0 auto; display:inline-flex; align-items:center; justify-content:center; gap:5px; min-height:46px;
+                           padding:8px 10px; border:0; border-left:2px solid var(--ink); background:transparent; color:var(--ink);
+                           text-transform:uppercase; letter-spacing:.04em; font-size:12px; font-weight:900; cursor:pointer; white-space:nowrap; }
+body.d .d-onglets button:first-child, body.d .d-onglets button[hidden] + button { border-left:0; }
+body.d .d-onglets button i { font-style:normal; font-family:var(--mono); font-size:11px; color:var(--muted); }
+body.d .d-onglets button.on { background:var(--ink); color:var(--sur-ink); }
+body.d .d-onglets button.on i { color:var(--rouge); }
+body.d .d-glisse { display:flex; position:relative; overflow-x:auto; overflow-y:hidden; scroll-snap-type:x mandatory; scrollbar-width:none;
+                   overscroll-behavior-x:contain; margin:0 -16px; transition:height .18s ease; }
+body.d .d-glisse::-webkit-scrollbar { display:none; }
+body.d .d-panneau { flex:0 0 100%; min-width:0; align-self:flex-start; scroll-snap-align:start; scroll-snap-stop:always; padding:0 20px 8px 16px; }
+body.d .d-contenu { display:contents; }
+@media (prefers-reduced-motion: reduce) { body.d .d-glisse { transition:none; } }
