@@ -3,7 +3,7 @@
 // [B v0.2] (7 oct. : retour a la B) la langue est SEULEMENT dans Regler ; l'en-tete montre la connexion ;
 // repris de la maquette C : fiche du kit (calibration, mise a jour), ticket garde par run avec sa pastille n/m.
 (function () {
-  var VERSION = '0.11.2';   // = MARKETING_VERSION de l'app iPhone (ios/App/App.xcodeproj)
+  var VERSION = '0.11.3';   // = MARKETING_VERSION de l'app iPhone (ios/App/App.xcodeproj)
   var $ = DLC.$, T = DLI18n.T;
   // les textes de B sont dans b-textes.js (charge avant ce fichier)
   // [B v0.2] les tickets de demonstration et la comparaison viennent du noyau commun (DLC) ; les tickets tapes
@@ -320,7 +320,8 @@
   }
   function runTicket() { return runs.filter(function (x) { return x.id === $('bTRun').value; })[0]; }
   function afficherPhoto(r, puis) {
-    $('bPhotoFig').hidden = true; $('bPhotoFig').classList.remove('grand'); $('bPhotoMsg').textContent = T('b_photoAide');
+    // [22 oct.] sans photo, plus de texte d'aide (« elle reste dans ce telephone » : la confidentialite le dit deja)
+    $('bPhotoFig').hidden = true; $('bPhotoFig').classList.remove('grand'); $('bPhotoMsg').textContent = '';
     $('bOcr').hidden = true; oublierOcr();
     if (!r) return;
     Photos.lire(r.id).then(function (p) {

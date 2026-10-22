@@ -141,12 +141,12 @@ window.DLKit = (function () {
     kitRunAbsent: 'ce run n’est plus dans le module', idxRefusOff: 'la course à index est coupée',
     idxRefusCourse: 'un run est en cours', idxRefusManque: 'il manque le run de référence ou la cible'
   }, {
-    kitPasDlpt2: 'This device is not a DRAGLOG module (DLAP or other).', kitRefus: 'the module refused: {x}',
-    kitDumpDelai: 'the runs stopped arriving (nothing for 8 s)', kitCmdAbsente: 'this module takes no command',
-    calRefus: 'Calibration refused: {x}', calMuet: 'The module does not answer the calibration (6 s).',
+    kitPasDlpt2: 'This is not a DRAGLOG device (DLAP or other).', kitRefus: 'the device refused: {x}',
+    kitDumpDelai: 'the runs stopped arriving (nothing for 8 s)', kitCmdAbsente: 'this device takes no command',
+    calRefus: 'Calibration refused: {x}', calMuet: 'The device does not answer the calibration (6 s).',
     calR1: 'IMU silent', calR2: 'vehicle moving', calR3: 'too much vibration (engine idling?)',
-    calR4: 'the module is moving', calR5: 'real rotation detected', calR6: 'no IMU', kitRejeuBle: 'no replay with a real module',
-    kitRunAbsent: 'this run is no longer in the module', idxRefusOff: 'index racing is off',
+    calR4: 'the device is moving', calR5: 'real rotation detected', calR6: 'no IMU', kitRejeuBle: 'no replay with a real device',
+    kitRunAbsent: 'this run is no longer in the device', idxRefusOff: 'index racing is off',
     idxRefusCourse: 'a run is in progress', idxRefusManque: 'the reference run or the target is missing'
   });
   function TT(k, v) { return window.DLI18n ? DLI18n.T(k, v) : k; }

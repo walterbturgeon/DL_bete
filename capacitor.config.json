@@ -9,10 +9,10 @@
   "plugins": {
     "BluetoothLe": {
       "displayStrings": {
-        "scanning": "Recherche du module… / Searching for the module…",
+        "scanning": "Recherche du module… / Searching for the device…",
         "cancel": "Annuler / Cancel",
-        "availableDevices": "Modules trouvés / Modules found",
-        "noDeviceFound": "Aucun module trouvé / No module found"
+        "availableDevices": "Modules trouvés / Devices found",
+        "noDeviceFound": "Aucun module trouvé / No device found"
       }
     }
   }

@@ -156,6 +156,7 @@ body.e .b-table th { color:var(--muted); font-weight:500; }
 body.e .b-bilan { font-weight:700; }
 body.e .b-ecu-resume, body.e .b-maj-kit { border-radius:10px; }
 body.e .b-photo-fig img { border-radius:10px; }
+body.e #bPhotoMsg:empty { display:none; }             /* [22 oct.] pas de ligne vide sans message d'etat */
 body.e #bResultat, body.e #bCalage { scroll-margin-top:72px; }
 body.e .b-calage { border-top:0; margin-top:0; padding-top:0; }
 

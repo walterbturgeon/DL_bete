@@ -82,9 +82,14 @@ window.DLC = (function () {
     }).filter(Boolean);
   }
   // les donnees d'un graphique de run (vitesse A, G de A, vitesse B en pointille)
+  // [22 oct.] + le G de B : meme couleur et memes tirets que sa vitesse, trait plus mince
   function donneesRun(a, b, axe) {
     var sA = serie(a, axe, 'v'), gA = serie(a, axe, 'g'), series = [];
-    if (b) { var sB = serie(b, axe, 'v'); series.push({ x: sB.x, y: sB.y, axe: 'g', couleur: '--cmp', largeur: 2, tirets: [6, 4], nom: 'cmp' }); }
+    if (b) {
+      var sB = serie(b, axe, 'v'), gB = serie(b, axe, 'g');
+      series.push({ x: gB.x, y: gB.y, axe: 'd', couleur: '--cmp', largeur: 1.2, tirets: [6, 4], nom: 'gcmp' });
+      series.push({ x: sB.x, y: sB.y, axe: 'g', couleur: '--cmp', largeur: 2, tirets: [6, 4], nom: 'cmp' });
+    }
     series.push({ x: gA.x, y: gA.y, axe: 'd', couleur: '--gcol', largeur: 1.4, nom: 'g' });
     series.push({ x: sA.x, y: sA.y, axe: 'g', couleur: '--trait', largeur: 2.2, nom: 'v' });
     var fin = a.jalons['1320'];
@@ -106,7 +111,7 @@ window.DLC = (function () {
     var val = {}; info.valeurs.forEach(function (v) { val[v.nom] = v.y; });
     var xTxt = axe === 't' ? nf(info.x, 3) + ' s' : nf(info.x, 0) + ' ' + T('pi');
     var s = T('lecture', { x: xTxt, v: val.v == null ? '--' : nf(val.v, 1), u: unite(), g: val.g == null ? '--' : nf(val.g, 2) });
-    if (avecCmp) s += T('lectureCmp', { v: val.cmp == null ? '--' : nf(val.cmp, 1), u: unite() });
+    if (avecCmp) s += T('lectureCmp', { v: val.cmp == null ? '--' : nf(val.cmp, 1), u: unite(), g: val.gcmp == null ? '--' : nf(val.gcmp, 2) });
     return s;
   }
 
@@ -236,7 +241,7 @@ window.DLC = (function () {
   }, {
     tk_conseil60: 'Only the 60 ft is late: try “Timing mark position” or “60 ft offset”.',
     tk_conseilTous: 'Every timing mark has the same difference: try the roll-out (“Where the timer starts”).',
-    tk_conseilOk: 'Your module matches the slip.', tk_bilan: '{n} of {m} timing marks within your 0.02 s target.'
+    tk_conseilOk: 'Your device matches the slip.', tk_bilan: '{n} of {m} timing marks within your 0.02 s target.'
   });
   // tk = { 60, 330, 660, 1320 (s), v660, v1320 (mph) } ; une valeur absente = null. Ecart = kit - ticket.
   // Classe : ok <= 0,020 s (la cible), proche <= 0,040 s, hors au-dela.

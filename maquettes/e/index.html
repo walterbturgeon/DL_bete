@@ -8,7 +8,7 @@
 <link rel="icon" href="../../img/dl-logo.webp">
 <link rel="stylesheet" href="../../css/base-maquettes.css?v=0.3">
 <link rel="stylesheet" href="../b/b.css?v=0.10">
-<link rel="stylesheet" href="e.css?v=0.3">
+<link rel="stylesheet" href="e.css?v=0.4">
 </head>
 <body class="e">
 <!-- MAQUETTE E « PISTE » (21 oct.), aux couleurs du logo DRAGLOGICS ; c'est l'app iPhone depuis la 0.11.0
@@ -131,7 +131,8 @@
         <figcaption class="b-boutons"><button type="button" class="bouton" id="bPhotoAgrandir" data-i18n="b_photoAgrandir">Agrandir</button>
           <button type="button" class="bouton" id="bPhotoRetirer" data-i18n="b_photoRetirer">Retirer la photo</button></figcaption>
       </figure>
-      <p class="aide" id="bPhotoMsg" aria-live="polite" data-i18n="b_photoAide"></p>
+      <!-- [22 oct.] plus de texte d'aide ici (la confidentialite le dit deja) : seulement les messages d'etat de la photo -->
+      <p class="aide" id="bPhotoMsg" aria-live="polite"></p>
       <div class="b-ocr" id="bOcr" hidden>
         <div class="champ"><label for="bNumero" data-i18n="b_ocrNumero">Ton numéro sur le ticket</label>
           <input type="text" id="bNumero" maxlength="10" autocomplete="off" spellcheck="false" autocapitalize="characters"><p class="aide" data-i18n="b_ocrNumeroAide"></p></div>
@@ -338,17 +339,17 @@
   <button type="button" data-vue="regler"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg><span data-i18n="b_regler">Régler</span></button>
 </nav>
 
-<script src="../../js/i18n.js?v=0.4"></script>
+<script src="../../js/i18n.js?v=0.5"></script>
 <script src="../../js/graph.js?v=0.3"></script>
 <script src="../../js/demo-runs.js?v=0.3"></script>
 <script src="../../js/index-calc.js?v=0.9"></script>
 <script src="../../js/chrono.js?v=0.10"></script>
-<script src="../../js/kit.js?v=0.11"></script>
-<script src="../../js/commun.js?v=0.11"></script>
+<script src="../../js/kit.js?v=0.12"></script>
+<script src="../../js/commun.js?v=0.12"></script>
 <script src="../../js/ocr-ticket.js?v=0.8"></script>
-<script src="../b/b-textes.js?v=0.11"></script>
-<script src="e-textes.js?v=0.2"></script>
-<script src="../b/b.js?v=0.11"></script>
+<script src="../b/b-textes.js?v=0.12"></script>
+<script src="e-textes.js?v=0.3"></script>
+<script src="../b/b.js?v=0.12"></script>
 <script src="e.js?v=0.1"></script>
 </body>
 </html>

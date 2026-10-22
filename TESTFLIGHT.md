@@ -72,16 +72,16 @@ Une nouvelle build = recommencer l'étape 4. Le numéro de build monte tout seul
 > puis touche « Chercher un module (Bluetooth) » dans les 20 s.
 
 **What to Test — EN**
-> First iPhone build. Try: 1) Connect > “Try the demo module”; 2) Run and Runs; 3) Check against the time slip, with
-> “Take a photo” or “Import an image”; 4) with a real module: turn it on, then tap “Find a module (Bluetooth)” within 20 s.
+> First iPhone build. Try: 1) Connect > “Try the demo device”; 2) Run and Runs; 3) Check against the time slip, with
+> “Take a photo” or “Import an image”; 4) with a real device: turn it on, then tap “Find a device (Bluetooth)” within 20 s.
 
 **Description de la bêta (tests externes seulement)**
 > DRAGLOGICS lit les temps de ton module de chrono de drag par le Bluetooth, garde tes runs dans le téléphone et les
 > compare au ticket de la piste. Un module de démonstration permet d'essayer l'app sans matériel.
 
 **Notes pour l'examen d'Apple (tests externes et App Store)**
-> The app needs a DRAGLOGICS timing module (Bluetooth LE). Without the module, use the built-in demo: tap “Connect”, then
-> “Try the demo module”. The demo replays three synthetic runs. No account, no login.
+> The app needs a DRAGLOGICS timing device (Bluetooth LE). Without the device, use the built-in demo: tap “Connect”, then
+> “Try the demo device”. The demo replays three synthetic runs. No account, no login.
 
 **Politique de confidentialité** : https://walterbturgeon.github.io/DL_bete/confidentialite.html
 **Confidentialité de l'app** (App Store Connect > App Privacy) : « Données non collectées ».
