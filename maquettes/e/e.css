@@ -155,13 +155,14 @@ body.e .b-photo-fig img { border-radius:10px; }
 body.e #bResultat, body.e #bCalage { scroll-margin-top:72px; }
 body.e .b-calage { border-top:0; margin-top:0; padding-top:0; }
 
-/* ---- la barre du bas : blanche, icones grises au trait, l'onglet actif en rouge ; GO en lettres grasses */
+/* ---- la barre du bas : blanche, icones grises au trait, l'onglet actif en rouge ; SEND IT en lettres grasses
+   [21 oct.] « SEND IT » remplace « GO » : 7 lettres au lieu de 2, sur UNE ligne, dans la hauteur de l'icone (24 px) */
 body.e .b-barre { background:var(--card); border-top:1px solid var(--line); }
 body.e .b-barre button { color:var(--muted); font-weight:500; font-size:11px; }
 body.e .b-barre svg { stroke-width:1.6; }
 body.e .b-barre button.actif { color:var(--rouge); }
 body.e .b-barre button.actif svg { background:none; padding:0; width:24px; height:24px; }
-body.e .e-go-txt { font-size:24px; line-height:24px; font-weight:900; font-style:italic; letter-spacing:-.02em; }
+body.e .e-go-txt { font-size:17px; line-height:24px; font-weight:900; font-style:italic; letter-spacing:-.02em; white-space:nowrap; }
 body.e .b-envoi { background:var(--bg); }
 
 /* ---- la feuille de connexion */
