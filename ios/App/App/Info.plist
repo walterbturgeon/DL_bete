@@ -25,9 +25,9 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>DRAGLOGICS uses Bluetooth to connect to your timing kit, read your runs and change its settings. / DRAGLOGICS utilise le Bluetooth pour se connecter à ton kit de chrono, lire tes runs et changer ses réglages.</string>
+	<string>DRAGLOGICS uses Bluetooth to connect to your timing module, read your runs and change its settings. / DRAGLOGICS utilise le Bluetooth pour se connecter à ton module de chrono, lire tes runs et changer ses réglages.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>DRAGLOGICS uses the camera to photograph your time slip and compare it with your kit. The photo stays on your phone. / DRAGLOGICS utilise l’appareil photo pour photographier ton ticket et le comparer à ton kit. La photo reste dans ton téléphone.</string>
+	<string>DRAGLOGICS uses the camera to photograph your time slip and compare it with your module. The photo stays on your phone. / DRAGLOGICS utilise l’appareil photo pour photographier ton ticket et le comparer à ton module. La photo reste dans ton téléphone.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>DRAGLOGICS opens a picture of your time slip only when you choose one. It stays on your phone. / DRAGLOGICS ouvre une image de ton ticket seulement quand tu la choisis. Elle reste dans ton téléphone.</string>
 	<key>LSRequiresIPhoneOS</key>

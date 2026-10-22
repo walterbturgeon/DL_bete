@@ -8,7 +8,7 @@
 <link rel="icon" href="../../img/dl-logo.webp">
 <link rel="stylesheet" href="../../css/base-maquettes.css?v=0.3">
 <link rel="stylesheet" href="../b/b.css?v=0.10">
-<link rel="stylesheet" href="e.css?v=0.2">
+<link rel="stylesheet" href="e.css?v=0.3">
 </head>
 <body class="e">
 <!-- MAQUETTE E « PISTE » (21 oct.), aux couleurs du logo DRAGLOGICS ; c'est l'app iPhone depuis la 0.11.0
@@ -29,13 +29,13 @@
 <!-- ====== ACCUEIL ====== pas montre dans E : l'ecran GO (Courir) le remplace. Les elements restent pour b.js. -->
 <section id="v-accueil" class="vue" hidden>
   <div class="b-tuiles">
-    <button type="button" class="b-tuile att" id="tKit"><b data-i18n="b_monKit">Mon kit</b><span class="sous" id="tKitSous"></span></button>
+    <button type="button" class="b-tuile att" id="tKit"><b data-i18n="b_monKit">Mon module</b><span class="sous" id="tKitSous"></span></button>
     <button type="button" class="b-tuile" id="tCourir"><b data-i18n="b_pret">Prêt à courir</b><span class="sous" id="tCourirSous"></span></button>
     <button type="button" class="b-tuile" id="tRuns"><b data-i18n="b_mesRuns">Mes runs</b><span class="sous" id="tRunsSous"></span></button>
-    <button type="button" class="b-tuile" id="tTicket"><b data-i18n="b_ticket">Comparer au ticket</b><span class="sous" data-i18n="b_ticketSous">Vérifie ton kit</span></button>
+    <button type="button" class="b-tuile" id="tTicket"><b data-i18n="b_ticket">Comparer au ticket</b><span class="sous" data-i18n="b_ticketSous">Vérifie ton module</span></button>
   </div>
   <ol class="b-etapes" id="bEtapes">
-    <li id="e1"><span class="rond">1</span><span data-i18n="b_e1">Connecter le kit</span></li>
+    <li id="e1"><span class="rond">1</span><span data-i18n="b_e1">Connecter le module</span></li>
     <li id="e2"><span class="rond">2</span><span data-i18n="b_e2">Faire un run</span></li>
     <li id="e3"><span class="rond">3</span><span data-i18n="b_e3">Comparer au ticket</span></li>
   </ol>
@@ -63,9 +63,12 @@
     <div class="b-etat-kit" id="bEtatKit" hidden><span class="b-gps" id="bGps"><span class="point"></span><span id="bGpsTxt"></span></span>
       <span class="b-chip" id="bTb" hidden></span></div>
     <button type="button" class="bouton plein b-rearmer" id="bRearmer" hidden data-i18n="b_rearmer">Réarmer le chrono</button>
+    <!-- [21 oct.] « Rejouer un run » (kit de demo) monte ici, sous l'etat du chrono : en bas de la vue, la barre du bas
+         en cachait la moitie sur un iPhone (bouton a 714-766 px, barre a 739 px, ecran de 844 px) -->
+    <button type="button" class="bouton e-pilule-btn" id="bRejouer" data-i18n="bRejouer">Rejouer un run</button>
   </div>
   <div class="e-sous-go">
-    <p class="vide" id="bCourirVide" data-i18n="b_pretOff">Connecte le kit d'abord.</p>
+    <p class="vide" id="bCourirVide" data-i18n="b_pretOff">Connecte le module d'abord.</p>
     <div class="b-carte b-idx" id="bIdx" hidden>
       <div class="b-idx-l"><span class="b-chip" id="bIdxChip"></span><span id="bIdxTxt"></span></div>
       <p class="b-idx-direct num" id="bIdxDirect"></p>
@@ -77,17 +80,16 @@
         <canvas class="graphe" id="cvB" role="img" data-i18n-aria="ariaDirect"></canvas>
         <div class="legende"><span class="l-v"><i></i><span data-i18n="lgVitesse"></span></span><span class="l-g"><i></i><span data-i18n="lgG"></span></span></div>
       </div></details>
-    <button type="button" class="bouton e-pilule-btn" id="bRejouer" data-i18n="bRejouer">Rejouer un run</button>
     <details class="b-plus" id="bBanc" hidden><summary data-i18n="b_banc">Banc d'essai</summary>
       <p class="aide" data-i18n="b_simAvert"></p>
-      <button type="button" class="bouton e-pilule-btn" id="bSim" data-i18n="b_sim">Course simulée du kit (banc)</button></details>
+      <button type="button" class="bouton e-pilule-btn" id="bSim" data-i18n="b_sim">Course simulée du module (banc)</button></details>
   </div>
 </section>
 
 <!-- ====== RUNS ====== l'historique en lignes ; un run ouvre sa page (chevron retour dans la bande) -->
 <section id="v-runs" class="vue" hidden>
   <div class="e-page" id="pRuListe">
-    <h2 class="e-groupe" data-i18n="e_gRuns">Runs gardés dans le kit</h2>
+    <h2 class="e-groupe" data-i18n="e_gRuns">Runs gardés dans le module</h2>
     <div class="e-liste"><div id="bListe" class="b-liste"></div>
       <p class="vide" id="bRunsVide" data-i18n="b_aucunRun">Aucun run.</p></div>
   </div>
@@ -156,7 +158,7 @@
     <div id="bResultat" hidden>
       <h2 class="e-groupe" data-i18n="e_gResultat">Résultat</h2>
       <div class="e-liste">
-        <table class="b-table"><thead><tr><th data-i18n="b_jalon">Jalon</th><th class="n" data-i18n="b_kit">Kit</th><th class="n" data-i18n="b_tk">Ticket</th><th class="n" data-i18n="b_ecart">Écart</th><th></th></tr></thead><tbody id="bResCorps"></tbody></table>
+        <table class="b-table"><thead><tr><th data-i18n="b_jalon">Jalon</th><th class="n" data-i18n="b_kit">Module</th><th class="n" data-i18n="b_tk">Ticket</th><th class="n" data-i18n="b_ecart">Écart</th><th></th></tr></thead><tbody id="bResCorps"></tbody></table>
         <p class="b-bilan" id="bBilan"></p>
         <p class="aide" id="bConseil"></p>
       </div>
@@ -176,16 +178,16 @@
      seulement sur les pages du kit. Les valeurs a droite sont relues dans les champs par e.js. -->
 <section id="v-regler" class="vue" hidden>
   <form id="bForm" novalidate>
-    <p class="vide" id="bRegVide" data-i18n="videReg">Connecte un kit.</p>
+    <p class="vide" id="bRegVide" data-i18n="videReg">Connecte un module.</p>
     <div class="e-page" id="pReMenu">
-      <h2 class="e-groupe e-kit-seul" data-i18n="e_gKit">Le kit</h2>
+      <h2 class="e-groupe e-kit-seul" data-i18n="e_gKit">Le module</h2>
       <div class="e-liste e-menu e-kit-seul">
         <button type="button" class="e-ligne" data-page="pReVeh"><span class="e-ic e-ic-rouge"><svg viewBox="0 0 24 24"><path d="M3 15l2-5h14l2 5v3H3z"/><circle cx="7.5" cy="18" r="1.6"/><circle cx="16.5" cy="18" r="1.6"/></svg></span>
           <span class="e-nom" data-i18n="e_mVehicule">Véhicule</span><span class="e-val" data-val="veh"></span></button>
         <button type="button" class="e-ligne" data-page="pReEcu"><span class="e-ic e-ic-noir"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/></svg></span>
           <span class="e-nom" data-i18n="e_mEcu">ECU et CAN</span><span class="e-val" data-val="ecu"></span></button>
         <button type="button" class="e-ligne" data-page="pReKit"><span class="e-ic e-ic-fonce"><svg viewBox="0 0 24 24"><path d="M9 2v6M15 2v6"/><path d="M6 8h12v3a6 6 0 0 1-12 0V8Z"/><path d="M12 17v5"/></svg></span>
-          <span class="e-nom" data-i18n="e_mKit">Kit et GPS</span><span class="e-val" data-val="kit"></span></button>
+          <span class="e-nom" data-i18n="e_mKit">Module et GPS</span><span class="e-val" data-val="kit"></span></button>
         <button type="button" class="e-ligne" data-page="pReIdx" id="eLigneIdx"><span class="e-ic e-ic-gris"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 3"/></svg></span>
           <span class="e-nom" data-i18n="b_idxTitre">Course à index</span><span class="e-val" data-val="idx"></span></button>
       </div>
@@ -255,16 +257,16 @@
           </details></div></div>
       </div>
       <div class="e-page e-page-kit" id="pReKit" hidden>
-        <div class="b-etape"><span class="rond">4</span><div><h3 data-i18n="b_s5">Le kit</h3>
+        <div class="b-etape"><span class="rond">4</span><div><h3 data-i18n="b_s5">Le module</h3>
           <div class="champ"><label for="f-sfx" data-i18n="sfxNom"></label><input type="text" id="f-sfx" maxlength="5" autocomplete="off" spellcheck="false"></div>
           <div class="champ"><label for="f-grate" data-i18n="grateNom"></label><select id="f-grate"><option value="40">25 Hz</option><option value="50">20 Hz</option><option value="100">10 Hz</option></select></div>
           <div class="champ"><label for="f-tzh" data-i18n="tzhNom"></label><input type="number" id="f-tzh" min="-12" max="14" step="1"></div>
           <div class="champ"><label for="f-pfft" data-i18n="pfftNom"></label><select id="f-pfft"></select></div>
           <div class="champ" id="bChCms"><label for="f-cms" data-i18n="cmsNom"></label><input type="number" id="f-cms" min="-600" max="600" step="5"><p class="aide" data-i18n="cmsAide"></p></div></div></div>
-        <h2 class="e-groupe" data-i18n="e_hFiche">Fiche du kit</h2>
+        <h2 class="e-groupe" data-i18n="e_hFiche">Fiche du module</h2>
         <div class="e-liste">
           <dl class="b-fiche" id="bFiche"></dl>
-          <p class="vide" id="bFicheVide" data-i18n="videKit">Aucun kit connecté.</p>
+          <p class="vide" id="bFicheVide" data-i18n="videKit">Aucun module connecté.</p>
           <div class="b-boutons"><button type="button" class="bouton" id="bCal" data-i18n="calBtn">Calibrer</button>
             <button type="button" class="bouton" id="bMaj" data-i18n="majBtn">Passer en mise à jour</button></div>
           <p class="aide" data-i18n="calAide"></p>
@@ -311,14 +313,14 @@
       <div class="e-liste"><p class="aide" data-i18n="priveTexte"></p>
         <button type="button" class="bouton" id="bEffacer" data-i18n="effacer"></button><p class="aide" id="bPriveMsg" aria-live="polite"></p><p class="aide" id="bVersion"></p></div>
     </div>
-    <div class="b-envoi" id="eEnvoi" hidden><button type="submit" class="bouton plein e-pilule-btn" data-i18n="envoyer">Envoyer au kit</button><p id="bFormMsg" aria-live="polite"></p></div>
+    <div class="b-envoi" id="eEnvoi" hidden><button type="submit" class="bouton plein e-pilule-btn" data-i18n="envoyer">Envoyer au module</button><p id="bFormMsg" aria-live="polite"></p></div>
   </form>
 </section>
 </main>
 
 <div id="voile" hidden></div>
 <div id="feuilleCx" class="feuille" hidden role="dialog" aria-modal="true" aria-labelledby="cxTitre">
-  <h2 id="cxTitre" data-i18n="cxTitre">Connecter un kit</h2>
+  <h2 id="cxTitre" data-i18n="cxTitre">Connecter un module</h2>
   <p class="aide" data-i18n="cxPourquoi"></p>
   <button type="button" class="bouton plein large" id="cxBle" data-i18n="cxBle"></button>
   <button type="button" class="bouton large" id="cxDemo" data-i18n="cxDemo"></button>
@@ -336,17 +338,17 @@
   <button type="button" data-vue="regler"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg><span data-i18n="b_regler">Régler</span></button>
 </nav>
 
-<script src="../../js/i18n.js?v=0.3"></script>
+<script src="../../js/i18n.js?v=0.4"></script>
 <script src="../../js/graph.js?v=0.3"></script>
 <script src="../../js/demo-runs.js?v=0.3"></script>
 <script src="../../js/index-calc.js?v=0.9"></script>
 <script src="../../js/chrono.js?v=0.10"></script>
-<script src="../../js/kit.js?v=0.10"></script>
-<script src="../../js/commun.js?v=0.10"></script>
+<script src="../../js/kit.js?v=0.11"></script>
+<script src="../../js/commun.js?v=0.11"></script>
 <script src="../../js/ocr-ticket.js?v=0.8"></script>
-<script src="../b/b-textes.js?v=0.10"></script>
-<script src="e-textes.js?v=0.1"></script>
-<script src="../b/b.js?v=0.10"></script>
+<script src="../b/b-textes.js?v=0.11"></script>
+<script src="e-textes.js?v=0.2"></script>
+<script src="../b/b.js?v=0.11"></script>
 <script src="e.js?v=0.1"></script>
 </body>
 </html>

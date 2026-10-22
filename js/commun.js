@@ -232,11 +232,11 @@ window.DLC = (function () {
   DLI18n.ajouter({
     tk_conseil60: 'Le 60 pi seul est en retard : essaie « Position des jalons » ou « Décalage du 60 pi ».',
     tk_conseilTous: 'Tous les jalons ont le même écart : essaie le roll-out (« Où le chrono part »).',
-    tk_conseilOk: 'Ton kit colle au ticket.', tk_bilan: '{n} jalons sur {m} dans ta cible de 0,02 s.'
+    tk_conseilOk: 'Ton module colle au ticket.', tk_bilan: '{n} jalons sur {m} dans ta cible de 0,02 s.'
   }, {
     tk_conseil60: 'Only the 60 ft is late: try “Timing mark position” or “60 ft offset”.',
     tk_conseilTous: 'Every timing mark has the same difference: try the roll-out (“Where the timer starts”).',
-    tk_conseilOk: 'Your kit matches the slip.', tk_bilan: '{n} of {m} timing marks within your 0.02 s target.'
+    tk_conseilOk: 'Your module matches the slip.', tk_bilan: '{n} of {m} timing marks within your 0.02 s target.'
   });
   // tk = { 60, 330, 660, 1320 (s), v660, v1320 (mph) } ; une valeur absente = null. Ecart = kit - ticket.
   // Classe : ok <= 0,020 s (la cible), proche <= 0,040 s, hors au-dela.

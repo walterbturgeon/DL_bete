@@ -1,34 +1,34 @@
 'use strict';
 // Les textes de la maquette B (francais et anglais), a part : l'application ET le kit graphique les chargent.
 DLI18n.ajouter({
-  b_accueil: 'Accueil', b_courir: 'Courir', b_regler: 'Régler', b_monKit: 'Mon kit', b_kitOff: 'Pas connecté — touche ici',
-  b_kitOn: '{nom} · {s} satellites', b_pret: 'Prêt à courir', b_pretOff: 'Connecte le kit d’abord.', b_dernier: 'Dernier : {t} s',
+  b_accueil: 'Accueil', b_courir: 'Courir', b_regler: 'Régler', b_monKit: 'Mon module', b_kitOff: 'Pas connecté — touche ici',
+  b_kitOn: '{nom} · {s} satellites', b_pret: 'Prêt à courir', b_pretOff: 'Connecte le module d’abord.', b_dernier: 'Dernier : {t} s',
   b_mesRuns: 'Mes runs', b_nbRuns: '{n} runs · meilleur {t} s', b_aucunRun: 'Aucun run pour l’instant.',
-  b_ticket: 'Comparer au ticket', b_ticketSous: 'Vérifie ton kit avec le ticket de la piste', b_etapes: 'Les étapes',
-  b_e1: 'Connecter le kit', b_e2: 'Faire un run', b_e3: 'Comparer au ticket',
+  b_ticket: 'Comparer au ticket', b_ticketSous: 'Vérifie ton module avec le ticket de la piste', b_etapes: 'Les étapes',
+  b_e1: 'Connecter le module', b_e2: 'Faire un run', b_e3: 'Comparer au ticket',
   b_hTicket: 'Comparer au ticket de la piste', b_run: 'Run', b_saisir: 'Entre les temps du ticket, en secondes (ex. 1,290).',
-  b_remplirDemo: 'Remplir avec le ticket de démo', b_comparer: 'Comparer', b_jalon: 'Jalon', b_kit: 'Kit', b_tk: 'Ticket', b_ecart: 'Écart',
+  b_remplirDemo: 'Remplir avec le ticket de démo', b_comparer: 'Comparer', b_jalon: 'Jalon', b_kit: 'Module', b_tk: 'Ticket', b_ecart: 'Écart',
   b_bilan: '{n} jalons sur {m} dans ta cible de 0,02 s.', b_conseil60: 'Le 60 pi seul est en retard : essaie « Où sont les jalons » dans Régler.',
-  b_conseilTous: 'Tous les jalons ont le même écart : essaie « Où le chrono part » dans Régler.', b_conseilOk: 'Ton kit colle au ticket.',
+  b_conseilTous: 'Tous les jalons ont le même écart : essaie « Où le chrono part » dans Régler.', b_conseilOk: 'Ton module colle au ticket.',
   b_vit18: 'Vitesse 1/8 (mph)', b_vit14: 'Vitesse 1/4 (mph)', b_s1: 'Où le chrono part', b_s2: 'Où sont les jalons', b_s2b: 'Si le 60 pi reste à part',
-  b_s3: 'Ton départ', b_s4: 'Vers l’ECU', b_s5: 'Le kit', b_ticketVide: 'Aucun run à comparer. Connecte le kit et fais un run.',
+  b_s3: 'Ton départ', b_s4: 'Vers l’ECU', b_s5: 'Le module', b_ticketVide: 'Aucun run à comparer. Connecte le module et fais un run.',
   b_ticketAvecRun: 'Comparer ce run au ticket', b_saisieErr: 'Entre au moins un temps du ticket.', b_vitLab: 'vitesse {d}'
 }, {
-  b_accueil: 'Home', b_courir: 'Run', b_regler: 'Set up', b_monKit: 'My kit', b_kitOff: 'Not connected — tap here',
-  b_kitOn: '{nom} · {s} satellites', b_pret: 'Ready to run', b_pretOff: 'Connect the kit first.', b_dernier: 'Last: {t} s',
+  b_accueil: 'Home', b_courir: 'Run', b_regler: 'Set up', b_monKit: 'My module', b_kitOff: 'Not connected — tap here',
+  b_kitOn: '{nom} · {s} satellites', b_pret: 'Ready to run', b_pretOff: 'Connect the module first.', b_dernier: 'Last: {t} s',
   b_mesRuns: 'My runs', b_nbRuns: '{n} runs · best {t} s', b_aucunRun: 'No run yet.',
-  b_ticket: 'Check against the slip', b_ticketSous: 'Check your kit against the time slip', b_etapes: 'The steps',
-  b_e1: 'Connect the kit', b_e2: 'Make a run', b_e3: 'Check against the slip',
+  b_ticket: 'Check against the slip', b_ticketSous: 'Check your module against the time slip', b_etapes: 'The steps',
+  b_e1: 'Connect the module', b_e2: 'Make a run', b_e3: 'Check against the slip',
   b_hTicket: 'Check against the time slip', b_run: 'Run', b_saisir: 'Type the times from the slip, in seconds (e.g. 1.290).',
-  b_remplirDemo: 'Fill with the demo slip', b_comparer: 'Compare', b_jalon: 'Mark', b_kit: 'Kit', b_tk: 'Slip', b_ecart: 'Difference',
+  b_remplirDemo: 'Fill with the demo slip', b_comparer: 'Compare', b_jalon: 'Mark', b_kit: 'Module', b_tk: 'Slip', b_ecart: 'Difference',
   b_bilan: '{n} of {m} timing marks within your 0.02 s target.', b_conseil60: 'Only the 60 ft is late: try “Where the timing marks are” in Set up.',
-  b_conseilTous: 'Every timing mark has the same difference: try “Where the timer starts” in Set up.', b_conseilOk: 'Your kit matches the slip.',
+  b_conseilTous: 'Every timing mark has the same difference: try “Where the timer starts” in Set up.', b_conseilOk: 'Your module matches the slip.',
   b_vit18: '1/8 speed (mph)', b_vit14: '1/4 speed (mph)', b_s1: 'Where the timer starts', b_s2: 'Where the timing marks are', b_s2b: 'If the 60 ft stays apart',
-  b_s3: 'Your start', b_s4: 'To the ECU', b_s5: 'The kit', b_ticketVide: 'No run to compare. Connect the kit and make a run.',
+  b_s3: 'Your start', b_s4: 'To the ECU', b_s5: 'The module', b_ticketVide: 'No run to compare. Connect the module and make a run.',
   b_ticketAvecRun: 'Check this run against the slip', b_saisieErr: 'Type at least one time from the slip.', b_vitLab: '{d} speed'
 });
-DLI18n.ajouter({ b_tkPastille: '{n}/{m}', b_version: 'DRAGLOGICS {v} — version d’essai. Le kit de démonstration rejoue des runs synthétiques.' },
-                 { b_tkPastille: '{n}/{m}', b_version: 'DRAGLOGICS {v} — test version. The demo kit replays synthetic runs.' });
+DLI18n.ajouter({ b_tkPastille: '{n}/{m}', b_version: 'DRAGLOGICS {v} — version d’essai. Le module de démonstration rejoue des runs synthétiques.' },
+                 { b_tkPastille: '{n}/{m}', b_version: 'DRAGLOGICS {v} — test version. The demo module replays synthetic runs.' });
 // [B v0.8] la lecture automatique du ticket (7 oct.)
 DLI18n.ajouter({
   b_ocrLire: 'Lire le ticket', b_ocrNumero: 'Ton numéro sur le ticket', b_ocrNumeroAide: 'Sert à trouver ton couloir (ex. NT1234).',
@@ -70,20 +70,20 @@ DLI18n.ajouter({
   b_etatPret: 'PRÊT — pars quand tu veux', b_etatSansGps: 'PAS DE POSITION GPS — attends avant de partir',
   b_etatCourse: 'EN COURSE · {t} s', b_etatSim: 'SIMULATION · {t} s', b_etatFini: 'TERMINÉ · {t} s',
   b_etatAbandon: 'ABANDON (20 s sans arrivée) — réarme', b_etatAttente: 'EN ATTENTE — réarme le chrono',
-  b_gpsOk: 'GPS · {s} satellites · {hz} Hz', b_gpsNon: 'GPS : pas de position ({s} satellites). Mets le kit à ciel ouvert.',
+  b_gpsOk: 'GPS · {s} satellites · {hz} Hz', b_gpsNon: 'GPS : pas de position ({s} satellites). Mets le module à ciel ouvert.',
   b_tbAttente: 'Transbrake : rien reçu de l’ECU', b_tbEngage: 'Transbrake engagé', b_tbRelache: 'Transbrake relâché',
   b_rearmer: 'Réarmer le chrono', b_banc: 'Banc d’essai',
-  b_simAvert: 'La course simulée s’enregistre dans le kit comme un vrai run : elle remplace le plus ancien des 8 runs gardés.',
-  b_simConfirme: 'Lancer une course simulée ? Elle remplace le plus ancien des 8 runs gardés dans le kit.'
+  b_simAvert: 'La course simulée s’enregistre dans le module comme un vrai run : elle remplace le plus ancien des 8 runs gardés.',
+  b_simConfirme: 'Lancer une course simulée ? Elle remplace le plus ancien des 8 runs gardés dans le module.'
 }, {
   b_etatPret: 'READY — go when you want', b_etatSansGps: 'NO GPS POSITION — wait before you go',
   b_etatCourse: 'RUNNING · {t} s', b_etatSim: 'SIMULATION · {t} s', b_etatFini: 'FINISHED · {t} s',
   b_etatAbandon: 'ABORTED (20 s without finish) — re-arm', b_etatAttente: 'WAITING — re-arm the timer',
-  b_gpsOk: 'GPS · {s} satellites · {hz} Hz', b_gpsNon: 'GPS: no position ({s} satellites). Put the kit under open sky.',
+  b_gpsOk: 'GPS · {s} satellites · {hz} Hz', b_gpsNon: 'GPS: no position ({s} satellites). Put the module under open sky.',
   b_tbAttente: 'Transbrake: nothing from the ECU', b_tbEngage: 'Transbrake engaged', b_tbRelache: 'Transbrake released',
   b_rearmer: 'Re-arm the timer', b_banc: 'Bench test',
-  b_simAvert: 'The simulated run is stored in the kit like a real run: it replaces the oldest of the 8 runs kept.',
-  b_simConfirme: 'Start a simulated run? It replaces the oldest of the 8 runs kept in the kit.'
+  b_simAvert: 'The simulated run is stored in the module like a real run: it replaces the oldest of the 8 runs kept.',
+  b_simConfirme: 'Start a simulated run? It replaces the oldest of the 8 runs kept in the module.'
 });
 // [B v0.4] l'etape « Ton ECU » (7 oct.)
 DLI18n.ajouter({
@@ -99,12 +99,12 @@ DLI18n.ajouter({
   b_res_holley_dom: 'Débit 1 Mbit/s, automatique. Départ : relâchement du transbrake (sortie 0 du canal 8).',
   b_res_fueltech: 'Débit 1 Mbit/s, fixe. Départ : 2-step du FuelTech, lu dans son flux. Les 5 voies envoyées au FuelTech sont déjà définies :',
   b_res_link: 'Départ : Launch Control du Link, au relâchement, lu dans le flux choisi.',
-  b_res_ecumaster: 'Le kit envoie le flux GPStoCAN V2 (ID de base {base}). Départ : {dep}.',
-  b_res_autre: 'Mode ancien, gardé pour les kits déjà réglés ainsi.',
+  b_res_ecumaster: 'Le module envoie le flux GPStoCAN V2 (ID de base {base}). Départ : {dep}.',
+  b_res_autre: 'Mode ancien, gardé pour les modules déjà réglés ainsi.',
   b_ftV1: 'in1 « Brake pressure » = distance (pi × 10)', b_ftV2: 'in2 « Tire temp FL » = vitesse au dernier jalon (mph)',
   b_ftV3: 'in3 « Tire temp FR » = vitesse instantanée (mph)', b_ftV4: 'in21 « Fuel flow A » = temps au dernier jalon',
   b_ftV5: 'in22 « Fuel flow B » = temps au 60 pi',
-  b_avLink157: '⚠ Avec le firmware {fw}, en DRAGLOGICS, le kit lit toujours le Generic Dash 1000 et envoie 1200 / 1201 : le flux et les ID choisis ici comptent seulement à partir de la PT2.1.57.',
+  b_avLink157: '⚠ Avec le firmware {fw}, en DRAGLOGICS, le module lit toujours le Generic Dash 1000 et envoie 1200 / 1201 : le flux et les ID choisis ici comptent seulement à partir de la PT2.1.57.',
   b_avTrameEnPlus: '⚠ Une trame CAN de départ est aussi active : {dep}. Retire-la dans « Départ : réglages avancés » si elle ne sert pas.'
 }, {
   b_s3e: 'Your ECU', b_ecuNom: 'ECU brand', b_ecuHp: 'Holley HP / Terminator X', b_ecuDom: 'Holley Dominator',
@@ -119,69 +119,69 @@ DLI18n.ajouter({
   b_res_holley_dom: 'Bit rate 1 Mbit/s, automatic. Start: transbrake release (output 0 of channel 8).',
   b_res_fueltech: 'Bit rate 1 Mbit/s, fixed. Start: FuelTech 2-step, read from its stream. The 5 inputs sent to the FuelTech are already set:',
   b_res_link: 'Start: Link Launch Control, on release, read from the chosen stream.',
-  b_res_ecumaster: 'The kit sends the GPStoCAN V2 stream (base ID {base}). Start: {dep}.',
-  b_res_autre: 'Old mode, kept for kits already set this way.',
+  b_res_ecumaster: 'The module sends the GPStoCAN V2 stream (base ID {base}). Start: {dep}.',
+  b_res_autre: 'Old mode, kept for modules already set this way.',
   b_ftV1: 'in1 “Brake pressure” = distance (ft × 10)', b_ftV2: 'in2 “Tire temp FL” = speed at the last timing mark (mph)',
   b_ftV3: 'in3 “Tire temp FR” = live speed (mph)', b_ftV4: 'in21 “Fuel flow A” = time at the last timing mark',
   b_ftV5: 'in22 “Fuel flow B” = 60 ft time',
-  b_avLink157: '⚠ With firmware {fw}, in DRAGLOGICS, the kit always reads Generic Dash 1000 and sends 1200 / 1201: the stream and IDs chosen here apply only from PT2.1.57.',
+  b_avLink157: '⚠ With firmware {fw}, in DRAGLOGICS, the module always reads Generic Dash 1000 and sends 1200 / 1201: the stream and IDs chosen here apply only from PT2.1.57.',
   b_avTrameEnPlus: '⚠ A CAN start frame is also active: {dep}. Remove it in “Start: advanced settings” if it is not used.'
 });
 // [B v0.3] le vrai kit par Bluetooth
 DLI18n.ajouter({
-  b_sim: 'Course simulée du kit (banc)', b_runsLecture: 'Lecture des runs du kit…', b_runsErr: 'Runs pas lus : {x}',
-  b_runsManque: '⚠ Le kit annonce {a} runs mais {n} ne sont pas arrivés : le kit n’a pas pu les envoyer (firmware).',
-  b_majConfirme: 'Passer le kit en mise à jour ? Il quitte le Bluetooth et ouvre son WiFi de mise à jour jusqu’au prochain redémarrage.',
-  b_majBle: 'Le kit est en mise à jour : rejoins son WiFi BPS-GPS-OTA, puis ouvre http://192.168.4.1/update.'
+  b_sim: 'Course simulée du module (banc)', b_runsLecture: 'Lecture des runs du module…', b_runsErr: 'Runs pas lus : {x}',
+  b_runsManque: '⚠ Le module annonce {a} runs mais {n} ne sont pas arrivés : le module n’a pas pu les envoyer (firmware).',
+  b_majConfirme: 'Passer le module en mise à jour ? Il quitte le Bluetooth et ouvre son WiFi de mise à jour jusqu’au prochain redémarrage.',
+  b_majBle: 'Le module est en mise à jour : rejoins son WiFi BPS-GPS-OTA, puis ouvre http://192.168.4.1/update.'
 }, {
-  b_sim: 'Kit simulated run (bench)', b_runsLecture: 'Reading the kit runs…', b_runsErr: 'Runs not read: {x}',
-  b_runsManque: '⚠ The kit announces {a} runs but {n} did not arrive: the kit could not send them (firmware).',
-  b_majConfirme: 'Put the kit in update mode? It leaves Bluetooth and opens its update WiFi until the next restart.',
-  b_majBle: 'The kit is in update mode: join its BPS-GPS-OTA WiFi, then open http://192.168.4.1/update.'
+  b_sim: 'Module simulated run (bench)', b_runsLecture: 'Reading the module runs…', b_runsErr: 'Runs not read: {x}',
+  b_runsManque: '⚠ The module announces {a} runs but {n} did not arrive: the module could not send them (firmware).',
+  b_majConfirme: 'Put the module in update mode? It leaves Bluetooth and opens its update WiFi until the next restart.',
+  b_majBle: 'The module is in update mode: join its BPS-GPS-OTA WiFi, then open http://192.168.4.1/update.'
 });
 
 // [0.10.0] la regle uniforme (kit PT2.1.64) : le type de vehicule, le depart, le calage automatique par ticket
 DLI18n.ajouter({
   b_vehTitre: 'Ton véhicule', b_vehVoiture: 'Voiture', b_vehMoto: 'Moto', b_vehNom1: 'voiture', b_vehNom2: 'moto', b_po: 'po',
   b_vehAide: 'Le type règle tout le chrono. Il reste un seul réglage, le départ : l’app le cale toute seule chaque fois que tu compares un ticket.',
-  b_vehChoisir: 'Choisis le type de ton véhicule, puis « Envoyer au kit ».',
-  b_vehMajKit: 'Le firmware {fw} n’a pas le type de véhicule : mets le kit à jour (PT2.1.64 ou plus) pour le réglage simple et le calage automatique.',
+  b_vehChoisir: 'Choisis le type de ton véhicule, puis « Envoyer au module ».',
+  b_vehMajKit: 'Le firmware {fw} n’a pas le type de véhicule : mets le module à jour (PT2.1.64 ou plus) pour le réglage simple et le calage automatique.',
   b_depLigne: 'Départ : {d} po — {src}', b_depDefaut: 'valeur par défaut d’une {t}, pas encore calée sur un ticket',
   b_depCale: 'calé sur {n} ticket(s), le dernier le {q}', b_depMainTxt: 'réglé à la main',
-  b_depMain: 'Régler le départ à la main', b_depMainAide: 'Par demi-pouce, puis « Envoyer au kit ». Le prochain ticket comparé recale le départ.',
-  b_conseilType: 'Choisis le type de véhicule dans Régler : l’app calera ensuite le kit avec chaque ticket.',
+  b_depMain: 'Régler le départ à la main', b_depMainAide: 'Par demi-pouce, puis « Envoyer au module ». Le prochain ticket comparé recale le départ.',
+  b_conseilType: 'Choisis le type de véhicule dans Régler : l’app calera ensuite le module avec chaque ticket.',
   b_calTitre: 'Calage automatique', b_calAnnuler: 'Annuler le calage',
-  b_calFait: '✓ Calé : départ {d} po (avant {a} po). Valeur du milieu de {n} ticket(s). Le kit l’utilise dès le prochain run.',
-  b_calDeja: '✓ Le kit est déjà calé : départ {d} po (valeur du milieu de {n} ticket(s)).',
+  b_calFait: '✓ Calé : départ {d} po (avant {a} po). Valeur du milieu de {n} ticket(s). Le module l’utilise dès le prochain run.',
+  b_calDeja: '✓ Le module est déjà calé : départ {d} po (valeur du milieu de {n} ticket(s)).',
   b_calPrevu: 'Ce run avec le départ {d} po :', b_calAnnule: 'Calage annulé : départ remis à {d} po.',
   b_calSansType: 'Pas de calage : choisis d’abord le type de véhicule dans Régler.',
   b_calPeu: 'Pas de calage : il faut le 60 pi et au moins un autre temps du ticket.',
-  b_calDyn: 'Pas de calage : ce run vient d’avant la mise à jour du kit (modèle GPS {m}). Compare un run plus récent.',
-  b_calDiverge: '⚠ Pas de calage : l’app ne refait pas les temps de ce run comme le kit (écart de {n} ms). Signale-le.',
+  b_calDyn: 'Pas de calage : ce run vient d’avant la mise à jour du module (modèle GPS {m}). Compare un run plus récent.',
+  b_calDiverge: '⚠ Pas de calage : l’app ne refait pas les temps de ce run comme le module (écart de {n} ms). Signale-le.',
   b_calRefus: 'Pas de calage : ce ticket ne concorde pas avec ce run (le {j} reste à {e} s). Vérifie le run choisi et les temps lus.',
   b_calRien: 'Pas de calage : le run est trop court pour ce ticket.',
-  b_calLoin: 'Ce ticket demande un départ de {n} po, loin des tickets d’avant ({m} po).\n\nAs-tu déplacé le kit ou l’antenne GPS ?\n\nOK : recommencer le calage avec ce ticket.\nAnnuler : ignorer ce ticket.',
+  b_calLoin: 'Ce ticket demande un départ de {n} po, loin des tickets d’avant ({m} po).\n\nAs-tu déplacé le module ou l’antenne GPS ?\n\nOK : recommencer le calage avec ce ticket.\nAnnuler : ignorer ce ticket.',
   b_calIgnore: 'Ticket ignoré pour le calage (il demandait {n} po).', b_calErr: '⚠ Calage pas fait : {x}'
 }, {
   b_vehTitre: 'Your vehicle', b_vehVoiture: 'Car', b_vehMoto: 'Motorcycle', b_vehNom1: 'car', b_vehNom2: 'motorcycle', b_po: 'in',
   b_vehAide: 'The type sets the whole timer. One setting is left, the start: the app sets it by itself each time you compare a time slip.',
-  b_vehChoisir: 'Pick your vehicle type, then “Send to the kit”.',
-  b_vehMajKit: 'Firmware {fw} has no vehicle type: update the kit (PT2.1.64 or later) for the simple setting and the automatic calibration.',
+  b_vehChoisir: 'Pick your vehicle type, then “Send to the module”.',
+  b_vehMajKit: 'Firmware {fw} has no vehicle type: update the module (PT2.1.64 or later) for the simple setting and the automatic calibration.',
   b_depLigne: 'Start: {d} in — {src}', b_depDefaut: 'default for a {t}, not set from a slip yet',
   b_depCale: 'set from {n} slip(s), the last on {q}', b_depMainTxt: 'set by hand',
-  b_depMain: 'Set the start by hand', b_depMainAide: 'In half inches, then “Send to the kit”. The next slip you compare sets the start again.',
-  b_conseilType: 'Pick the vehicle type in Set up: the app then calibrates the kit with each slip.',
+  b_depMain: 'Set the start by hand', b_depMainAide: 'In half inches, then “Send to the module”. The next slip you compare sets the start again.',
+  b_conseilType: 'Pick the vehicle type in Set up: the app then calibrates the module with each slip.',
   b_calTitre: 'Automatic calibration', b_calAnnuler: 'Undo the calibration',
-  b_calFait: '✓ Set: start {d} in (was {a} in). Middle value of {n} slip(s). The kit uses it from the next run.',
-  b_calDeja: '✓ The kit is already set: start {d} in (middle value of {n} slip(s)).',
+  b_calFait: '✓ Set: start {d} in (was {a} in). Middle value of {n} slip(s). The module uses it from the next run.',
+  b_calDeja: '✓ The module is already set: start {d} in (middle value of {n} slip(s)).',
   b_calPrevu: 'This run with a {d} in start:', b_calAnnule: 'Calibration undone: start back to {d} in.',
   b_calSansType: 'No calibration: first pick the vehicle type in Set up.',
   b_calPeu: 'No calibration: the 60 ft and at least one other time from the slip are needed.',
-  b_calDyn: 'No calibration: this run was made before the kit update (GPS model {m}). Compare a newer run.',
-  b_calDiverge: '⚠ No calibration: the app does not compute this run like the kit (difference of {n} ms). Report it.',
+  b_calDyn: 'No calibration: this run was made before the module update (GPS model {m}). Compare a newer run.',
+  b_calDiverge: '⚠ No calibration: the app does not compute this run like the module (difference of {n} ms). Report it.',
   b_calRefus: 'No calibration: this slip does not match this run (the {j} stays at {e} s). Check the chosen run and the times read.',
   b_calRien: 'No calibration: the run is too short for this slip.',
-  b_calLoin: 'This slip asks for a {n} in start, far from the slips before ({m} in).\n\nDid you move the kit or the GPS antenna?\n\nOK: start the calibration again with this slip.\nCancel: ignore this slip.',
+  b_calLoin: 'This slip asks for a {n} in start, far from the slips before ({m} in).\n\nDid you move the module or the GPS antenna?\n\nOK: start the calibration again with this slip.\nCancel: ignore this slip.',
   b_calIgnore: 'Slip ignored for the calibration (it asked for {n} in).', b_calErr: '⚠ Calibration not done: {x}'
 });
 
@@ -190,14 +190,14 @@ DLI18n.ajouter({
 DLI18n.ajouter({
   b_idxTitre: 'Course à index', idxonNom: 'Mode index', b_idxCoupee: 'Non', b_idxActive: 'Oui',
   b_idxIndex: 'Index (s)', b_idxMarge: 'Marge (s)', idxcNom: 'Cible (index + marge)',
-  b_idxCibleTxt: 'Le kit vise {c} s au 1/4 (temps de la piste). Breakout sous {i} s.',
-  b_idxCibleVide: 'Entre l’index et la marge : sans cible, le kit ne commande rien.',
-  b_idxRef: 'Run de référence', b_idxRefBtn: 'Prendre ce run comme référence', b_idxPasDeRun: 'Aucun 1/4 complet dans le kit',
-  b_idxRefAucune: 'Référence actuelle : aucune. Sans référence, le kit ne commande rien.',
+  b_idxCibleTxt: 'Le module vise {c} s au 1/4 (temps de la piste). Breakout sous {i} s.',
+  b_idxCibleVide: 'Entre l’index et la marge : sans cible, le module ne commande rien.',
+  b_idxRef: 'Run de référence', b_idxRefBtn: 'Prendre ce run comme référence', b_idxPasDeRun: 'Aucun 1/4 complet dans le module',
+  b_idxRefAucune: 'Référence actuelle : aucune. Sans référence, le module ne commande rien.',
   b_idxRefActuelle: 'Référence actuelle : le run de {h}, 1/4 à {t} s.',
-  b_idxRefEnvoi: 'Envoi au kit…', b_idxRefOk: 'Référence prise par le kit.',
-  b_idxRefNon: '⚠ Le kit n’a pas pris ce run (pas un 1/4 complet, ou flash pleine). La référence n’a pas changé.',
-  b_idxAide: 'Entre 330 et 1320 pi, le kit projette ton 1/4 avec le run de référence. S’il finirait avant la cible, il envoie à l’ECU une commande de 0 à 1023 qui réduit le papillon, jamais plus vite qu’un pied. 0 = aucune réduction. La limite de la réduction est dans la table de l’ECU. Avec « Oui », chaque run passe par l’index, jusqu’à ce que tu remettes « Non ».',
+  b_idxRefEnvoi: 'Envoi au module…', b_idxRefOk: 'Référence prise par le module.',
+  b_idxRefNon: '⚠ Le module n’a pas pris ce run (pas un 1/4 complet, ou flash pleine). La référence n’a pas changé.',
+  b_idxAide: 'Entre 330 et 1320 pi, le module projette ton 1/4 avec le run de référence. S’il finirait avant la cible, il envoie à l’ECU une commande de 0 à 1023 qui réduit le papillon, jamais plus vite qu’un pied. 0 = aucune réduction. La limite de la réduction est dans la table de l’ECU. Avec « Oui », chaque run passe par l’index, jusqu’à ce que tu remettes « Non ».',
   b_idxPlus: 'Commande : réglages avancés', idxidNom: 'Trame CAN (ID en hexadécimal)', b_idxIdErr: 'ID CAN invalide : 1 à 7FF en hexadécimal.',
   idxzNom: 'Zone morte (ms d’avance)', idxpNom: 'Commande pleine à (ms d’avance)', idxfNom: 'Filtre (ms)', idxvNom: 'Pente maximale (comptes par seconde)',
   b_idxTrame: 'Trame de 8 octets, gros-boutiste, 25 fois par seconde : octets 0-1 commande (0-1023), 2 état, 3 compteur, 4-5 avance projetée (ms, signée), 6-7 distance (pi).',
@@ -206,14 +206,14 @@ DLI18n.ajouter({
 }, {
   b_idxTitre: 'Index racing', idxonNom: 'Index mode', b_idxCoupee: 'No', b_idxActive: 'Yes',
   b_idxIndex: 'Index (s)', b_idxMarge: 'Margin (s)', idxcNom: 'Target (index + margin)',
-  b_idxCibleTxt: 'The kit aims at {c} s in the 1/4 (track time). Breakout under {i} s.',
-  b_idxCibleVide: 'Enter the index and the margin: without a target, the kit commands nothing.',
-  b_idxRef: 'Reference run', b_idxRefBtn: 'Use this run as the reference', b_idxPasDeRun: 'No full 1/4 in the kit',
-  b_idxRefAucune: 'Current reference: none. Without a reference, the kit commands nothing.',
+  b_idxCibleTxt: 'The module aims at {c} s in the 1/4 (track time). Breakout under {i} s.',
+  b_idxCibleVide: 'Enter the index and the margin: without a target, the module commands nothing.',
+  b_idxRef: 'Reference run', b_idxRefBtn: 'Use this run as the reference', b_idxPasDeRun: 'No full 1/4 in the module',
+  b_idxRefAucune: 'Current reference: none. Without a reference, the module commands nothing.',
   b_idxRefActuelle: 'Current reference: the run of {h}, 1/4 in {t} s.',
-  b_idxRefEnvoi: 'Sending to the kit…', b_idxRefOk: 'Reference taken by the kit.',
-  b_idxRefNon: '⚠ The kit did not take this run (not a full 1/4, or flash full). The reference did not change.',
-  b_idxAide: 'Between 330 and 1320 ft, the kit projects your 1/4 with the reference run. If you would finish before the target, it sends the ECU a 0 to 1023 command that reduces the throttle, never faster than a foot. 0 = no reduction. The reduction limit is in the ECU table. With “Yes”, every run goes through the index until you set “No” again.',
+  b_idxRefEnvoi: 'Sending to the module…', b_idxRefOk: 'Reference taken by the module.',
+  b_idxRefNon: '⚠ The module did not take this run (not a full 1/4, or flash full). The reference did not change.',
+  b_idxAide: 'Between 330 and 1320 ft, the module projects your 1/4 with the reference run. If you would finish before the target, it sends the ECU a 0 to 1023 command that reduces the throttle, never faster than a foot. 0 = no reduction. The reduction limit is in the ECU table. With “Yes”, every run goes through the index until you set “No” again.',
   b_idxPlus: 'Command: advanced settings', idxidNom: 'CAN frame (hexadecimal ID)', b_idxIdErr: 'Invalid CAN ID: 1 to 7FF in hexadecimal.',
   idxzNom: 'Dead band (ms of lead)', idxpNom: 'Full command at (ms of lead)', idxfNom: 'Filter (ms)', idxvNom: 'Maximum slope (counts per second)',
   b_idxTrame: '8-byte frame, big-endian, 25 times per second: bytes 0-1 command (0-1023), 2 state, 3 counter, 4-5 projected lead (ms, signed), 6-7 distance (ft).',

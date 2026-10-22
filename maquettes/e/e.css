@@ -112,6 +112,10 @@ body.e .e-go .b-gps .point { background:rgba(255,255,255,.7); }
 body.e .e-go .b-gps.on .point { background:#3ee26a; } body.e .e-go .b-gps.off { color:#fff; } body.e .e-go .b-gps.off .point { background:var(--att); }
 /* .bouton.b-rearmer : plus fort que « .bouton.plein » (rouge, defini plus bas), sinon le bouton se fond dans le fond rouge */
 body.e .e-go .bouton.b-rearmer { margin:0; width:auto; min-width:200px; background:#1c1c1e; border-color:#1c1c1e; color:#fff; }
+/* [21 oct.] « Rejouer un run » (kit de demo) : la meme pilule que « Rearmer », sous l'etat du chrono ;
+   sans kit, b.js le desactive : il ne sert a rien, on le cache */
+body.e .e-go #bRejouer { margin:0; width:auto; min-width:200px; min-height:46px; background:#1c1c1e; border-color:#1c1c1e; color:#fff; }
+body.e:not(.e-connecte) #bRejouer { display:none; }
 body.e .e-sous-go { padding-bottom:8px; }
 body.e .e-sous-go > .vide { display:none; }            /* le bouton « Connecter » sous l'anneau le dit deja */
 
@@ -127,7 +131,7 @@ body.e .b-ligne.choisi { background:none; border-radius:0; }
 body.e .b-ligne .q { font-weight:500; }
 body.e .b-ligne .et { font-size:19px; font-weight:700; color:var(--ink); }
 body.e #bDetailTitre { display:none; }                 /* la bande porte deja le titre du run (e.js le lit ici) */
-body.e .e-plus { margin-top:18px; }
+body.e .e-plus { margin-top:6px; }                     /* [21 oct.] 18 -> 6 : « Courbe du run » au-dessus de la barre du bas */
 body.e .e-plus summary, body.e .b-plus summary { color:var(--rouge); font-weight:600; min-height:44px; display:flex; align-items:center; cursor:pointer; }
 body.e .e-courbe { padding-top:10px; padding-bottom:12px; }
 body.e .lecture { border-radius:10px; background:var(--tab); }

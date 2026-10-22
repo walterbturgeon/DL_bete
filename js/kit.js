@@ -133,20 +133,20 @@ window.DLKit = (function () {
   var FIN_DUMP = '[BLE_DUMP_END]';
   var CAL_RAISONS = ['', 'calR1', 'calR2', 'calR3', 'calR4', 'calR5', 'calR6'];
   if (window.DLI18n) DLI18n.ajouter({
-    kitPasDlpt2: 'Ce module n’est pas un kit DRAGLOG (DLAP ou autre).', kitRefus: 'le kit a refusé : {x}',
-    kitDumpDelai: 'les runs n’arrivent plus (rien depuis 8 s)', kitCmdAbsente: 'ce kit ne prend pas de commande',
-    calRefus: 'Calibration refusée : {x}', calMuet: 'Le kit ne répond pas à la calibration (6 s).',
+    kitPasDlpt2: 'Cet appareil n’est pas un module DRAGLOG (DLAP ou autre).', kitRefus: 'le module a refusé : {x}',
+    kitDumpDelai: 'les runs n’arrivent plus (rien depuis 8 s)', kitCmdAbsente: 'ce module ne prend pas de commande',
+    calRefus: 'Calibration refusée : {x}', calMuet: 'Le module ne répond pas à la calibration (6 s).',
     calR1: 'IMU muet', calR2: 'véhicule en mouvement', calR3: 'trop de vibrations (moteur au ralenti ?)',
-    calR4: 'le kit bouge', calR5: 'rotation réelle détectée', calR6: 'IMU absent', kitRejeuBle: 'pas de rejeu avec un vrai kit',
-    kitRunAbsent: 'ce run n’est plus dans le kit', idxRefusOff: 'la course à index est coupée',
+    calR4: 'le module bouge', calR5: 'rotation réelle détectée', calR6: 'IMU absent', kitRejeuBle: 'pas de rejeu avec un vrai module',
+    kitRunAbsent: 'ce run n’est plus dans le module', idxRefusOff: 'la course à index est coupée',
     idxRefusCourse: 'un run est en cours', idxRefusManque: 'il manque le run de référence ou la cible'
   }, {
-    kitPasDlpt2: 'This module is not a DRAGLOG kit (DLAP or other).', kitRefus: 'the kit refused: {x}',
-    kitDumpDelai: 'the runs stopped arriving (nothing for 8 s)', kitCmdAbsente: 'this kit takes no command',
-    calRefus: 'Calibration refused: {x}', calMuet: 'The kit does not answer the calibration (6 s).',
+    kitPasDlpt2: 'This device is not a DRAGLOG module (DLAP or other).', kitRefus: 'the module refused: {x}',
+    kitDumpDelai: 'the runs stopped arriving (nothing for 8 s)', kitCmdAbsente: 'this module takes no command',
+    calRefus: 'Calibration refused: {x}', calMuet: 'The module does not answer the calibration (6 s).',
     calR1: 'IMU silent', calR2: 'vehicle moving', calR3: 'too much vibration (engine idling?)',
-    calR4: 'the kit is moving', calR5: 'real rotation detected', calR6: 'no IMU', kitRejeuBle: 'no replay with a real kit',
-    kitRunAbsent: 'this run is no longer in the kit', idxRefusOff: 'index racing is off',
+    calR4: 'the module is moving', calR5: 'real rotation detected', calR6: 'no IMU', kitRejeuBle: 'no replay with a real module',
+    kitRunAbsent: 'this run is no longer in the module', idxRefusOff: 'index racing is off',
     idxRefusCourse: 'a run is in progress', idxRefusManque: 'the reference run or the target is missing'
   });
   function TT(k, v) { return window.DLI18n ? DLI18n.T(k, v) : k; }
