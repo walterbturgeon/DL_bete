@@ -3,7 +3,7 @@
 // [B v0.2] (7 oct. : retour a la B) la langue est SEULEMENT dans Regler ; l'en-tete montre la connexion ;
 // repris de la maquette C : fiche du kit (calibration, mise a jour), ticket garde par run avec sa pastille n/m.
 (function () {
-  var VERSION = '0.11.3';   // = MARKETING_VERSION de l'app iPhone (ios/App/App.xcodeproj)
+  var VERSION = '0.13.0';   // = MARKETING_VERSION de l'app iPhone (ios/App/App.xcodeproj)
   var $ = DLC.$, T = DLI18n.T;
   // les textes de B sont dans b-textes.js (charge avant ce fichier)
   // [B v0.2] les tickets de demonstration et la comparaison viennent du noyau commun (DLC) ; les tickets tapes
@@ -669,14 +669,19 @@
   //   Holley HP / Terminator X : HOLLEY, hecu 0 (transbrake canal 298), 1 Mbit/s automatique, ID de l'expander au choix
   //   Holley Dominator         : HOLLEY, hecu 1 (sortie 0 du canal 8), idem
   //   FuelTech FT450/550/600   : FUELTECH, 1 Mbit/s fixe, depart = 2-step du FuelTech, les 5 voies deja definies
+  //   FuelTech FT470 / FT700   : FUELTECH_CAN (module PT2.1.65+), 1 Mbit/s fixe, depart = 2-step, 2 trames 1200/1201
+  //                              du DBC DragLogics vers 7 Custom measurements (#21 a #27) ; le DBC est sur le site
   //   Link                     : LINK, debit au choix, Generic Dash ou Strada, ID lu (1000) et envoye (1200/1201)
   //   ECUMaster                : ECUMASTER, debit au choix, depart par la trame CAN d'embrayage (0x500)
   // f-mode et f-hecu sont des champs caches : seul ce bloc les pose. Rien ne part avant « Envoyer au kit ».
   var ANCIENS = ['LINK_AEM', 'FUELTECH_GPS', 'VAG_WHEELSPEED'];
   var TRAME_EMB = { scid: 1280, scext: 0, scby: 0, scmk: 1, sced: 2 };   // 0x500, octet 0, bit 0, front descendant (relache)
+  // [0.12.0] les voies montrees sous la marque FuelTech, selon le modele
+  var VOIES = { fueltech: ['b_ftV1', 'b_ftV2', 'b_ftV3', 'b_ftV4', 'b_ftV5'],
+                fueltech_can: ['b_ftcV1', 'b_ftcV2', 'b_ftcV3', 'b_ftcV4', 'b_ftcV5', 'b_ftcV6', 'b_ftcV7'] };
   function familleDe(c) {
     if (c.mode === 'HOLLEY') return Number(c.hecu) === 1 ? 'holley_dom' : 'holley_hp';
-    return { FUELTECH: 'fueltech', LINK: 'link', ECUMASTER: 'ecumaster' }[c.mode] || 'autre';
+    return { FUELTECH: 'fueltech', FUELTECH_CAN: 'fueltech_can', LINK: 'link', ECUMASTER: 'ecumaster' }[c.mode] || 'autre';
   }
   function hex(v) { var n = Number(v); return v !== '' && Number.isInteger(n) && n >= 0 ? '0x' + n.toString(16).toUpperCase() : ''; }
   function fwAvant(fw, a, b, c) {   // « PT2.1.56 » avant 2.1.57 ?
@@ -711,9 +716,11 @@
     $('bChCbr').hidden = !(f === 'link' || f === 'ecumaster' || f === 'autre');
     $('bChHid').hidden = !holley;
     $('bChLect').hidden = $('bChLid').hidden = $('bChEid').hidden = f !== 'link';
-    $('bVoiesFt').hidden = f !== 'fueltech';
+    $('bVoiesFt').hidden = !VOIES[f];
+    if (VOIES[f]) $('bVoiesFt').innerHTML = VOIES[f].map(function (k) { return '<li>' + T(k) + '</li>'; }).join('');
     if (holley) { $('f-mode').value = 'HOLLEY'; $('f-hecu').value = f === 'holley_dom' ? '1' : '0'; $('f-cbr').value = '1000000'; }
     if (f === 'fueltech') { $('f-mode').value = 'FUELTECH'; $('f-cbr').value = '1000000'; }
+    if (f === 'fueltech_can') { $('f-mode').value = 'FUELTECH_CAN'; $('f-cbr').value = '1000000'; }   // [0.12.0] FT470 / FT700
     if (f === 'link') {
       $('f-mode').value = 'LINK';
       // [B v0.4] en passant en Link, on part des DEFAUTS (7 oct. : « LINK_GD par defaut ») : Generic Dash,
@@ -737,13 +744,15 @@
     if (!cfg) return;
     var f = familleDe(cfg), oa = $('bEcu').querySelector('option[value="autre"]');
     oa.hidden = oa.disabled = f !== 'autre';
+    // [0.12.0] le FT470 / FT700 demande un module PT2.1.65 ou plus : avant, le module refuserait le mode FUELTECH_CAN
+    var oc = $('bEcu').querySelector('option[value="fueltech_can"]');
+    if (oc) oc.hidden = oc.disabled = fwAvant(cfg.fw, 2, 1, 65) && f !== 'fueltech_can';
     if (f === 'autre') {
       var s = $('bModeAutre');
       if (!Array.prototype.some.call(s.options, function (o) { return o.value === cfg.mode; })) { var o = document.createElement('option'); o.value = o.textContent = cfg.mode; s.appendChild(o); }
       s.value = cfg.mode;
     }
-    $('bVoiesFt').innerHTML = ['b_ftV1', 'b_ftV2', 'b_ftV3', 'b_ftV4', 'b_ftV5'].map(function (k) { return '<li>' + T(k) + '</li>'; }).join('');
-    $('bEcu').value = f; montrerEcu(f, false);
+    $('bEcu').value = f; montrerEcu(f, false);   // [0.12.0] montrerEcu remplit les voies selon le modele
   }
   $('bEcu').addEventListener('change', function () { montrerEcu($('bEcu').value, true); });
   $('bModeAutre').addEventListener('change', function () { $('f-mode').value = $('bModeAutre').value; });
@@ -753,6 +762,7 @@
   function rendreFiche() {
     var e = DLKit.etat();
     $('bFicheVide').hidden = !!cfg; $('bFiche').hidden = !cfg; $('bCal').disabled = !cfg; $('bMaj').disabled = !cfg;
+    rendreMajFw();   // [0.13.0]
     if (!cfg) { $('bFiche').innerHTML = ''; return; }
     var l = [[T('fNom'), e.nom], [T('fFw'), cfg.fw], [T('fMode'), e.mode === 'demo' ? T('modeDemo') : 'Bluetooth'],
              [T('fGps'), T('gpsTxt', { s: cfg.sats != null ? cfg.sats : '--', hz: cfg.hz != null ? cfg.hz : '--' })], [T('fCal'), T(cfg.cal ? 'faite' : 'aFaire')]];
@@ -771,6 +781,61 @@
     DLKit.commande('maj').then(function () { $('bKitMsg').textContent = T('b_majBle'); },
       function (err) { $('bKitMsg').textContent = err.message === 'maj-demo' ? T('majDemo') : err.message === 'hors-ligne' ? T('horsLigneMsg') : err.message; });
   });
+  // [0.13.0] LA MISE A JOUR DU FIRMWARE PAR LE BLUETOOTH (module PT2.1.66 et plus ; protocole dans js/kit.js).
+  // Le fichier .bin est choisi dans le telephone (Fichiers, iCloud, courriel enregistre) : il n'est pas dans l'app.
+  // Un module plus vieux garde l'ancien bouton (WiFi BPS-GPS-OTA) ; un module 1.66 ne montre que la mise a jour par l'app.
+  // ⚠ La section reste visible pendant le redemarrage du module (cfg vide) : on y lit la fin du transfert.
+  // ⚠ Les maquettes B et D chargent aussi ce fichier SANS cette section : rien ne s'y branche (fwUi faux).
+  var fwFichier = null, fwEnCours = false, fwUi = !!document.getElementById('bFwBloc');
+  function rendreMajFw() {
+    if (!fwUi) return;
+    var ok = DLKit.majPossible();
+    $('bFwBloc').hidden = !cfg && !fwEnCours;
+    $('bFwVieux').hidden = ok || !cfg;
+    if (cfg && !ok) $('bFwVieux').textContent = T('b_fwVieux', { fw: cfg.fw || '?' });
+    $('bFwChoix').hidden = !ok && !fwEnCours;
+    $('bMaj').hidden = ok;
+    $('bFwChoisir').classList.toggle('inactif', fwEnCours);
+    $('bFwFichier').disabled = fwEnCours;
+    $('bFwInstaller').disabled = !ok || !fwFichier || fwEnCours;
+    $('bFwArreter').hidden = !fwEnCours;
+  }
+  if (fwUi) $('bFwFichier').addEventListener('change', function (ev) {
+    var f = ev.target.files && ev.target.files[0];
+    if (!f) return;
+    fwFichier = null; $('bFwEtat').textContent = ''; $('bFwBarre').hidden = true;
+    $('bFwInfo').textContent = T('b_fwLecture');
+    f.arrayBuffer().then(function (buf) {
+      fwFichier = DLKit.lireFirmware(buf);
+      $('bFwInfo').textContent = T('b_fwFichier', { nom: f.name, fw: fwFichier.fw, ko: Math.round(fwFichier.taille / 1024) });
+    }).catch(function (e) { fwFichier = null; $('bFwInfo').textContent = '⚠ ' + e.message; })
+      .then(function () { ev.target.value = ''; rendreMajFw(); });   // le meme fichier peut etre choisi de nouveau
+  });
+  if (fwUi) $('bFwInstaller').addEventListener('click', function () {
+    if (!fwFichier || fwEnCours) return;
+    var attendu = fwFichier.fw;
+    if (!window.confirm(T('b_fwConfirme', { avant: (cfg && cfg.fw) || '?', apres: attendu }))) return;
+    fwEnCours = true; rendreMajFw();
+    $('bFwBarre').hidden = false; $('bFwBarre').value = 0;
+    $('bFwEtat').textContent = T('b_fwDebut');
+    DLKit.majFirmware(fwFichier, function (p) {
+      $('bFwBarre').value = Math.round(1000 * p.fait / p.total);
+      if (p.etape === 'redemarrage') { $('bFwEtat').textContent = T('b_fwRedemarre'); return; }
+      var reste = p.oPs > 0 ? Math.round((p.total - p.fait) / p.oPs) : null;
+      $('bFwEtat').textContent = T('b_fwProgres', { pc: Math.floor(100 * p.fait / p.total), ko: decimal(p.oPs / 1024, 1),
+                                                   s: reste == null ? '--' : reste, trous: p.trous });
+    }).then(function (r) {
+      // un echec doit se voir : on compare la version RELUE dans le module a celle du fichier
+      var bon = r.apres === attendu;
+      $('bFwEtat').textContent = bon ? T('b_fwOk', { fw: r.apres, s: Math.round(r.ms / 1000), trous: r.trous })
+                                     : '⚠ ' + T('b_fwPasPris', { fw: r.apres || '?', attendu: attendu });
+      if (bon) { fwFichier = null; $('bFwInfo').textContent = ''; }
+      if (DLKit.etat().connecte) DLKit.lireConfig().then(function (c) { cfg = c; rendreRegl(); rendreFiche(); rendreAccueil(); }, erreurKit);
+    }, function (e) {
+      $('bFwEtat').textContent = '⚠ ' + (e.message === 'hors-ligne' ? T('b_fwCoupe') : e.message);
+    }).then(function () { fwEnCours = false; rendreMajFw(); });
+  });
+  if (fwUi) $('bFwArreter').addEventListener('click', function () { DLKit.arreterMaj(); });
   function prefsApp() {
     // [B v0.2] la langue : seulement ici, dans Regler (plus dans l'en-tete)
     DLC.segment('segLangue', prefs.v.langue, function (v) { prefs.v.langue = v; prefs.garder(); DLI18n.choisir(v); DLC.viderCache(); toutRendre(); });

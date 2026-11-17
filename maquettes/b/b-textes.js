@@ -104,6 +104,12 @@ DLI18n.ajouter({
   b_ftV1: 'in1 « Brake pressure » = distance (pi × 10)', b_ftV2: 'in2 « Tire temp FL » = vitesse au dernier jalon (mph)',
   b_ftV3: 'in3 « Tire temp FR » = vitesse instantanée (mph)', b_ftV4: 'in21 « Fuel flow A » = temps au dernier jalon',
   b_ftV5: 'in22 « Fuel flow B » = temps au 60 pi',
+  // [0.12.0] FT470 / FT700 par « Customizable CAN » (module PT2.1.65 et plus)
+  b_ecuFtc: 'FuelTech FT470 / FT700',
+  b_res_fueltech_can: 'Débit 1 Mbit/s, fixe. Départ : 2-step du FuelTech, lu dans son flux FTCAN 2.0. Le module envoie 2 trames (ID 1200 et 1201, 25 Hz) au « Customizable CAN » du FuelTech. Importe le fichier DBC DragLogics dans FuelTech Vision : le fichier et les instructions sont sur le site DragLogics. Les 7 valeurs vont dans ces Custom measurements :',
+  b_ftcV1: '#21 = temps de la course (s)', b_ftcV2: '#22 = distance (pi)', b_ftcV3: '#23 = vitesse (mph)',
+  b_ftcV4: '#24 = temps au dernier jalon (s)', b_ftcV5: '#25 = vitesse au dernier jalon (mph)',
+  b_ftcV6: '#26 = dernier jalon (1 = 60 pi, 2 = 330 pi, 3 = 1/8, 4 = 1/4)', b_ftcV7: '#27 = état (0 attente, 1 course, 2 terminée)',
   b_avLink157: '⚠ Avec le firmware {fw}, en DRAGLOGICS, le module lit toujours le Generic Dash 1000 et envoie 1200 / 1201 : le flux et les ID choisis ici comptent seulement à partir de la PT2.1.57.',
   b_avTrameEnPlus: '⚠ Une trame CAN de départ est aussi active : {dep}. Retire-la dans « Départ : réglages avancés » si elle ne sert pas.'
 }, {
@@ -124,6 +130,11 @@ DLI18n.ajouter({
   b_ftV1: 'in1 “Brake pressure” = distance (ft × 10)', b_ftV2: 'in2 “Tire temp FL” = speed at the last timing mark (mph)',
   b_ftV3: 'in3 “Tire temp FR” = live speed (mph)', b_ftV4: 'in21 “Fuel flow A” = time at the last timing mark',
   b_ftV5: 'in22 “Fuel flow B” = 60 ft time',
+  b_ecuFtc: 'FuelTech FT470 / FT700',
+  b_res_fueltech_can: 'Bit rate 1 Mbit/s, fixed. Start: FuelTech 2-step, read from its FTCAN 2.0 stream. The device sends 2 frames (ID 1200 and 1201, 25 Hz) to the FuelTech “Customizable CAN”. Import the DragLogics DBC file into FuelTech Vision: the file and the instructions are on the DragLogics website. The 7 values go to these Custom measurements:',
+  b_ftcV1: '#21 = run time (s)', b_ftcV2: '#22 = distance (ft)', b_ftcV3: '#23 = speed (mph)',
+  b_ftcV4: '#24 = time at the last timing mark (s)', b_ftcV5: '#25 = speed at the last timing mark (mph)',
+  b_ftcV6: '#26 = last timing mark (1 = 60 ft, 2 = 330 ft, 3 = 1/8, 4 = 1/4)', b_ftcV7: '#27 = state (0 waiting, 1 running, 2 finished)',
   b_avLink157: '⚠ With firmware {fw}, in DRAGLOGICS, the device always reads Generic Dash 1000 and sends 1200 / 1201: the stream and IDs chosen here apply only from PT2.1.57.',
   b_avTrameEnPlus: '⚠ A CAN start frame is also active: {dep}. Remove it in “Start: advanced settings” if it is not used.'
 });
@@ -219,4 +230,31 @@ DLI18n.ajouter({
   b_idxTrame: '8-byte frame, big-endian, 25 times per second: bytes 0-1 command (0-1023), 2 state, 3 counter, 4-5 projected lead (ms, signed), 6-7 distance (ft).',
   b_idxArme: 'INDEX ON', b_idxPasArme: 'INDEX NOT ARMED: send “Yes” again in Set up',
   b_idxCibleCourte: 'target {c} s', b_idxDirect: 'Lead {a} ms · command {c} ({p} %)'
+});
+
+// [0.13.0] la mise a jour du firmware par le Bluetooth (module PT2.1.66 et plus)
+DLI18n.ajouter({
+  b_fwTitre: 'Mise à jour du firmware',
+  b_fwAide: 'Mets le fichier .bin dans ton téléphone (Fichiers, iCloud ou une pièce jointe enregistrée). La voiture doit être arrêtée. Garde l’app ouverte, l’écran allumé et le téléphone près du module : le transfert prend 1 à 3 minutes, puis le module redémarre. Si le transfert s’arrête, le module garde son ancien firmware.',
+  b_fwChoisir: 'Choisir le fichier .bin', b_fwInstaller: 'Installer', b_fwArreter: 'Arrêter',
+  b_fwVieux: 'Le firmware {fw} ne se met pas à jour par l’app. Installe une fois la PT2.1.66 ou plus par USB.',
+  b_fwLecture: 'Lecture du fichier…', b_fwFichier: '{nom} : firmware {fw}, {ko} ko. Prêt à installer.',
+  b_fwConfirme: 'Installer le firmware {apres} dans le module (maintenant {avant}) ? Le module arrête le GPS et le CAN pendant le transfert, puis il redémarre.',
+  b_fwDebut: 'Début du transfert…', b_fwProgres: '{pc} % · {ko} ko/s · reste {s} s · reprises : {trous}',
+  b_fwRedemarre: 'Fichier accepté. Le module redémarre ; reconnexion pour lire sa version…',
+  b_fwOk: 'Mise à jour faite : le module est en {fw} ({s} s, reprises : {trous}).',
+  b_fwPasPris: 'Le module est revenu en {fw}, pas en {attendu} : la nouvelle version n’a pas démarré. Il garde son ancien firmware.',
+  b_fwCoupe: 'La connexion est perdue pendant le transfert. Le module redémarre sur son ancien firmware. Reconnecte-le et recommence.'
+}, {
+  b_fwTitre: 'Firmware update',
+  b_fwAide: 'Put the .bin file on your phone (Files, iCloud or a saved attachment). The vehicle must be stopped. Keep the app open, the screen on and the phone near the device: the transfer takes 1 to 3 minutes, then the device restarts. If the transfer stops, the device keeps its old firmware.',
+  b_fwChoisir: 'Choose the .bin file', b_fwInstaller: 'Install', b_fwArreter: 'Stop',
+  b_fwVieux: 'Firmware {fw} does not update from the app. Install PT2.1.66 or later once by USB.',
+  b_fwLecture: 'Reading the file…', b_fwFichier: '{nom}: firmware {fw}, {ko} KB. Ready to install.',
+  b_fwConfirme: 'Install firmware {apres} in the device (now {avant})? The device stops the GPS and the CAN during the transfer, then it restarts.',
+  b_fwDebut: 'Starting the transfer…', b_fwProgres: '{pc} % · {ko} KB/s · {s} s left · resends: {trous}',
+  b_fwRedemarre: 'File accepted. The device restarts; reconnecting to read its version…',
+  b_fwOk: 'Update done: the device runs {fw} ({s} s, resends: {trous}).',
+  b_fwPasPris: 'The device came back on {fw}, not {attendu}: the new version did not start. It keeps its old firmware.',
+  b_fwCoupe: 'The connection was lost during the transfer. The device restarts on its old firmware. Reconnect it and try again.'
 });

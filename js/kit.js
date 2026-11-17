@@ -17,6 +17,11 @@
 //   DLKit.listerRuns()          promesse -> [{ id, quand, jalons, ... }]
 //   DLKit.lireRun(id)           promesse -> le run complet (ech = echantillons)
 //   DLKit.commande(nom)         'calibrer' | 'maj' | 'rejouer:<id>' (demo) | 'sim' (vrai kit : course simulee au banc)
+//   [0.13.0] la mise a jour du firmware par le Bluetooth (module PT2.1.66 et plus) :
+//   DLKit.majPossible()         true si le module connecte a la caracteristique 7a1e0006 (ou en demo)
+//   DLKit.lireFirmware(buf)     ArrayBuffer d'un .bin -> { fw, taille, crc, octets } ; une erreur dite si ce n'est pas un DLPT2
+//   DLKit.majFirmware(f, suivi) promesse -> { octets, ms, trous, avant, apres } ; suivi({ fait, total, oPs, trous, etape })
+//   DLKit.arreterMaj()          arrete le transfert (le module redemarre sur son ancien firmware)
 window.DLKit = (function () {
   var ecouteurs = { etat: [], telem: [], jalon: [], run: [] };
   function emettre(type, x) { (ecouteurs[type] || []).forEach(function (f) { try { f(x); } catch (e) { console.error(e); } }); }
@@ -31,7 +36,9 @@ window.DLKit = (function () {
   // ---------------------------------------------------------------- le kit de demonstration
   var demo = {
     // [0.10.0] comme un kit PT2.1.64 de type voiture : depart par defaut 8 po (16 demi-pouces), jalons a D - 50 po
-    cfg: { fw: 'PT2.1.64', app: 'dlg', sfx: 'DEMO', board: 'DEMO00000000', rpo: 8, jpo: -50, cms: 0, d60: 0, veh: 1, dep: 16, pfft: 0,
+    // [0.12.0] annonce la PT2.1.65 : le choix FuelTech FT470 / FT700 (mode FUELTECH_CAN) se montre aussi en demo
+    // [0.13.0] annonce la PT2.1.66 : la mise a jour par le Bluetooth se montre aussi en demo (transfert simule)
+    cfg: { fw: 'PT2.1.66', app: 'dlg', sfx: 'DEMO', board: 'DEMO00000000', rpo: 8, jpo: -50, cms: 0, d60: 0, veh: 1, dep: 16, pfft: 0,
            mode: 'HOLLEY', cbr: 1000000, hecu: 1, strig: 1, scid: 1280, grate: 40, dynm: 8, imuf: 2, tzh: -4,
            imu: 1, cal: 1, sats: 14, fix: 3, hz: 25,
            // [B v0.4] l'ECU et le depart CAN, memes cles que le JSON du kit
@@ -128,7 +135,7 @@ window.DLKit = (function () {
   // ⚠ Le kit refuse un JSON de config ENTIER pour une seule valeur fausse, sans repondre d'erreur : on n'envoie que
   //   les reglages CHANGES, puis on RELIT le kit et on compare chaque valeur envoyee (un refus est dit a voix haute).
   function uuid(n) { return '7a1e000' + n + '-9f2b-4b8e-8f21-3d6c9a1e0000'; }
-  var SVC = uuid(0), C_TELEM = uuid(1), C_CONFIG = uuid(3), C_CMD = uuid(4), C_DUMP = uuid(5);
+  var SVC = uuid(0), C_TELEM = uuid(1), C_CONFIG = uuid(3), C_CMD = uuid(4), C_DUMP = uuid(5), C_MAJ = uuid(6);
   var dec = new TextDecoder(), enc = new TextEncoder();
   var FIN_DUMP = '[BLE_DUMP_END]';
   var CAL_RAISONS = ['', 'calR1', 'calR2', 'calR3', 'calR4', 'calR5', 'calR6'];
@@ -139,7 +146,18 @@ window.DLKit = (function () {
     calR1: 'IMU muet', calR2: 'véhicule en mouvement', calR3: 'trop de vibrations (moteur au ralenti ?)',
     calR4: 'le module bouge', calR5: 'rotation réelle détectée', calR6: 'IMU absent', kitRejeuBle: 'pas de rejeu avec un vrai module',
     kitRunAbsent: 'ce run n’est plus dans le module', idxRefusOff: 'la course à index est coupée',
-    idxRefusCourse: 'un run est en cours', idxRefusManque: 'il manque le run de référence ou la cible'
+    idxRefusCourse: 'un run est en cours', idxRefusManque: 'il manque le run de référence ou la cible',
+    // [0.13.0] la mise a jour du firmware
+    majPasImage: 'Ce fichier n’est pas un firmware ESP32 (.bin).', majPasEsp32: 'Ce firmware est pour une autre puce que celle du module.',
+    majTropGros: 'Ce firmware est trop gros pour le module ({n} ko).',
+    majPasDlpt2: 'Ce fichier n’est pas un firmware DLPT2 qui se met à jour par l’app (PT2.1.66 ou plus).',
+    majAbsente: 'Ce module ne se met pas à jour par l’app : installe une fois la PT2.1.66 ou plus par USB.',
+    majRefus: 'Mise à jour refusée par le module : {x}', majRoule: 'la voiture roule ou un run est en cours',
+    majTaille: 'taille du fichier refusée', majDebut: 'le module ne peut pas commencer', majEcriture: 'erreur d’écriture dans le module',
+    majIncomplet: 'fichier incomplet', majCrc: 'fichier abîmé pendant le transfert (CRC)', majImage: 'le module refuse l’image (vérification)',
+    majSession: 'pas de mise à jour en cours', majFormat: 'paquet mal formé', majArret: 'arrêt demandé', majTropLong: 'trop d’octets',
+    majInconnu: 'raison inconnue', majMuet: 'Le module ne répond plus pendant la mise à jour.', majArretee: 'Mise à jour arrêtée. Le module garde son ancien firmware.',
+    majPasRevenu: 'Le module n’est pas revenu après son redémarrage (45 s). Rallume-le, puis reconnecte-le pour lire sa version.'
   }, {
     kitPasDlpt2: 'This is not a DRAGLOG device (DLAP or other).', kitRefus: 'the device refused: {x}',
     kitDumpDelai: 'the runs stopped arriving (nothing for 8 s)', kitCmdAbsente: 'this device takes no command',
@@ -147,11 +165,22 @@ window.DLKit = (function () {
     calR1: 'IMU silent', calR2: 'vehicle moving', calR3: 'too much vibration (engine idling?)',
     calR4: 'the device is moving', calR5: 'real rotation detected', calR6: 'no IMU', kitRejeuBle: 'no replay with a real device',
     kitRunAbsent: 'this run is no longer in the device', idxRefusOff: 'index racing is off',
-    idxRefusCourse: 'a run is in progress', idxRefusManque: 'the reference run or the target is missing'
+    idxRefusCourse: 'a run is in progress', idxRefusManque: 'the reference run or the target is missing',
+    majPasImage: 'This file is not an ESP32 firmware (.bin).', majPasEsp32: 'This firmware is for another chip than the device’s.',
+    majTropGros: 'This firmware is too big for the device ({n} KB).',
+    majPasDlpt2: 'This file is not a DLPT2 firmware that updates from the app (PT2.1.66 or later).',
+    majAbsente: 'This device does not update from the app: install PT2.1.66 or later once by USB.',
+    majRefus: 'Update refused by the device: {x}', majRoule: 'the vehicle is moving or a run is in progress',
+    majTaille: 'file size refused', majDebut: 'the device cannot start', majEcriture: 'write error in the device',
+    majIncomplet: 'incomplete file', majCrc: 'file damaged during the transfer (CRC)', majImage: 'the device refuses the image (check)',
+    majSession: 'no update in progress', majFormat: 'malformed packet', majArret: 'stop requested', majTropLong: 'too many bytes',
+    majInconnu: 'unknown reason', majMuet: 'The device stopped answering during the update.', majArretee: 'Update stopped. The device keeps its old firmware.',
+    majPasRevenu: 'The device did not come back after its restart (45 s). Turn it on again, then reconnect it to read its version.'
   });
   function TT(k, v) { return window.DLI18n ? DLI18n.T(k, v) : k; }
 
-  var ble = { dev: null, ch: {}, telem: null, etatPerf: null, suivi: false, vus: {}, runs: null, dump: null };
+  // [0.13.0] + connu (pour se reconnecter sans la liste apres le redemarrage d'une mise a jour), fw, majSession
+  var ble = { dev: null, ch: {}, telem: null, etatPerf: null, suivi: false, vus: {}, runs: null, dump: null, connu: null, fw: '', majSession: null };
   function lireJson(c) { return c.readValue().then(function (v) { return JSON.parse(dec.decode(v)); }); }
   function ecrire(c, txt) {
     var d = enc.encode(txt);
@@ -196,7 +225,9 @@ window.DLKit = (function () {
   }
   function finBle() {
     if (ble.dump) { var d = ble.dump; ble.dump = null; clearTimeout(d.minuterie); d.ko(new Error('hors-ligne')); }
-    ble = { dev: null, ch: {}, telem: null, etatPerf: null, suivi: false, vus: {}, runs: null, dump: null };
+    // [0.13.0] une mise a jour en cours le sait tout de suite (sinon elle attendrait 4 s une reponse qui ne viendra pas)
+    if (ble.majSession && ble.majSession.attente) { var a = ble.majSession.attente; ble.majSession.attente = null; a.ko(new Error('hors-ligne')); }
+    ble = { dev: null, ch: {}, telem: null, etatPerf: null, suivi: false, vus: {}, runs: null, dump: null, connu: null, fw: '', majSession: null };
     if (st.mode === 'ble') { st = { connecte: false, mode: null, nom: '' }; emettre('etat', { connecte: false, mode: null, nom: '' }); }
   }
   // [B v0.9] L'APP NATIVE (iPhone, Android : Capacitor) n'a pas navigator.bluetooth. Le module
@@ -210,7 +241,8 @@ window.DLKit = (function () {
     return !!(C && C.isNativePlatform && C.isNativePlatform()) || /[?&]natif=1\b/.test(location.search);
   }
   var bleNatifPret = null;
-  function ouvrirBleNatif() {
+  // [0.13.0] connu = { id, name } d'un module deja choisi : on se reconnecte sans montrer la liste (apres une mise a jour)
+  function ouvrirBleNatif(connu) {
     var B = window.capacitorCommunityBluetoothLe.BleClient, finDev = [], dev = null;
     // la permission Bluetooth est demandee ICI, quand l'utilisateur touche « Chercher un kit » (regle Apple et Google)
     if (!bleNatifPret) bleNatifPret = B.initialize({ androidNeverForLocation: true }).catch(function (e) { bleNatifPret = null; throw e; });
@@ -219,6 +251,8 @@ window.DLKit = (function () {
       return {
         readValue: function () { return B.read(dev.id, SVC, u); },
         writeValueWithResponse: function (d) { return B.write(dev.id, SVC, u, new DataView(d.buffer, d.byteOffset, d.byteLength)); },
+        // [0.13.0] ⚠ sur iOS, le module n'attend PAS la file d'iOS : un paquet peut etre jete (voir majBle)
+        writeValueWithoutResponse: function (d) { return B.writeWithoutResponse(dev.id, SVC, u, new DataView(d.buffer, d.byteOffset, d.byteLength)); },
         startNotifications: function () {
           return B.startNotifications(dev.id, SVC, u, function (v) { ecoute.forEach(function (f) { f({ target: { value: v } }); }); });
         },
@@ -226,6 +260,7 @@ window.DLKit = (function () {
       };
     }
     return bleNatifPret.then(function () {
+      if (connu) return { deviceId: connu.id, name: connu.name };
       return B.requestDevice({ services: [SVC] });
     }).catch(function (e) {
       // l'utilisateur ferme la liste : meme message que dans le navigateur (« recherche annulee »)
@@ -247,32 +282,37 @@ window.DLKit = (function () {
         addEventListener: function (t, f) { if (t === 'gattserverdisconnected') finDev.push(f); },
         gatt: { get connected() { return dev.ouvert; }, disconnect: function () { B.disconnect(dev.id); } }
       };
-      return { dev: faux, c: [carac(C_CONFIG), opt(C_TELEM), opt(C_CMD), opt(C_DUMP)] };
+      return { dev: faux, c: [carac(C_CONFIG), opt(C_TELEM), opt(C_CMD), opt(C_DUMP), opt(C_MAJ)], connu: { natif: true, id: dev.id, name: dev.name } };
     });
   }
-  function connecterBle() {
+  // [0.13.0] connu = ble.connu d'une connexion d'avant : pas de liste, on rouvre le meme module (apres une mise a jour)
+  function connecterBle(connu) {
     var natif = bleNatifDispo();
     if (!natif && !navigator.bluetooth) return Promise.reject(new Error('ble-absent'));
-    var dev, svc;
-    var ouvrir = natif ? ouvrirBleNatif().then(function (r) {
+    var dev, svc, garde;
+    var ouvrir = natif ? ouvrirBleNatif(connu).then(function (r) {
       dev = r.dev; dev.addEventListener('gattserverdisconnected', finBle);
+      garde = r.connu;
       return r.c;
-    }) : navigator.bluetooth.requestDevice({ filters: [{ services: [SVC] }], optionalServices: [SVC] }).then(function (d) {
-      dev = d; dev.addEventListener('gattserverdisconnected', finBle);
+    }) : (connu && connu.web ? Promise.resolve(connu.web) : navigator.bluetooth.requestDevice({ filters: [{ services: [SVC] }], optionalServices: [SVC] })).then(function (d) {
+      dev = d; garde = { web: d };
+      if (!dev._dlFin) { dev._dlFin = true; dev.addEventListener('gattserverdisconnected', finBle); }   // une seule fois par appareil
       return dev.gatt.connect();
     }).then(function (srv) { return srv.getPrimaryService(SVC); }).then(function (s) {
       svc = s;
       var opt = function (u) { return svc.getCharacteristic(u).catch(function () { return null; }); };
-      return Promise.all([svc.getCharacteristic(C_CONFIG), opt(C_TELEM), opt(C_CMD), opt(C_DUMP)]);
+      return Promise.all([svc.getCharacteristic(C_CONFIG), opt(C_TELEM), opt(C_CMD), opt(C_DUMP), opt(C_MAJ)]);
     });
     return ouvrir.then(function (c) {
-      ble.dev = dev; ble.ch = { config: c[0], telem: c[1], cmd: c[2], dump: c[3] };
+      ble.dev = dev; ble.ch = { config: c[0], telem: c[1], cmd: c[2], dump: c[3], maj: c[4] }; ble.connu = garde;
       return lireJson(ble.ch.config);
     }).then(function (cfg) {
       // la nouvelle app parle aux DLPT2 seulement : un DLAP (E3B4) a sa propre page
       if (cfg.dev === 'DLAP' || !ble.ch.telem) { dev.gatt.disconnect(); throw new Error(TT('kitPasDlpt2')); }
+      ble.fw = cfg.fw || '';
       var p = [ble.ch.telem.startNotifications().then(function () { ble.ch.telem.addEventListener('characteristicvaluechanged', surTelem); })];
       if (ble.ch.dump) p.push(ble.ch.dump.startNotifications().then(function () { ble.ch.dump.addEventListener('characteristicvaluechanged', surDump); }));
+      if (ble.ch.maj) p.push(ble.ch.maj.startNotifications().then(function () { ble.ch.maj.addEventListener('characteristicvaluechanged', surMaj); }));
       return Promise.all(p).then(function () {
         st = { connecte: true, mode: 'ble', nom: nomDuKit(cfg, dev.name) };
         emettre('etat', { connecte: true, mode: 'ble', nom: st.nom });
@@ -401,7 +441,225 @@ window.DLKit = (function () {
     });
   }
 
+  // ---------------------------------------------------------------- [0.13.0] mise a jour du firmware par le Bluetooth
+  // Protocole : le meme que le firmware du module (PT2.1.66). Le fichier .bin est CHOISI DANS LE TELEPHONE : il n'est ni
+  // dans l'app ni dans le depot.
+  // ⚠ Le module Bluetooth d'iOS (bluetooth-le 8.3.0, Device.swift) envoie une ecriture sans reponse SANS attendre la
+  //   file d'iOS : un paquet peut etre jete sans erreur. Le module n'ecrit que la position qu'il attend et dit le trou
+  //   (0x85) ; l'app repart de la. Chaque fenetre finit par un POINT (0x03, avec reponse) : le telephone n'a jamais plus
+  //   d'une fenetre d'avance, et la fenetre se reduit a chaque trou.
+  // ⚠ CHAQUE POINT PORTE UN NUMERO que le module renvoie (0x82). Sans lui, une reponse en retard etait prise pour celle du
+  //   POINT suivant : l'app reculait a une vieille position, le module disait un trou, et ainsi de suite (banc simule,
+  //   perte de 2 % : 3 448 reprises pour 254 paquets perdus). Une reponse d'un autre numero est ignoree.
+  var MAJ_MAX = 0x1E0000, MAJ_MARQUE = '@@DLPT2@@';
+  var MAJ_CODES = ['', 'majRoule', 'majTaille', 'majDebut', 'majEcriture', 'majIncomplet', 'majCrc', 'majImage', 'majSession', 'majFormat', 'majArret', 'majTropLong'];
+  var CRC_T = null;
+  function crc32(u8) {   // CRC-32 de zlib (le module calcule le meme avec esp_rom_crc32_le)
+    if (!CRC_T) {
+      CRC_T = new Uint32Array(256);
+      for (var n = 0; n < 256; n++) { var r = n; for (var k = 0; k < 8; k++) r = (r & 1) ? (0xEDB88320 ^ (r >>> 1)) : (r >>> 1); CRC_T[n] = r >>> 0; }
+    }
+    var c = 0xFFFFFFFF;
+    for (var i = 0; i < u8.length; i++) c = CRC_T[(c ^ u8[i]) & 0xFF] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  }
+  // Un .bin du DLPT2 : image ESP32 (0xE9, puce 0) qui porte la marque « @@DLPT2@@PT2.x.yy » (PT2.1.66 et plus).
+  // Sans la marque : autre carte, autre croquis, ou firmware qui ne saurait plus se mettre a jour par l'app -> refus.
+  function lireFirmware(buf) {
+    var u8 = new Uint8Array(buf);
+    if (u8.length < 65536 || u8[0] !== 0xE9) throw new Error(TT('majPasImage'));
+    if ((u8[12] | (u8[13] << 8)) !== 0) throw new Error(TT('majPasEsp32'));
+    if (u8.length > MAJ_MAX) throw new Error(TT('majTropGros', { n: Math.round(u8.length / 1024) }));
+    var mq = enc.encode(MAJ_MARQUE), at = -1, p = 0;
+    while ((p = u8.indexOf(mq[0], p)) >= 0) {
+      var k = 1; while (k < mq.length && u8[p + k] === mq[k]) k++;
+      if (k === mq.length) { at = p; break; }
+      p++;
+    }
+    if (at < 0) throw new Error(TT('majPasDlpt2'));
+    var v = '', q = at + mq.length;
+    while (q < u8.length && u8[q] && v.length < 16) v += String.fromCharCode(u8[q++]);
+    if (!/^PT2\.\d+\.\d+$/.test(v)) throw new Error(TT('majPasDlpt2'));
+    return { fw: v, taille: u8.length, crc: crc32(u8), octets: u8 };
+  }
+  function erreurMaj(x) {
+    return new Error(TT('majRefus', { x: TT(MAJ_CODES[x.code] || 'majInconnu') + (x.err ? ' (Update ' + x.err + ')' : '') }));
+  }
+  function surMaj(ev) {
+    var dv = ev.target.value, m = ble.majSession, a;
+    if (!m || !dv || dv.byteLength < 1) return;
+    var t = dv.getUint8(0);
+    if (t === 0x84) {   // la session est finie sur une erreur (le module redemarre)
+      m.erreur = { code: dv.byteLength > 1 ? dv.getUint8(1) : 0, err: dv.byteLength > 2 ? dv.getUint8(2) : 0 };
+      if (m.attente) { a = m.attente; m.attente = null; a.ko(erreurMaj(m.erreur)); }
+      return;
+    }
+    if (t === 0x82 && dv.byteLength >= 6) {   // la reponse d'un POINT : seulement celle du numero attendu
+      if (m.attente && m.attente.type === 0x82 && m.attente.numero === dv.getUint8(5)) { a = m.attente; m.attente = null; a.ok(dv.getUint32(1, true)); }
+      return;
+    }
+    if (t === 0x85 && dv.byteLength >= 5) { m.trou = dv.getUint32(1, true); return; }   // un trou : la fenetre se ferme tout de suite
+    if (m.attente && m.attente.type === t) { a = m.attente; m.attente = null; a.ok(dv); }
+  }
+  function ecrireOctets(c, b) {
+    if (typeof c.writeValueWithResponse === 'function') return c.writeValueWithResponse(b);
+    return c.writeValue(b);
+  }
+  function ecrireSans(c, b) {
+    if (typeof c.writeValueWithoutResponse === 'function') return c.writeValueWithoutResponse(b);
+    return ecrireOctets(c, b);
+  }
+  function pause(ms) { return new Promise(function (ok) { setTimeout(ok, ms); }); }
+  // La taille d'un paquet : MTU - 3 (ATT) - 6 (en-tete du POINT), au plus 512 par valeur (NimBLE), multiple de 16.
+  function tailleMorceau() {
+    var B = window.capacitorCommunityBluetoothLe && window.capacitorCommunityBluetoothLe.BleClient;
+    if (!ble.connu || !ble.connu.natif || !B || !B.getMtu) return Promise.resolve(176);   // Bluetooth Web : MTU inconnue
+    return B.getMtu(ble.connu.id).then(function (mtu) {
+      var n = Math.min(Number(mtu) - 3, 512) - 6;
+      return n >= 32 ? Math.floor(n / 16) * 16 : 16;
+    }, function () { return 176; });
+  }
+  function majBle(f, suivi) {
+    var c = ble.ch.maj;
+    if (!c) return Promise.reject(new Error(TT('majAbsente')));
+    var u8 = f.octets, N = u8.length, connu = ble.connu, avant = ble.fw;
+    var m = { attente: null, trou: null, erreur: null, arret: false, numero: 0 }, morceau = 176, fen = 16, propres = 0, trous = 0, t0 = Date.now();
+    ble.majSession = m;
+    function attendre(type, ms, numero) {   // AVANT l'ecriture : la reponse peut arriver avant que l'ecriture ne rende la main
+      return new Promise(function (ok, ko) {
+        var att, t = setTimeout(function () { if (m.attente === att) { m.attente = null; ko(new Error('delai')); } }, ms);
+        att = m.attente = { type: type, numero: numero, ok: function (x) { clearTimeout(t); ok(x); }, ko: function (e) { clearTimeout(t); ko(e); } };
+      });
+    }
+    function paquet(op, pos, len, numero) {   // DONNEE : 5 octets d'en-tete ; POINT : 6 (le numero a l'octet 5)
+      var e = op === 0x03 ? 6 : 5, b = new Uint8Array(e + len);
+      b[0] = op; b[1] = pos & 255; b[2] = (pos >>> 8) & 255; b[3] = (pos >>> 16) & 255; b[4] = (pos >>> 24) & 255;
+      if (op === 0x03) b[5] = numero;
+      if (len) b.set(u8.subarray(pos, pos + len), e);
+      return b;
+    }
+    function verifierEtat() {
+      if (m.erreur) throw erreurMaj(m.erreur);
+      if (m.arret) throw new Error(TT('majArretee'));
+    }
+    function point(pos, len, essais) {   // un POINT : le module dit ou il en est ; 3 essais si la reponse ne vient pas
+      m.numero = (m.numero + 1) & 255;
+      var w = attendre(0x82, 4000, m.numero);
+      return ecrireOctets(c, paquet(0x03, pos, len, m.numero)).then(function () { return w; }).catch(function (e) {
+        if (e && e.message === 'delai' && essais > 1 && !m.erreur && !m.arret) return point(0, 0, essais - 1);
+        throw (e && e.message === 'delai') ? new Error(TT('majMuet')) : e;
+      });
+    }
+    function fenetre(pos) {
+      verifierEtat();
+      if (pos >= N) return Promise.resolve();
+      var p = pos, k = 0;
+      m.trou = null;
+      function un() {
+        verifierEtat();
+        if (m.trou != null || p >= N || k >= fen - 1) return null;
+        var len = Math.min(morceau, N - p), b = paquet(0x02, p, len);
+        p += len; k++;
+        return ecrireSans(c, b).then(un);
+      }
+      return Promise.resolve().then(un).then(function () {
+        var len = (m.trou == null && p < N) ? Math.min(morceau, N - p) : 0, fin = p + len;
+        return point(p, len, 3).then(function (attendu) {
+          if (attendu < fin) { trous++; propres = 0; fen = Math.max(4, fen >> 1); }
+          else if (++propres >= 4) { propres = 0; fen = Math.min(48, fen + 4); }
+          suivi({ fait: attendu, total: N, oPs: attendu * 1000 / Math.max(1, Date.now() - t0), trous: trous });
+          return fenetre(attendu);
+        });
+      });
+    }
+    function finir() {
+      var w = attendre(0x83, 20000);   // le module verifie l'image (SHA-256 de 1,5 Mo) avant de repondre
+      return ecrireOctets(c, new Uint8Array([0x04])).then(function () { return w; }).then(function (dv) {
+        var code = dv.getUint8(1);
+        if (code === 5) return fenetre(dv.getUint32(3, true)).then(finir);   // incomplet : on envoie ce qui manque
+        if (code) throw erreurMaj({ code: code, err: dv.getUint8(2) });
+        return { octets: N, ms: Date.now() - t0, trous: trous };
+      }, function (e) { throw (e && e.message === 'delai') ? new Error(TT('majMuet')) : e; });
+    }
+    return tailleMorceau().then(function (n) {
+      morceau = n;
+      var d = new Uint8Array(9), w = attendre(0x81, 6000);
+      d[0] = 0x01;
+      [N, f.crc].forEach(function (v, i) { for (var j = 0; j < 4; j++) d[1 + 4 * i + j] = (v >>> (8 * j)) & 255; });
+      return ecrireOctets(c, d).then(function () { return w; });
+    }).then(function (dv) {
+      var code = dv.getUint8(1);
+      if (code) throw erreurMaj({ code: code, err: 0 });
+      t0 = Date.now();
+      console.log('[maj] debut : ' + N + ' octets, paquets de ' + morceau + ', fenetre ' + fen);
+      return fenetre(0);
+    }).then(finir).then(function (r) {
+      ble.majSession = null;
+      console.log('[maj] image acceptee : ' + r.octets + ' octets en ' + r.ms + ' ms, ' + r.trous + ' trous');
+      suivi({ fait: N, total: N, etape: 'redemarrage' });
+      return reconnecter(connu, 45000).then(function (cfg) { r.avant = avant; r.apres = cfg.fw || ''; return r; });
+    }, function (e) {
+      ble.majSession = null;
+      if (m.arret) e = new Error(TT('majArretee'));   // l'arret a la main : pas « refusee par le module »
+      else if (!st.connecte) e = new Error('hors-ligne');   // coupure : l'app dit b_fwCoupe, pas le texte brut du module Bluetooth
+      else if (e && e.message === 'delai') e = new Error(TT('majMuet'));
+      throw e;
+    });
+  }
+  // Apres l'image acceptee, le module redemarre (1,5 s). On attend la coupure, puis on rouvre LE MEME module sans liste.
+  // ⚠ En DRAGLOGICS, le module n'annonce son Bluetooth que 20 s apres l'allumage : les essais commencent tout de suite.
+  function reconnecter(connu, limiteMs) {
+    var fin = Date.now() + limiteMs, t1 = Date.now();
+    function coupe() {
+      if (!st.connecte || Date.now() - t1 > 8000) return Promise.resolve();
+      return pause(200).then(coupe);
+    }
+    function essai() {
+      return pause(1500).then(function () { return connecterBle(connu); }).catch(function (e) {
+        if (Date.now() > fin) throw new Error(TT('majPasRevenu'));
+        console.log('[maj] reconnexion : ' + (e && e.message));
+        return essai();
+      });
+    }
+    return coupe().then(function () { return st.connecte ? null : essai(); }).then(function () { return lireConfigBle(); });
+  }
+  // Le module de demonstration : le meme suivi, a ~300 ko/s, puis le « redemarrage » sur la version du fichier.
+  function majDemo(f, suivi) {
+    var N = f.octets.length, fait = 0, t0 = Date.now(), m = { arret: false };
+    demo.maj = m;
+    return new Promise(function (ok, ko) {
+      (function pas() {
+        if (m.arret) { demo.maj = null; ko(new Error(TT('majArretee'))); return; }
+        fait = Math.min(N, fait + 24576);
+        suivi({ fait: fait, total: N, oPs: fait * 1000 / Math.max(1, Date.now() - t0), trous: 0 });
+        if (fait < N) { setTimeout(pas, 80); return; }
+        suivi({ fait: N, total: N, etape: 'redemarrage' });
+        setTimeout(function () {
+          var avant = demo.cfg.fw; demo.cfg.fw = f.fw; demo.maj = null;
+          ok({ octets: N, ms: Date.now() - t0, trous: 0, avant: avant, apres: f.fw });
+        }, 1500);
+      })();
+    });
+  }
+
   return {
+    // [0.13.0] la mise a jour du firmware par le Bluetooth
+    majPossible: function () { return st.connecte && (st.mode === 'demo' || (st.mode === 'ble' && !!ble.ch.maj)); },
+    lireFirmware: lireFirmware,
+    majFirmware: function (f, suivi) {
+      if (!st.connecte) return Promise.reject(new Error('hors-ligne'));
+      suivi = suivi || function () {};
+      return st.mode === 'ble' ? majBle(f, suivi) : majDemo(f, suivi);
+    },
+    arreterMaj: function () {
+      if (demo.maj) demo.maj.arret = true;
+      var m = ble.majSession;
+      if (m && !m.arret) {
+        m.arret = true;
+        // le module dit 0x84 ARRET et redemarre sur son ancien firmware ; une erreur d'envoi ici ne change rien
+        if (ble.ch.maj) ecrireOctets(ble.ch.maj, new Uint8Array([0x05])).catch(function () {});
+      }
+    },
     sur: function (type, f) { if (ecouteurs[type]) ecouteurs[type].push(f); },
     etat: function () { return { connecte: st.connecte, mode: st.mode, nom: st.nom }; },
     connecter: function (mode) {

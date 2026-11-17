@@ -173,3 +173,12 @@ body.e .b-envoi { background:var(--bg); }
 /* ---- la feuille de connexion */
 body.e .feuille { border-radius:16px 16px 0 0; border:0; }
 body.e .feuille .bouton { width:100%; }
+
+/* ---- [0.13.0] la mise a jour du firmware */
+body.e .b-fw progress { display:block; width:100%; height:10px; margin:10px 0 4px; border:0; border-radius:999px; background:var(--line); overflow:hidden; -webkit-appearance:none; appearance:none; }
+body.e .b-fw progress[hidden] { display:none; }
+body.e .b-fw progress::-webkit-progress-bar { background:var(--line); border-radius:999px; }
+body.e .b-fw progress::-webkit-progress-value { background:var(--rouge); border-radius:999px; }
+body.e .b-fw progress::-moz-progress-bar { background:var(--rouge); border-radius:999px; }
+body.e .b-fw label.bouton { display:inline-flex; align-items:center; }
+body.e .b-fw label.bouton.inactif { opacity:.45; pointer-events:none; }

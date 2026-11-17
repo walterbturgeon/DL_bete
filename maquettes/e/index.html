@@ -8,7 +8,7 @@
 <link rel="icon" href="../../img/dl-logo.webp">
 <link rel="stylesheet" href="../../css/base-maquettes.css?v=0.3">
 <link rel="stylesheet" href="../b/b.css?v=0.10">
-<link rel="stylesheet" href="e.css?v=0.4">
+<link rel="stylesheet" href="e.css?v=0.5">
 </head>
 <body class="e">
 <!-- MAQUETTE E « PISTE » (21 oct.), aux couleurs du logo DRAGLOGICS ; c'est l'app iPhone depuis la 0.11.0
@@ -228,7 +228,7 @@
           <input type="hidden" id="f-mode"><input type="hidden" id="f-hecu">
           <div class="champ"><label for="bEcu" data-i18n="b_ecuNom">Marque de l'ECU</label>
             <select id="bEcu"><option value="holley_hp" data-i18n="b_ecuHp">Holley HP / Terminator X</option><option value="holley_dom" data-i18n="b_ecuDom">Holley Dominator</option>
-              <option value="fueltech" data-i18n="b_ecuFt">FuelTech FT450 / FT550 / FT600</option><option value="link" data-i18n="b_ecuLink">Link</option>
+              <option value="fueltech" data-i18n="b_ecuFt">FuelTech FT450 / FT550 / FT600</option><option value="fueltech_can" data-i18n="b_ecuFtc">FuelTech FT470 / FT700</option><option value="link" data-i18n="b_ecuLink">Link</option>
               <option value="ecumaster" data-i18n="b_ecuEcum">ECUMaster</option><option value="autre" data-i18n="b_ecuAutre">Autre (mode ancien)</option></select></div>
           <p class="b-ecu-resume" id="bEcuResume"></p>
           <div class="champ" id="bChAutre" hidden><label for="bModeAutre" data-i18n="modeNom"></label>
@@ -272,6 +272,24 @@
             <button type="button" class="bouton" id="bMaj" data-i18n="majBtn">Passer en mise à jour</button></div>
           <p class="aide" data-i18n="calAide"></p>
           <p class="aide" id="bKitMsg" aria-live="polite"></p>
+        </div>
+        <div id="bFwBloc" hidden>
+          <h2 class="e-groupe" data-i18n="b_fwTitre">Mise à jour du firmware</h2>
+          <div class="e-liste b-fw">
+            <p class="aide" id="bFwVieux" hidden></p>
+            <div id="bFwChoix">
+              <p class="aide" data-i18n="b_fwAide"></p>
+              <div class="b-boutons">
+                <label class="bouton" id="bFwChoisir" for="bFwFichier" data-i18n="b_fwChoisir">Choisir le fichier .bin</label>
+                <input type="file" id="bFwFichier" class="b-cache">
+                <button type="button" class="bouton plein" id="bFwInstaller" data-i18n="b_fwInstaller" disabled>Installer</button>
+                <button type="button" class="bouton" id="bFwArreter" data-i18n="b_fwArreter" hidden>Arrêter</button>
+              </div>
+              <p class="aide" id="bFwInfo"></p>
+              <progress id="bFwBarre" max="1000" value="0" hidden></progress>
+              <p class="aide" id="bFwEtat" aria-live="polite"></p>
+            </div>
+          </div>
         </div>
       </div>
       <div class="e-page e-page-kit" id="pReIdx" hidden>
@@ -344,12 +362,12 @@
 <script src="../../js/demo-runs.js?v=0.3"></script>
 <script src="../../js/index-calc.js?v=0.9"></script>
 <script src="../../js/chrono.js?v=0.10"></script>
-<script src="../../js/kit.js?v=0.12"></script>
+<script src="../../js/kit.js?v=0.14"></script>
 <script src="../../js/commun.js?v=0.12"></script>
 <script src="../../js/ocr-ticket.js?v=0.8"></script>
-<script src="../b/b-textes.js?v=0.12"></script>
+<script src="../b/b-textes.js?v=0.14"></script>
 <script src="e-textes.js?v=0.3"></script>
-<script src="../b/b.js?v=0.12"></script>
+<script src="../b/b.js?v=0.14"></script>
 <script src="e.js?v=0.1"></script>
 </body>
 </html>
