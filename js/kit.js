@@ -634,8 +634,12 @@ window.DLKit = (function () {
         suivi({ fait: fait, total: N, oPs: fait * 1000 / Math.max(1, Date.now() - t0), trous: 0 });
         if (fait < N) { setTimeout(pas, 80); return; }
         suivi({ fait: N, total: N, etape: 'redemarrage' });
+        // [0.13.1] comme le vrai module : il redemarre, la connexion tombe 1,5 s, puis l'app le retrouve
+        var nom = st.nom;
+        demo.arreter(); st = { connecte: false, mode: null, nom: '' }; emettre('etat', { connecte: false, mode: null, nom: '' });
         setTimeout(function () {
           var avant = demo.cfg.fw; demo.cfg.fw = f.fw; demo.maj = null;
+          st = { connecte: true, mode: 'demo', nom: nom }; demo.demarrer(); emettre('etat', { connecte: true, mode: 'demo', nom: nom });
           ok({ octets: N, ms: Date.now() - t0, trous: 0, avant: avant, apres: f.fw });
         }, 1500);
       })();

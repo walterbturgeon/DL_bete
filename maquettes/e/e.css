@@ -182,3 +182,4 @@ body.e .b-fw progress::-webkit-progress-value { background:var(--rouge); border-
 body.e .b-fw progress::-moz-progress-bar { background:var(--rouge); border-radius:999px; }
 body.e .b-fw label.bouton { display:inline-flex; align-items:center; }
 body.e .b-fw label.bouton.inactif { opacity:.45; pointer-events:none; }
+body.e.b-fw-en-cours #eEnvoi { display:none !important; }   /* [0.13.1] cache pendant la mise a jour du firmware */

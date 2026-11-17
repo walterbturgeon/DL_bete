@@ -3,7 +3,7 @@
 // [B v0.2] (7 oct. : retour a la B) la langue est SEULEMENT dans Regler ; l'en-tete montre la connexion ;
 // repris de la maquette C : fiche du kit (calibration, mise a jour), ticket garde par run avec sa pastille n/m.
 (function () {
-  var VERSION = '0.13.0';   // = MARKETING_VERSION de l'app iPhone (ios/App/App.xcodeproj)
+  var VERSION = '0.13.1';   // = MARKETING_VERSION de l'app iPhone (ios/App/App.xcodeproj)
   var $ = DLC.$, T = DLI18n.T;
   // les textes de B sont dans b-textes.js (charge avant ce fichier)
   // [B v0.2] les tickets de demonstration et la comparaison viennent du noyau commun (DLC) ; les tickets tapes
@@ -516,6 +516,7 @@
   function rendreRegl() { $('bRegVide').hidden = !!cfg; $('bRegCorps').hidden = !cfg; $('bFormMsg').textContent = ''; if (cfg) { DLC.remplirForm(cfg); ecuDepuisCfg(); idxDepuisCfg(); vehDepuisCfg(); } }
   $('bForm').addEventListener('submit', function (ev) {
     ev.preventDefault();
+    if (fwEnCours) return;   // [0.13.1] pas de reglages envoyes au module pendant la mise a jour de son firmware
     idxVersForm();   // [B v0.9] index + marge -> f-idxc, ID hexadecimal -> f-idxid (gardes dans l'appareil)
     DLC.envoyerForm($('bFormMsg'), function (c) { cfg = c; ecuDepuisCfg(); idxDepuisCfg(); vehDepuisCfg(); rendreFiche(); majIdxCourir(dernierTelem); });
   });
@@ -794,11 +795,14 @@
     $('bFwVieux').hidden = ok || !cfg;
     if (cfg && !ok) $('bFwVieux').textContent = T('b_fwVieux', { fw: cfg.fw || '?' });
     $('bFwChoix').hidden = !ok && !fwEnCours;
-    $('bMaj').hidden = ok;
+    $('bMaj').hidden = ok || fwEnCours;   // [0.13.1] pas l'ancien bouton WiFi pendant la coupure du redemarrage
     $('bFwChoisir').classList.toggle('inactif', fwEnCours);
     $('bFwFichier').disabled = fwEnCours;
     $('bFwInstaller').disabled = !ok || !fwFichier || fwEnCours;
     $('bFwArreter').hidden = !fwEnCours;
+    // [0.13.1] pendant le transfert, le bouton fixe « Envoyer au module » est cache (CSS body.b-fw-en-cours) : sur un
+    // telephone, il couvrait la barre et le message de fin, et il aurait ecrit des reglages au milieu de la mise a jour
+    document.body.classList.toggle('b-fw-en-cours', fwEnCours);
   }
   if (fwUi) $('bFwFichier').addEventListener('change', function (ev) {
     var f = ev.target.files && ev.target.files[0];
@@ -818,6 +822,7 @@
     fwEnCours = true; rendreMajFw();
     $('bFwBarre').hidden = false; $('bFwBarre').value = 0;
     $('bFwEtat').textContent = T('b_fwDebut');
+    fwMontrer();   // [0.13.1] la barre et le texte viennent a l'ecran tout seuls (ils sont en bas de la page)
     DLKit.majFirmware(fwFichier, function (p) {
       $('bFwBarre').value = Math.round(1000 * p.fait / p.total);
       if (p.etape === 'redemarrage') { $('bFwEtat').textContent = T('b_fwRedemarre'); return; }
@@ -833,8 +838,14 @@
       if (DLKit.etat().connecte) DLKit.lireConfig().then(function (c) { cfg = c; rendreRegl(); rendreFiche(); rendreAccueil(); }, erreurKit);
     }, function (e) {
       $('bFwEtat').textContent = '⚠ ' + (e.message === 'hors-ligne' ? T('b_fwCoupe') : e.message);
-    }).then(function () { fwEnCours = false; rendreMajFw(); });
+    }).then(function () {
+      fwEnCours = false; rendreMajFw();
+      // [0.13.1] le bouton « Envoyer au module » revient : le message de fin est remis au centre, au-dessus de lui
+      setTimeout(fwMontrer, 300);
+    });
   });
+  // [0.13.1] defilement IMMEDIAT (pas « smooth ») : un defilement doux ne finit pas toujours (volet cache, page occupee)
+  function fwMontrer() { var el = $('bFwEtat'); if (el && el.offsetParent) el.scrollIntoView({ block: 'center' }); }
   if (fwUi) $('bFwArreter').addEventListener('click', function () { DLKit.arreterMaj(); });
   function prefsApp() {
     // [B v0.2] la langue : seulement ici, dans Regler (plus dans l'en-tete)

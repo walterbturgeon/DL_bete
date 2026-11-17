@@ -41,7 +41,10 @@
     if (document.body.getAttribute('data-vue') !== v) document.body.setAttribute('data-vue', v || '');
     var avecKit = !$('bRegCorps').hidden;
     // une sous-page du kit n'a plus de sens sans kit : retour au menu
-    if (ouverte.regler && !avecKit && $(ouverte.regler).classList.contains('e-page-kit')) ouverte.regler = null;
+    // [0.13.1] SAUF pendant une mise a jour du firmware : le module redemarre (coupure de quelques secondes) et la page
+    // garde la barre et le message de fin ; avant, elle se fermait et le message de fin restait dans une page cachee
+    if (ouverte.regler && !avecKit && !document.body.classList.contains('b-fw-en-cours') &&
+        $(ouverte.regler).classList.contains('e-page-kit')) ouverte.regler = null;
     Object.keys(RACINE).forEach(function (vv) {
       var p = ouverte[vv];
       document.querySelectorAll('#v-' + vv + ' .e-page').forEach(function (pg) { cacher(pg, p ? pg.id !== p : pg.id !== RACINE[vv]); });
