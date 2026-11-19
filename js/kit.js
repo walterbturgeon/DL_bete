@@ -148,7 +148,7 @@ window.DLKit = (function () {
     kitRunAbsent: 'ce run n’est plus dans le module', idxRefusOff: 'la course à index est coupée',
     idxRefusCourse: 'un run est en cours', idxRefusManque: 'il manque le run de référence ou la cible',
     // [0.13.0] la mise a jour du firmware
-    majPasImage: 'Ce fichier n’est pas un firmware ESP32 (.bin).', majPasEsp32: 'Ce firmware est pour une autre puce que celle du module.',
+    majPasImage: 'Ce fichier n’est pas un firmware ESP32 (.bin).', majPasEsp32: 'Ce firmware n’est ni pour une puce ESP32 ni pour une ESP32-S3.',
     majTropGros: 'Ce firmware est trop gros pour le module ({n} ko).',
     majPasDlpt2: 'Ce fichier n’est pas un firmware DLPT2 qui se met à jour par l’app (PT2.1.66 ou plus).',
     majAbsente: 'Ce module ne se met pas à jour par l’app : installe une fois la PT2.1.66 ou plus par USB.',
@@ -166,7 +166,7 @@ window.DLKit = (function () {
     calR4: 'the device is moving', calR5: 'real rotation detected', calR6: 'no IMU', kitRejeuBle: 'no replay with a real device',
     kitRunAbsent: 'this run is no longer in the device', idxRefusOff: 'index racing is off',
     idxRefusCourse: 'a run is in progress', idxRefusManque: 'the reference run or the target is missing',
-    majPasImage: 'This file is not an ESP32 firmware (.bin).', majPasEsp32: 'This firmware is for another chip than the device’s.',
+    majPasImage: 'This file is not an ESP32 firmware (.bin).', majPasEsp32: 'This firmware is for neither an ESP32 nor an ESP32-S3 chip.',
     majTropGros: 'This firmware is too big for the device ({n} KB).',
     majPasDlpt2: 'This file is not a DLPT2 firmware that updates from the app (PT2.1.66 or later).',
     majAbsente: 'This device does not update from the app: install PT2.1.66 or later once by USB.',
@@ -451,7 +451,12 @@ window.DLKit = (function () {
   // ⚠ CHAQUE POINT PORTE UN NUMERO que le module renvoie (0x82). Sans lui, une reponse en retard etait prise pour celle du
   //   POINT suivant : l'app reculait a une vieille position, le module disait un trou, et ainsi de suite (banc simule,
   //   perte de 2 % : 3 448 reprises pour 254 paquets perdus). Une reponse d'un autre numero est ignoree.
-  var MAJ_MAX = 0x1E0000, MAJ_MARQUE = '@@DLPT2@@';
+  var MAJ_MARQUE = '@@DLPT2@@';
+  // [0.13.2] DEUX PUCES : le DLPT2 PT2.1.67 compile pour l'ESP32 (kits) et pour l'ESP32-S3 (modules de serie). Puce = octets
+  // 12-13 de l'en-tete de l'image. La taille maximale est celle d'un emplacement d'application du module : 0x1E0000 pour
+  // l'ESP32 (min_spiffs, 4 Mo), 0x640000 pour l'ESP32-S3 (default_16MB, 16 Mo). Le module refuse aussi une image de
+  // l'AUTRE puce : au premier paquet depuis la PT2.1.67, a la fin du transfert avant (verification de l'image).
+  var MAJ_PUCES = { 0: { nom: 'ESP32', max: 0x1E0000 }, 9: { nom: 'ESP32-S3', max: 0x640000 } };
   var MAJ_CODES = ['', 'majRoule', 'majTaille', 'majDebut', 'majEcriture', 'majIncomplet', 'majCrc', 'majImage', 'majSession', 'majFormat', 'majArret', 'majTropLong'];
   var CRC_T = null;
   function crc32(u8) {   // CRC-32 de zlib (le module calcule le meme avec esp_rom_crc32_le)
@@ -463,13 +468,14 @@ window.DLKit = (function () {
     for (var i = 0; i < u8.length; i++) c = CRC_T[(c ^ u8[i]) & 0xFF] ^ (c >>> 8);
     return (c ^ 0xFFFFFFFF) >>> 0;
   }
-  // Un .bin du DLPT2 : image ESP32 (0xE9, puce 0) qui porte la marque « @@DLPT2@@PT2.x.yy » (PT2.1.66 et plus).
-  // Sans la marque : autre carte, autre croquis, ou firmware qui ne saurait plus se mettre a jour par l'app -> refus.
+  // Un .bin du DLPT2 : image ESP32 ou ESP32-S3 (0xE9, puce 0 ou 9) qui porte la marque « @@DLPT2@@PT2.x.yy » (PT2.1.66 et
+  // plus). Sans la marque : autre carte, autre croquis, ou firmware qui ne saurait plus se mettre a jour par l'app -> refus.
   function lireFirmware(buf) {
     var u8 = new Uint8Array(buf);
     if (u8.length < 65536 || u8[0] !== 0xE9) throw new Error(TT('majPasImage'));
-    if ((u8[12] | (u8[13] << 8)) !== 0) throw new Error(TT('majPasEsp32'));
-    if (u8.length > MAJ_MAX) throw new Error(TT('majTropGros', { n: Math.round(u8.length / 1024) }));
+    var puce = MAJ_PUCES[u8[12] | (u8[13] << 8)];
+    if (!puce) throw new Error(TT('majPasEsp32'));
+    if (u8.length > puce.max) throw new Error(TT('majTropGros', { n: Math.round(u8.length / 1024) }));
     var mq = enc.encode(MAJ_MARQUE), at = -1, p = 0;
     while ((p = u8.indexOf(mq[0], p)) >= 0) {
       var k = 1; while (k < mq.length && u8[p + k] === mq[k]) k++;
@@ -480,7 +486,7 @@ window.DLKit = (function () {
     var v = '', q = at + mq.length;
     while (q < u8.length && u8[q] && v.length < 16) v += String.fromCharCode(u8[q++]);
     if (!/^PT2\.\d+\.\d+$/.test(v)) throw new Error(TT('majPasDlpt2'));
-    return { fw: v, taille: u8.length, crc: crc32(u8), octets: u8 };
+    return { fw: v, puce: puce.nom, taille: u8.length, crc: crc32(u8), octets: u8 };
   }
   function erreurMaj(x) {
     return new Error(TT('majRefus', { x: TT(MAJ_CODES[x.code] || 'majInconnu') + (x.err ? ' (Update ' + x.err + ')' : '') }));
@@ -526,10 +532,16 @@ window.DLKit = (function () {
     var m = { attente: null, trou: null, erreur: null, arret: false, numero: 0 }, morceau = 176, fen = 16, propres = 0, trous = 0, t0 = Date.now();
     ble.majSession = m;
     function attendre(type, ms, numero) {   // AVANT l'ecriture : la reponse peut arriver avant que l'ecriture ne rende la main
-      return new Promise(function (ok, ko) {
+      var p = new Promise(function (ok, ko) {
         var att, t = setTimeout(function () { if (m.attente === att) { m.attente = null; ko(new Error('delai')); } }, ms);
         att = m.attente = { type: type, numero: numero, ok: function (x) { clearTimeout(t); ok(x); }, ko: function (e) { clearTimeout(t); ko(e); } };
       });
+      // [0.13.2] ⚠ Un refus du module (0x84) peut rejeter cette attente AVANT que l'ecriture ne rende la main, donc avant
+      // le .then(() => w) qui s'y abonne : rejet « non traite » a cet instant. Le navigateur l'ecrit en rouge dans la
+      // console ; Node arrete le processus (banc simule, image S3 vers un module ESP32). La promesse rendue reste la meme :
+      // l'appelant recoit toujours le refus.
+      p.catch(function () {});
+      return p;
     }
     function paquet(op, pos, len, numero) {   // DONNEE : 5 octets d'en-tete ; POINT : 6 (le numero a l'octet 5)
       var e = op === 0x03 ? 6 : 5, b = new Uint8Array(e + len);

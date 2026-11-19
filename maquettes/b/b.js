@@ -3,7 +3,7 @@
 // [B v0.2] (7 oct. : retour a la B) la langue est SEULEMENT dans Regler ; l'en-tete montre la connexion ;
 // repris de la maquette C : fiche du kit (calibration, mise a jour), ticket garde par run avec sa pastille n/m.
 (function () {
-  var VERSION = '0.13.1';   // = MARKETING_VERSION de l'app iPhone (ios/App/App.xcodeproj)
+  var VERSION = '0.13.2';   // = MARKETING_VERSION de l'app iPhone (ios/App/App.xcodeproj)
   var $ = DLC.$, T = DLI18n.T;
   // les textes de B sont dans b-textes.js (charge avant ce fichier)
   // [B v0.2] les tickets de demonstration et la comparaison viennent du noyau commun (DLC) ; les tickets tapes
@@ -811,7 +811,8 @@
     $('bFwInfo').textContent = T('b_fwLecture');
     f.arrayBuffer().then(function (buf) {
       fwFichier = DLKit.lireFirmware(buf);
-      $('bFwInfo').textContent = T('b_fwFichier', { nom: f.name, fw: fwFichier.fw, ko: Math.round(fwFichier.taille / 1024) });
+      // [0.13.2] la puce de l'image est dite : un module ESP32 refuse une image ESP32-S3, et l'inverse
+      $('bFwInfo').textContent = T('b_fwFichier', { nom: f.name, fw: fwFichier.fw, puce: fwFichier.puce, ko: Math.round(fwFichier.taille / 1024) });
     }).catch(function (e) { fwFichier = null; $('bFwInfo').textContent = '⚠ ' + e.message; })
       .then(function () { ev.target.value = ''; rendreMajFw(); });   // le meme fichier peut etre choisi de nouveau
   });
