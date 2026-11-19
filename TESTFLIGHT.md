@@ -36,9 +36,14 @@ aucun Mac n'est nécessaire.
 ## Étape 2 — Vérifier la compilation (sans secret)
 
 1. Ouvre https://github.com/walterbturgeon/DL_bete/actions/workflows/ios-testflight.yml
-2. Touche **Run workflow**. Laisse **envoyer** décoché. Touche le bouton vert **Run workflow**.
-3. Attends 10 à 20 min. Une coche verte = l'app compile avec Xcode 26. Une croix rouge : ouvre l'exécution ;
+2. Touche **Run workflow**. Laisse **envoyer** décoché. Garde **Xcode** sur `27`. Touche le bouton vert **Run workflow**.
+3. Attends 10 à 20 min. Une coche verte = l'app compile avec Xcode 27. Une croix rouge : ouvre l'exécution ;
    le journal `journaux-ios-N` est en bas de la page.
+
+**Xcode 27** : Apple refuse, à partir d'avril 2027, une app construite sans le SDK iOS 27 (avertissement ITMS-90725).
+Le choix `27` (par défaut) utilise l'image `xcode-27` de GitHub et son Xcode par défaut. Le choix `26` garde l'ancien
+chemin (`macos-26`, dernier Xcode 26), qui a construit les builds 7 à 19. Le résumé de chaque exécution dit la version
+de Xcode et du SDK iOS.
 
 ## Étape 3 — Les secrets dans GitHub (une seule fois)
 

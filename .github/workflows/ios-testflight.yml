@@ -14,6 +14,11 @@ on:
         description: "Envoyer a TestFlight (decoche = compiler seulement, sans secret)"
         type: boolean
         default: false
+      xcode:
+        description: "Xcode (27 = exige par Apple a partir d'avril 2027 ; 26 = l'ancien chemin, builds 7 a 19)"
+        type: choice
+        options: ["27", "26"]
+        default: "27"
 
 permissions:
   contents: read
@@ -23,18 +28,28 @@ concurrency:
 
 jobs:
   ios:
-    # Apple exige Xcode 26 et le SDK iOS 26 depuis le 28 avril 2026
-    runs-on: macos-26
+    # Apple exige Xcode 26 et le SDK iOS 26 depuis le 28 avril 2026, puis Xcode 27 et le SDK iOS 27 a partir d'avril 2027
+    # (avertissement ITMS-90725 recu sur la build 19, 19 nov. 2026). Xcode 27 est sur l'image « xcode-27 » de GitHub
+    # (stable depuis le 15 oct. 2026 : Xcode 27.0, 27.1 par defaut, 27.2) ; l'image « macos-26 » n'a que Xcode 26.
+    runs-on: ${{ inputs.xcode == '26' && 'macos-26' || 'xcode-27' }}
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v6
 
-      - name: Xcode 26
+      - name: Xcode ${{ inputs.xcode }}
         run: |
-          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
-          [ -n "$X" ] || { echo "::error::aucun Xcode 26 sur ce Mac"; exit 1; }
+          if [ "${{ inputs.xcode }}" = "26" ]; then
+            X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          else
+            # le Xcode PAR DEFAUT de l'image (version stable choisie par GitHub), jamais le plus recent : il peut etre une beta
+            X=$(readlink -f /Applications/Xcode.app 2>/dev/null || echo /Applications/Xcode.app)
+          fi
+          [ -n "$X" ] && [ -d "$X" ] || { echo "::error::aucun Xcode ${{ inputs.xcode }} sur ce Mac"; exit 1; }
           sudo xcode-select -s "$X"
           xcodebuild -version
+          V=$(xcodebuild -version | head -1 | sed 's/Xcode //'); SDK=$(xcrun --sdk iphoneos --show-sdk-version)
+          case "$V" in "${{ inputs.xcode }}"*) ;; *) echo "::error::Xcode $V choisi, Xcode ${{ inputs.xcode }} demande"; exit 1;; esac
+          echo "Xcode $V, SDK iOS $SDK" >> "$GITHUB_STEP_SUMMARY"
 
       - uses: actions/setup-node@v6
         with:
