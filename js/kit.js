@@ -39,7 +39,8 @@ window.DLKit = (function () {
     // [0.12.0] annonce la PT2.1.65 : le choix FuelTech FT470 / FT700 (mode FUELTECH_CAN) se montre aussi en demo
     // [0.13.0] annonce la PT2.1.66 : la mise a jour par le Bluetooth se montre aussi en demo (transfert simule)
     // [0.13.3] puis la PT2.1.68 : comme un vrai module, la demo refuse un fichier NON signe
-    cfg: { fw: 'PT2.1.68', app: 'dlg', sfx: 'DEMO', board: 'DEMO00000000', rpo: 8, jpo: -50, cms: 0, d60: 0, veh: 1, dep: 16, pfft: 0,
+    // [0.14.0] puis la PT2.1.69 : la demo accepte aussi un fichier CHIFFRE
+    cfg: { fw: 'PT2.1.69', app: 'dlg', sfx: 'DEMO', board: 'DEMO00000000', rpo: 8, jpo: -50, cms: 0, d60: 0, veh: 1, dep: 16, pfft: 0,
            mode: 'HOLLEY', cbr: 1000000, hecu: 1, strig: 1, scid: 1280, grate: 40, dynm: 8, imuf: 2, tzh: -4,
            imu: 1, cal: 1, sats: 14, fix: 3, hz: 25,
            // [B v0.4] l'ECU et le depart CAN, memes cles que le JSON du kit
@@ -162,7 +163,12 @@ window.DLKit = (function () {
     // [0.13.3] la signature des images (module PT2.1.68 et plus)
     majSignature: 'signature refusée', majSig1: 'fichier non signé', majSig2: 'bloc de signature absent ou abîmé',
     majSig3: 'bloc de signature abîmé (CRC)', majSig4: 'le fichier a été modifié après sa signature', majSig5: 'fichier signé par une autre clé',
-    majSig6: 'signature fausse', majSig7: 'mémoire du module insuffisante'
+    majSig6: 'signature fausse', majSig7: 'mémoire du module insuffisante',
+    // [0.14.0] les fichiers chiffres (module ESP32-S3 en PT2.1.69 et plus)
+    majChiffreInconnu: 'Ce fichier chiffré ne dit pas sa version : il ne vient pas de l’outil DLPT2.',
+    majChiffre: 'fichier chiffré refusé', majCh1: 'ce module ne peut pas déchiffrer (seule une ESP32-S3 en PT2.1.69 ou plus le peut)',
+    majCh2: 'en-tête du fichier abîmé', majCh3: 'fichier chiffré pour une autre clé', majCh4: 'le fichier a été modifié',
+    majCh5: 'mémoire du module insuffisante', majCh6: 'erreur de déchiffrement'
   }, {
     kitPasDlpt2: 'This is not a DRAGLOG device (DLAP or other).', kitRefus: 'the device refused: {x}',
     kitDumpDelai: 'the runs stopped arriving (nothing for 8 s)', kitCmdAbsente: 'this device takes no command',
@@ -183,7 +189,11 @@ window.DLKit = (function () {
     majPasRevenu: 'The device did not come back after its restart (45 s). Turn it on again, then reconnect it to read its version.',
     majSignature: 'signature refused', majSig1: 'file not signed', majSig2: 'signature block missing or damaged',
     majSig3: 'signature block damaged (CRC)', majSig4: 'the file was changed after it was signed', majSig5: 'file signed with another key',
-    majSig6: 'wrong signature', majSig7: 'not enough memory in the device'
+    majSig6: 'wrong signature', majSig7: 'not enough memory in the device',
+    majChiffreInconnu: 'This encrypted file does not give its version: it does not come from the DLPT2 tool.',
+    majChiffre: 'encrypted file refused', majCh1: 'this device cannot decrypt (only an ESP32-S3 with PT2.1.69 or later can)',
+    majCh2: 'file header damaged', majCh3: 'file encrypted for another key', majCh4: 'the file was changed',
+    majCh5: 'not enough memory in the device', majCh6: 'decryption error'
   });
   function TT(k, v) { return window.DLI18n ? DLI18n.T(k, v) : k; }
 
@@ -465,7 +475,13 @@ window.DLKit = (function () {
   // l'ESP32 (min_spiffs, 4 Mo), 0x640000 pour l'ESP32-S3 (default_16MB, 16 Mo). Le module refuse aussi une image de
   // l'AUTRE puce : au premier paquet depuis la PT2.1.67, a la fin du transfert avant (verification de l'image).
   var MAJ_PUCES = { 0: { nom: 'ESP32', max: 0x1E0000 }, 9: { nom: 'ESP32-S3', max: 0x640000 } };
-  var MAJ_CODES = ['', 'majRoule', 'majTaille', 'majDebut', 'majEcriture', 'majIncomplet', 'majCrc', 'majImage', 'majSession', 'majFormat', 'majArret', 'majTropLong', 'majSignature'];
+  var MAJ_CODES = ['', 'majRoule', 'majTaille', 'majDebut', 'majEcriture', 'majIncomplet', 'majCrc', 'majImage', 'majSession', 'majFormat', 'majArret', 'majTropLong', 'majSignature', 'majChiffre'];
+  // [0.14.0] FICHIER CHIFFRE (etape C, module ESP32-S3 en PT2.1.69 et plus) : format esp_encrypted_img 2.1.0 d'Espressif.
+  // En-tete de 512 o : marque 0x0788b6cf, cle, IV, taille en clair (404), etiquette, puis 88 o reserves que le MODULE
+  // ignore ; l'outil du PC (chiffrer_image.py) y pose pour l'app : « DLFW » (424), version du bloc 1 (428), puce u16 (429),
+  // taille en clair u32 (431), signee (435), firmware sur 24 o (436). L'app ne dechiffre RIEN : elle lit ce bloc pour
+  // montrer la version et refuser tot une mauvaise puce. Le module, lui, verifie tout (etiquette GCM, signature).
+  var MAJ_MARQUE_CHIFFRE = 0x0788b6cf;
   var CRC_T = null;
   function crc32(u8) {   // CRC-32 de zlib (le module calcule le meme avec esp_rom_crc32_le)
     if (!CRC_T) {
@@ -478,8 +494,23 @@ window.DLKit = (function () {
   }
   // Un .bin du DLPT2 : image ESP32 ou ESP32-S3 (0xE9, puce 0 ou 9) qui porte la marque « @@DLPT2@@PT2.x.yy » (PT2.1.66 et
   // plus). Sans la marque : autre carte, autre croquis, ou firmware qui ne saurait plus se mettre a jour par l'app -> refus.
+  function lireChiffre(u8) {   // [0.14.0]
+    var n = u8.length, dv = new DataView(u8.buffer, u8.byteOffset, n);
+    if ((n - 512) % 4096) throw new Error(TT('majPasDlpt2'));
+    if (String.fromCharCode(u8[424], u8[425], u8[426], u8[427]) !== 'DLFW' || u8[428] !== 1) throw new Error(TT('majChiffreInconnu'));
+    var puce = MAJ_PUCES[dv.getUint16(429, true)];
+    if (!puce) throw new Error(TT('majPasEsp32'));
+    var clair = dv.getUint32(431, true);
+    if (clair !== n - 512 || dv.getUint32(404, true) !== clair) throw new Error(TT('majChiffreInconnu'));
+    if (clair > puce.max) throw new Error(TT('majTropGros', { n: Math.round(clair / 1024) }));
+    var v = '';
+    for (var q = 436; q < 460 && u8[q]; q++) v += String.fromCharCode(u8[q]);
+    if (!/^PT2\.\d+\.\d+$/.test(v)) throw new Error(TT('majChiffreInconnu'));
+    return { fw: v, puce: puce.nom, signe: u8[435] === 1, chiffre: true, taille: n, crc: crc32(u8), octets: u8 };
+  }
   function lireFirmware(buf) {
     var u8 = new Uint8Array(buf);
+    if (u8.length >= 512 + 8192 && ((u8[0] | (u8[1] << 8) | (u8[2] << 16) | (u8[3] << 24)) >>> 0) === MAJ_MARQUE_CHIFFRE) return lireChiffre(u8);
     if (u8.length < 65536 || u8[0] !== 0xE9) throw new Error(TT('majPasImage'));
     var puce = MAJ_PUCES[u8[12] | (u8[13] << 8)];
     if (!puce) throw new Error(TT('majPasEsp32'));
@@ -498,12 +529,15 @@ window.DLKit = (function () {
     // bloc de signature : marque 0xE7, version 2. Le module PT2.1.68 et plus refuse un fichier non signe ; l'app le dit
     // avant le transfert. La signature elle-meme, c'est le MODULE qui la verifie (cle publique dans son firmware).
     var n = u8.length, signe = (n % 4096 === 0 && n >= 8192 && u8[n - 4096] === 0xE7 && u8[n - 4095] === 0x02);
-    return { fw: v, puce: puce.nom, signe: signe, taille: n, crc: crc32(u8), octets: u8 };
+    return { fw: v, puce: puce.nom, signe: signe, chiffre: false, taille: n, crc: crc32(u8), octets: u8 };
   }
   // [0.13.3] code 12 du module PT2.1.68 = signature refusee ; l'octet d'erreur dit pourquoi (SIG_* du firmware)
   var MAJ_SIG = ['', 'majSig1', 'majSig2', 'majSig3', 'majSig4', 'majSig5', 'majSig6', 'majSig7'];
+  // [0.14.0] code 13 du module PT2.1.69 = fichier chiffre refuse ; l'octet d'erreur dit pourquoi (CH_* du firmware)
+  var MAJ_CH = ['', 'majCh1', 'majCh2', 'majCh3', 'majCh4', 'majCh5', 'majCh6'];
   function erreurMaj(x) {
     if (x.code === 12) return new Error(TT('majRefus', { x: TT('majSignature') + (MAJ_SIG[x.err] ? ' : ' + TT(MAJ_SIG[x.err]) : '') }));
+    if (x.code === 13) return new Error(TT('majRefus', { x: TT('majChiffre') + (MAJ_CH[x.err] ? ' : ' + TT(MAJ_CH[x.err]) : '') }));
     return new Error(TT('majRefus', { x: TT(MAJ_CODES[x.code] || 'majInconnu') + (x.err ? ' (Update ' + x.err + ')' : '') }));
   }
   function surMaj(ev) {
@@ -600,7 +634,9 @@ window.DLKit = (function () {
       });
     }
     function finir() {
-      var w = attendre(0x83, 20000);   // le module verifie l'image (SHA-256 de 1,5 Mo) avant de repondre
+      // le module verifie l'image (SHA-256 de 1,5 Mo) avant de repondre ; [0.14.0] un fichier chiffre : il finit aussi le
+      // dechiffrement (0 ms mesure le 19 nov. : sa boucle suit la reception), marge pour un module plus lent
+      var w = attendre(0x83, f.chiffre ? 30000 : 20000);
       return ecrireOctets(c, new Uint8Array([0x04])).then(function () { return w; }).then(function (dv) {
         var code = dv.getUint8(1);
         if (code === 5) return fenetre(dv.getUint32(3, true)).then(finir);   // incomplet : on envoie ce qui manque
@@ -616,7 +652,8 @@ window.DLKit = (function () {
       return ecrireOctets(c, d).then(function () { return w; });
     }).then(function (dv) {
       var code = dv.getUint8(1);
-      if (code) throw erreurMaj({ code: code, err: code === 12 ? 1 : 0 });   // [0.13.3] 12 au DEBUT = fichier non signe
+      // [0.13.3] 12 au DEBUT = fichier non signe ; [0.14.0] 13 au DEBUT = ce module n'a pas la cle (ESP32)
+      if (code) throw erreurMaj({ code: code, err: (code === 12 || code === 13) ? 1 : 0 });
       t0 = Date.now();
       console.log('[maj] debut : ' + N + ' octets, paquets de ' + morceau + ', fenetre ' + fen);
       return fenetre(0);

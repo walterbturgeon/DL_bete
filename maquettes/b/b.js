@@ -3,7 +3,7 @@
 // [B v0.2] (7 oct. : retour a la B) la langue est SEULEMENT dans Regler ; l'en-tete montre la connexion ;
 // repris de la maquette C : fiche du kit (calibration, mise a jour), ticket garde par run avec sa pastille n/m.
 (function () {
-  var VERSION = '0.13.3';   // = MARKETING_VERSION de l'app iPhone (ios/App/App.xcodeproj)
+  var VERSION = '0.14.0';   // = MARKETING_VERSION de l'app iPhone (ios/App/App.xcodeproj)
   var $ = DLC.$, T = DLI18n.T;
   // les textes de B sont dans b-textes.js (charge avant ce fichier)
   // [B v0.2] les tickets de demonstration et la comparaison viennent du noyau commun (DLC) ; les tickets tapes
@@ -814,9 +814,15 @@
       // [0.13.2] la puce de l'image est dite : un module ESP32 refuse une image ESP32-S3, et l'inverse
       // [0.13.3] et si le fichier est signe. Un module PT2.1.68 et plus refuse un fichier non signe : l'app le dit AVANT
       // un transfert de 1 a 3 min (le module, lui, le refuserait des le debut de toute facon).
+      // [0.14.0] et s'il est chiffre. Seul un module ESP32-S3 en PT2.1.69 et plus le dechiffre : un module plus ancien le
+      // refuserait au DEBUT (1.68 : « non signe ») ou a la fin (avant 1.68) ; l'app le dit avant.
       $('bFwInfo').textContent = T('b_fwFichier', { nom: f.name, fw: fwFichier.fw, puce: fwFichier.puce,
-                                                    sig: T(fwFichier.signe ? 'b_fwSigne' : 'b_fwPasSigne'), ko: Math.round(fwFichier.taille / 1024) });
-      if (!fwFichier.signe && cfg && !fwAvant(cfg.fw, 2, 1, 68)) {
+                                                    sig: T(fwFichier.chiffre ? 'b_fwChiffre' : fwFichier.signe ? 'b_fwSigne' : 'b_fwPasSigne'),
+                                                    ko: Math.round(fwFichier.taille / 1024) });
+      if (fwFichier.chiffre && cfg && fwAvant(cfg.fw, 2, 1, 69)) {
+        $('bFwInfo').textContent = '⚠ ' + T('b_fwChiffreExige', { fw: cfg.fw || '?' });
+        fwFichier = null;
+      } else if (!fwFichier.signe && cfg && !fwAvant(cfg.fw, 2, 1, 68)) {
         $('bFwInfo').textContent = '⚠ ' + T('b_fwSigneExige', { fw: cfg.fw });
         fwFichier = null;
       }
