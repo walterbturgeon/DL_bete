@@ -38,7 +38,8 @@ window.DLKit = (function () {
     // [0.10.0] comme un kit PT2.1.64 de type voiture : depart par defaut 8 po (16 demi-pouces), jalons a D - 50 po
     // [0.12.0] annonce la PT2.1.65 : le choix FuelTech FT470 / FT700 (mode FUELTECH_CAN) se montre aussi en demo
     // [0.13.0] annonce la PT2.1.66 : la mise a jour par le Bluetooth se montre aussi en demo (transfert simule)
-    cfg: { fw: 'PT2.1.66', app: 'dlg', sfx: 'DEMO', board: 'DEMO00000000', rpo: 8, jpo: -50, cms: 0, d60: 0, veh: 1, dep: 16, pfft: 0,
+    // [0.13.3] puis la PT2.1.68 : comme un vrai module, la demo refuse un fichier NON signe
+    cfg: { fw: 'PT2.1.68', app: 'dlg', sfx: 'DEMO', board: 'DEMO00000000', rpo: 8, jpo: -50, cms: 0, d60: 0, veh: 1, dep: 16, pfft: 0,
            mode: 'HOLLEY', cbr: 1000000, hecu: 1, strig: 1, scid: 1280, grate: 40, dynm: 8, imuf: 2, tzh: -4,
            imu: 1, cal: 1, sats: 14, fix: 3, hz: 25,
            // [B v0.4] l'ECU et le depart CAN, memes cles que le JSON du kit
@@ -157,7 +158,11 @@ window.DLKit = (function () {
     majIncomplet: 'fichier incomplet', majCrc: 'fichier abîmé pendant le transfert (CRC)', majImage: 'le module refuse l’image (vérification)',
     majSession: 'pas de mise à jour en cours', majFormat: 'paquet mal formé', majArret: 'arrêt demandé', majTropLong: 'trop d’octets',
     majInconnu: 'raison inconnue', majMuet: 'Le module ne répond plus pendant la mise à jour.', majArretee: 'Mise à jour arrêtée. Le module garde son ancien firmware.',
-    majPasRevenu: 'Le module n’est pas revenu après son redémarrage (45 s). Rallume-le, puis reconnecte-le pour lire sa version.'
+    majPasRevenu: 'Le module n’est pas revenu après son redémarrage (45 s). Rallume-le, puis reconnecte-le pour lire sa version.',
+    // [0.13.3] la signature des images (module PT2.1.68 et plus)
+    majSignature: 'signature refusée', majSig1: 'fichier non signé', majSig2: 'bloc de signature absent ou abîmé',
+    majSig3: 'bloc de signature abîmé (CRC)', majSig4: 'le fichier a été modifié après sa signature', majSig5: 'fichier signé par une autre clé',
+    majSig6: 'signature fausse', majSig7: 'mémoire du module insuffisante'
   }, {
     kitPasDlpt2: 'This is not a DRAGLOG device (DLAP or other).', kitRefus: 'the device refused: {x}',
     kitDumpDelai: 'the runs stopped arriving (nothing for 8 s)', kitCmdAbsente: 'this device takes no command',
@@ -175,7 +180,10 @@ window.DLKit = (function () {
     majIncomplet: 'incomplete file', majCrc: 'file damaged during the transfer (CRC)', majImage: 'the device refuses the image (check)',
     majSession: 'no update in progress', majFormat: 'malformed packet', majArret: 'stop requested', majTropLong: 'too many bytes',
     majInconnu: 'unknown reason', majMuet: 'The device stopped answering during the update.', majArretee: 'Update stopped. The device keeps its old firmware.',
-    majPasRevenu: 'The device did not come back after its restart (45 s). Turn it on again, then reconnect it to read its version.'
+    majPasRevenu: 'The device did not come back after its restart (45 s). Turn it on again, then reconnect it to read its version.',
+    majSignature: 'signature refused', majSig1: 'file not signed', majSig2: 'signature block missing or damaged',
+    majSig3: 'signature block damaged (CRC)', majSig4: 'the file was changed after it was signed', majSig5: 'file signed with another key',
+    majSig6: 'wrong signature', majSig7: 'not enough memory in the device'
   });
   function TT(k, v) { return window.DLI18n ? DLI18n.T(k, v) : k; }
 
@@ -457,7 +465,7 @@ window.DLKit = (function () {
   // l'ESP32 (min_spiffs, 4 Mo), 0x640000 pour l'ESP32-S3 (default_16MB, 16 Mo). Le module refuse aussi une image de
   // l'AUTRE puce : au premier paquet depuis la PT2.1.67, a la fin du transfert avant (verification de l'image).
   var MAJ_PUCES = { 0: { nom: 'ESP32', max: 0x1E0000 }, 9: { nom: 'ESP32-S3', max: 0x640000 } };
-  var MAJ_CODES = ['', 'majRoule', 'majTaille', 'majDebut', 'majEcriture', 'majIncomplet', 'majCrc', 'majImage', 'majSession', 'majFormat', 'majArret', 'majTropLong'];
+  var MAJ_CODES = ['', 'majRoule', 'majTaille', 'majDebut', 'majEcriture', 'majIncomplet', 'majCrc', 'majImage', 'majSession', 'majFormat', 'majArret', 'majTropLong', 'majSignature'];
   var CRC_T = null;
   function crc32(u8) {   // CRC-32 de zlib (le module calcule le meme avec esp_rom_crc32_le)
     if (!CRC_T) {
@@ -486,9 +494,16 @@ window.DLKit = (function () {
     var v = '', q = at + mq.length;
     while (q < u8.length && u8[q] && v.length < 16) v += String.fromCharCode(u8[q++]);
     if (!/^PT2\.\d+\.\d+$/.test(v)) throw new Error(TT('majPasDlpt2'));
-    return { fw: v, puce: puce.nom, taille: u8.length, crc: crc32(u8), octets: u8 };
+    // [0.13.3] SIGNE ? Un fichier signe (espsecure sign_data --version 2) finit par un secteur de 4 Ko qui commence par le
+    // bloc de signature : marque 0xE7, version 2. Le module PT2.1.68 et plus refuse un fichier non signe ; l'app le dit
+    // avant le transfert. La signature elle-meme, c'est le MODULE qui la verifie (cle publique dans son firmware).
+    var n = u8.length, signe = (n % 4096 === 0 && n >= 8192 && u8[n - 4096] === 0xE7 && u8[n - 4095] === 0x02);
+    return { fw: v, puce: puce.nom, signe: signe, taille: n, crc: crc32(u8), octets: u8 };
   }
+  // [0.13.3] code 12 du module PT2.1.68 = signature refusee ; l'octet d'erreur dit pourquoi (SIG_* du firmware)
+  var MAJ_SIG = ['', 'majSig1', 'majSig2', 'majSig3', 'majSig4', 'majSig5', 'majSig6', 'majSig7'];
   function erreurMaj(x) {
+    if (x.code === 12) return new Error(TT('majRefus', { x: TT('majSignature') + (MAJ_SIG[x.err] ? ' : ' + TT(MAJ_SIG[x.err]) : '') }));
     return new Error(TT('majRefus', { x: TT(MAJ_CODES[x.code] || 'majInconnu') + (x.err ? ' (Update ' + x.err + ')' : '') }));
   }
   function surMaj(ev) {
@@ -601,7 +616,7 @@ window.DLKit = (function () {
       return ecrireOctets(c, d).then(function () { return w; });
     }).then(function (dv) {
       var code = dv.getUint8(1);
-      if (code) throw erreurMaj({ code: code, err: 0 });
+      if (code) throw erreurMaj({ code: code, err: code === 12 ? 1 : 0 });   // [0.13.3] 12 au DEBUT = fichier non signe
       t0 = Date.now();
       console.log('[maj] debut : ' + N + ' octets, paquets de ' + morceau + ', fenetre ' + fen);
       return fenetre(0);
